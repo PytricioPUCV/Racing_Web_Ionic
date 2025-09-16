@@ -45,7 +45,7 @@ Sigue estos pasos para levantar el proyecto en un entorno de desarrollo local.
 
 1.  **Clona el repositorio:**
     ```bash
-    git clone [https://github.com/PytricioPUCV/Racing_Web_Ionic](https://github.com/PytricioPUCV/Racing_Web_Ionic)
+    git clone https://github.com/PytricioPUCV/Racing_Web_Ionic
     ```
 
 2.  **Navega a la carpeta del proyecto:**
