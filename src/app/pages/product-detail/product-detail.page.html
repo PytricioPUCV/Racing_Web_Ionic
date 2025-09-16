@@ -1,0 +1,85 @@
+<app-header></app-header>
+
+<ion-content>
+  <div *ngIf="product">
+    
+    <div class="breadcrumb">
+      <a href="/tabs/tab1">Inicio</a> / <a href="#">Chaquetas</a> / {{ product.name }}
+    </div>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <img [src]="product.image" [alt]="product.name" class="product-image">
+        </ion-col>
+
+        <ion-col size="12" size-md="6" class="product-info">
+          <div class="product-brand">{{ product.brand }}</div>
+          <h1 class="product-title">{{ product.name }}</h1>
+
+          <div class="price-wrapper">
+            <p class="product-price-original">${{ product.originalPrice.toLocaleString('es-CL') }}</p>
+            <p class="product-price">${{ product.price.toLocaleString('es-CL') }}</p>
+          </div>
+          
+          <div class="selector-container">
+            <ion-label>TALLA</ion-label>
+            <div class="size-options">
+              <ion-button fill="outline" (click)="selectSize('M')" [class.selected]="selectedSize === 'M'">M</ion-button>
+              <ion-button fill="outline" (click)="selectSize('L')" [class.selected]="selectedSize === 'L'">L</ion-button>
+              <ion-button fill="outline" (click)="selectSize('XL')" [class.selected]="selectedSize === 'XL'">XL</ion-button>
+              <ion-button fill="outline" (click)="selectSize('XXL')" [class.selected]="selectedSize === 'XXL'">XXL</ion-button>
+            </div>
+          </div>
+
+          <div class="quantity-and-cart">
+            <div class="quantity-container">
+              <ion-button fill="clear" (click)="changeQuantity(-1)">-</ion-button>
+              <span>{{ quantity }}</span>
+              <ion-button fill="clear" (click)="changeQuantity(1)">+</ion-button>
+            </div>
+            <ion-button expand="block" class="add-to-cart-btn">AÑADIR AL CARRITO</ion-button>
+          </div>
+
+          <ion-button expand="block" color="danger" class="buy-now-btn">COMPRAR AHORA</ion-button>
+
+          <ion-accordion-group>
+            <ion-accordion value="description">
+              <ion-item slot="header" color="light">
+                <ion-label>Descripción</ion-label>
+              </ion-item>
+              <div class="ion-padding" slot="content">
+                <p>{{ product.description }}</p>
+              </div>
+            </ion-accordion>
+            <ion-accordion value="care">
+              <ion-item slot="header" color="light">
+                <ion-label>Cuidados</ion-label>
+              </ion-item>
+              <div class="ion-padding" slot="content">
+                <p>Se recomienda lavar con agua fría y al revés, secado a temperatura ambiente. No usar secadora para evitar encogimiento.</p>
+              </div>
+            </ion-accordion>
+            <ion-accordion value="measurements">
+              <ion-item slot="header" color="light">
+                <ion-label>Medidas</ion-label>
+              </ion-item>
+              <div class="ion-padding" slot="content">
+                <p>LARGO - PECHO - ALTURA RECOMENDADA</p>
+                <ul>
+                  <li>Talla M - 68 cm - 116 cm - [165,170] cm</li>
+                  <li>Talla L - 70 cm - 120 cm - [170,175] cm</li>
+                </ul>
+              </div>
+            </ion-accordion>
+          </ion-accordion-group>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+  <div *ngIf="!product" class="ion-padding">
+    <h2>Producto no encontrado</h2>
+    <p>El producto que buscas no existe o no está disponible.</p>
+  </div>
+</ion-content>

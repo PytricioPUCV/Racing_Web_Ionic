@@ -1,0 +1,19 @@
+<svg
+  width="600"
+  height="300"
+  viewBox="0 0 600 150"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Texto inclinado en negro -->
+  <text
+    x="25"
+    y="110"
+    fill="#000"
+    font-family="Arial Black, sans-serif"
+    font-size="110"
+    font-weight="900"
+    transform="skewX(-15) scale(1.2,1)"
+  >
+    RACING
+  </text>
+</svg>

@@ -1,0 +1,31 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <img src="assets/logo.svg" alt="RCNG Logo" class="header-logo">
+    </ion-buttons>
+
+    <div class="desktop-nav ion-hide-md-down">
+      <a href="#"><b>INICIO</b></a>
+      <a href="#"><b>CHAQUETAS</b></a>
+      <a href="#"><b>ACCESORIOS</b></a>
+      <a href="#" class="destacado"><b>DESCUENTOS</b></a>
+    </div>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleTheme()">
+        <ion-icon slot="icon-only" name="sunny-outline" class="theme-icon-light"></ion-icon>
+        <ion-icon slot="icon-only" name="moon-outline" class="theme-icon-dark"></ion-icon>
+      </ion-button>
+
+      <ion-button>
+        <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+      </ion-button>
+      <ion-button routerLink="/register">
+        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+      </ion-button>
+      <ion-button>
+        <ion-icon slot="icon-only" name="bag-handle-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>

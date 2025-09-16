@@ -1,2 +1,55 @@
-// For information on how to create your own theme, please see:
-// http://ionicframework.com/docs/theming/
+body {
+  /* =============================================== */
+  /* TEMA CLARO (LIGHT MODE)                  */
+  /* =============================================== */
+
+  --ion-background-color: #f5f5f5;
+  --ion-text-color: #000;
+  --ion-toolbar-background: #fff;
+  --ion-card-background: #fff;
+  --ion-item-background: #fff;
+
+  --background-color: #f5f5f5;
+  --text-color: #000;
+  --header-bg: #fff;
+  --header-border: #eee;
+  --card-bg: #fff;
+  --price-original: #999;
+  --price-color: #666;
+  --footer-text: #999;
+  --footer-link: #999;
+  --footer-bg: #000;
+  --footer-text-bright: #fff;
+  --footer-border: #333;
+  --footer-copyright: #666;
+  --mobile-menu-bg: #000;
+  --product-image-radius: 12px;
+}
+
+
+body.dark {
+  /* =============================================== */
+  /* TEMA OSCURO                                     */
+  /* =============================================== */
+
+  --ion-background-color: #121212;
+  --ion-text-color: #e0e0e0;
+  --ion-toolbar-background: #1e1e1e;
+  --ion-card-background: #1e1e1e;
+  --ion-item-background: #1e1e1e;
+
+  --background-color: #121212;
+  --text-color: #e0e0e0;
+  --header-bg: #1e1e1e;
+  --header-border: #2c2c2c;
+  --card-bg: #1e1e1e;
+  --price-original: #888;
+  --price-color: #aaa;
+  --footer-text: #888;
+  --footer-link: #888;
+  --footer-bg: #0a0a0a;
+  --footer-text-bright: #e0e0e0;
+  --footer-border: #2c2c2c;
+  --footer-copyright: #666;
+  --mobile-menu-bg: #2c2c2c;
+}
