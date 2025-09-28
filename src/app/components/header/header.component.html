@@ -1,14 +1,13 @@
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <img src="assets/logo.svg" alt="RCNG Logo" class="header-logo">
+      <img src="assets/logo.svg" alt="RCNG Logo" class="header-logo" (click)="navigateTo('/home')" style="cursor: pointer;">
     </ion-buttons>
 
     <div class="desktop-nav ion-hide-md-down">
-      <a routerLink="/home"><b>INICIO</b></a>
-      <a routerLink="/jackets"><b>CHAQUETAS</b></a>
-      <a routerLink="/accessories"><b>ACCESORIOS</b></a>
-      <a href="#" class="destacado"><b>DESCUENTOS *Proximamente*</b></a>
+      <a (click)="navigateTo('/home')"><b>INICIO</b></a>
+      <a (click)="navigateTo('/jackets')"><b>CHAQUETAS</b></a>
+      <a (click)="navigateTo('/accessories')"><b>ACCESORIOS</b></a>
     </div>
 
     <ion-buttons slot="end">
@@ -16,16 +15,26 @@
         <ion-icon slot="icon-only" name="sunny-outline" class="theme-icon-light"></ion-icon>
         <ion-icon slot="icon-only" name="moon-outline" class="theme-icon-dark"></ion-icon>
       </ion-button>
-
-      <ion-button>
-        <ion-icon slot="icon-only" name="search-outline"></ion-icon>
-      </ion-button>
-      <ion-button routerLink="/register">
+      <ion-button (click)="navigateTo('/login')">
         <ion-icon slot="icon-only" name="person-outline"></ion-icon>
       </ion-button>
       <ion-button>
-        <ion-icon slot="icon-only" name="bag-handle-outline"></ion-icon>
+        <ion-icon slot="icon-only" name="search-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="navigateTo('/cart')"> <ion-icon slot="icon-only" name="bag-handle-outline"></ion-icon>
+      </ion-button>
+
+      <ion-button class="ion-hide-md-up" (click)="toggleMobileMenu()">
+        <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
+
+<div class="mobile-nav" [class.active]="isMobileMenuOpen">
+  <ul>
+    <li><a (click)="navigateToAndClose('/home')">INICIO</a></li>
+    <li><a (click)="navigateToAndClose('/jackets')">CHAQUETAS</a></li>
+    <li><a (click)="navigateToAndClose('/accessories')">ACCESORIOS</a></li>
+  </ul>
+</div>
