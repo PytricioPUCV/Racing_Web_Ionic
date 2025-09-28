@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router'; // <-- 1. IMPORTA ESTO
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 
@@ -12,7 +11,7 @@ type RegionKey = keyof typeof RegisterPage.prototype.regionesYComunas;
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, HeaderComponent, IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel] // <-- 2. AÑÁDELO AQUÍ
+  imports: [CommonModule, FormsModule, HeaderComponent, IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel] // <-- 2. AÑÁDELO AQUÍ
 })
 export class RegisterPage implements OnInit {
 

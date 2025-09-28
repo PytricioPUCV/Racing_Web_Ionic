@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
 import { ThemeService } from '../../services/theme';
 
@@ -15,7 +14,7 @@ export class HeaderComponent  implements OnInit {
 
   isMobileMenuOpen = false;
 
-  constructor(private themeService: ThemeService, private router: Router) { }
+  constructor(private themeService: ThemeService) { }
 
   ngOnInit() {}
 
@@ -23,16 +22,7 @@ export class HeaderComponent  implements OnInit {
     this.themeService.toggleTheme();
   }
 
-  navigateTo(path: string) {
-    this.router.navigate([path]);
-  }
-
   toggleMobileMenu() {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
-  }
-
-  navigateToAndClose(path: string) {
-    this.navigateTo(path);
-    this.isMobileMenuOpen = false;
   }
 }
