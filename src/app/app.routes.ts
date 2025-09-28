@@ -2,8 +2,8 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'home', // La nueva ruta para la página de inicio
-    loadComponent: () => import('./tab1/tab1.page').then((m) => m.Tab1Page),
+    path: 'home',
+    loadComponent: () => import('./home/home.page').then( m => m.HomePage)
   },
   {
     path: 'product/:id',
