@@ -20,7 +20,7 @@
 
 Este es un proyecto universitario para el ramo de "Web y Móvil", desarrollado con el framework Ionic y Angular. La aplicación es un e-commerce para la marca "RacingConEstilo", una tienda de streetwear inspirada en la cultura de las carreras de autos.
 
-![Captura de pantalla de la página de inicio](https://i.imgur.com/ehaGOR7.png)
+[![Captura de pantalla de la página de inicio](https://i.imgur.com/ehaGOR7.png)](https://racing-web-ionic.vercel.app/)
 
 El proyecto cuenta con una base de frontend que cubre las funcionalidades esenciales de un e-commerce moderno, incluyendo vistas de catálogo, detalle de producto y autenticación de usuarios. La arquitectura se centra en componentes reutilizables y un servicio central para la gestión de datos, asegurando la escalabilidad del sistema.
 
@@ -59,16 +59,16 @@ El proyecto cuenta con una base de frontend que cubre las funcionalidades esenci
 
 ## Arquitectura de la Información 
 [Estructura de Navegación - Página](https://whimsical.com/estructura-de-navegacion-pagina-FfecMFJYgrHrKuPHLwcUia)
-![Captura de pantalla del Flujo de Navegación Página](https://i.imgur.com/VWcv3yP.jpeg)
+[![Captura de pantalla del Flujo de Navegación Página](https://i.imgur.com/VWcv3yP.jpeg)](https://whimsical.com/estructura-de-navegacion-pagina-FfecMFJYgrHrKuPHLwcUia)
 
 [Flujo de Navegación - Compra](https://whimsical.com/flujo-de-navegacion-compra-BYthZ4Gd9HRMVqQf32mxQ2)
-![Captura de pantalla del Flujo de Navegación Compra](https://i.imgur.com/pVSGxEc.jpeg)
+[![Captura de pantalla del Flujo de Navegación Compra](https://i.imgur.com/pVSGxEc.jpeg)](https://whimsical.com/flujo-de-navegacion-compra-BYthZ4Gd9HRMVqQf32mxQ2)
 
 ---
 
 ## Prototipo de Diseño 
 [MockUps - Racing Jackets (Figma)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
-![Captura de pantalla del prototipo de Figma](https://i.imgur.com/2QRz8cs.png)
+[![Captura de pantalla del prototipo de Figma](https://i.imgur.com/2QRz8cs.png)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
 
 ---
 
