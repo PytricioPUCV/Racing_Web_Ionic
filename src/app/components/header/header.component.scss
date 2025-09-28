@@ -1,3 +1,5 @@
+/* === ESTILOS PARA EL HEADER === */
+
 ion-toolbar {
   --background: var(--header-bg);
   --border-color: var(--header-border);
@@ -59,5 +61,42 @@ ion-toolbar ion-button {
 
   &:hover {
     opacity: 0.7;
+  }
+}
+
+/* === ESTILOS PARA EL MENÚ MÓVIL === */
+
+.mobile-nav {
+  display: none;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  background-color: var(--header-bg);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+
+  &.active {
+    display: block;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  li a {
+    display: block;
+    padding: 15px 20px;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid var(--header-border);
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
   }
 }
