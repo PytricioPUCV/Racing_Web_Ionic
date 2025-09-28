@@ -57,18 +57,17 @@ El proyecto cuenta con una base de frontend que cubre las funcionalidades esenci
 
 ---
 
-## Arquitectura de la Información
-- https://whimsical.com/estructura-de-navegacion-pagina-FfecMFJYgrHrKuPHLwcUia
+## Arquitectura de la Información 
+[Estructura de Navegación - Página](https://whimsical.com/estructura-de-navegacion-pagina-FfecMFJYgrHrKuPHLwcUia)
 ![Captura de pantalla del Flujo de Navegación Página](https://i.imgur.com/VWcv3yP.jpeg)
 
-
-- https://whimsical.com/flujo-de-navegacion-compra-BYthZ4Gd9HRMVqQf32mxQ2
+[Flujo de Navegación - Compra](https://whimsical.com/flujo-de-navegacion-compra-BYthZ4Gd9HRMVqQf32mxQ2)
 ![Captura de pantalla del Flujo de Navegación Compra](https://i.imgur.com/pVSGxEc.jpeg)
 
 ---
 
-## Prototipo de Diseño
-- https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1
+## Prototipo de Diseño 
+[MockUps - Racing Jackets (Figma)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
 ![Captura de pantalla del prototipo de Figma](https://i.imgur.com/2QRz8cs.png)
 
 ---
