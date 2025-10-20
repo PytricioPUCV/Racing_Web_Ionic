@@ -1,8 +1,9 @@
 import express from 'express';
-// Importa el objeto 'db' que contiene la conexión y los modelos
 import { db } from './models';
+import userRoutes from './routes/userRoutes'; // <-- 1. IMPORTA LAS RUTAS
 
 const app = express();
+app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
 async function syncDatabase() {
@@ -17,6 +18,7 @@ async function syncDatabase() {
 
 syncDatabase();
 
+app.use('/api/users', userRoutes); // Cualquier petición a /api/users será manejada por userRoutes
 app.get('/', (req, res) => {
   res.send('¡El servidor backend con TypeScript está funcionando!');
 });
