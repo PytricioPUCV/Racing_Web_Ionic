@@ -4,7 +4,7 @@ import { Sequelize } from 'sequelize';
 const sequelize = new Sequelize('racing_db', 'postgres', 'c10h15n1', {
   host: 'localhost',
   dialect: 'postgres',
-  logging: false // Opcional: desactiva los logs de SQL en la consola
+  logging: false
 });
 
 // Probar la conexión

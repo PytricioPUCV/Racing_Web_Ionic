@@ -1,17 +1,17 @@
 import express from 'express';
-import sequelize from './database';
-import user from './models/user';
+// Importa el objeto 'db' que contiene la conexión y los modelos
+import { db } from './models';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Sincronizar modelos con la base de datos
 async function syncDatabase() {
   try {
-    await sequelize.sync();
-    console.log('Modelos sincronizados con la base de datos.');
+    // Usa db.sequelize para sincronizar. Ahora sí conoce el modelo User.
+    await db.sequelize.sync();
+    console.log('✅ Modelos sincronizados con la base de datos.');
   } catch (error) {
-    console.error('Error al sincronizar modelos:', error);
+    console.error('❌ Error al sincronizar modelos:', error);
   }
 }
 
@@ -22,5 +22,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor iniciado en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
 });
