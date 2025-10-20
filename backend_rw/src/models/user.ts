@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
-import sequelize from '../database'; // La ruta ahora es relativa a 'src'
+import sequelize from '../database';
 
-const user = sequelize.define('user', {
+const User = sequelize.define('User', {
   id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
@@ -10,7 +10,6 @@ const user = sequelize.define('user', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-
     unique: true
   },
   password: {
@@ -19,4 +18,4 @@ const user = sequelize.define('user', {
   }
 });
 
-export default user; // Usamos export default
+export default User;
