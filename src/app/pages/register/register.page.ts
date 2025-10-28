@@ -1,10 +1,9 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // NUEVO
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel, IonToast } from '@ionic/angular/standalone'; // AGREGADO IonToast
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel, IonToast } from '@ionic/angular/standalone'; 
 import { HeaderComponent } from '../../components/header/header.component';
-import { UserService } from '../../services/user.service'; // NUEVO
+import { UserService } from '../../services/user.service'; 
 
 type RegionKey = keyof typeof RegisterPage.prototype.regionesYComunas;
 
@@ -16,7 +15,7 @@ type RegionKey = keyof typeof RegisterPage.prototype.regionesYComunas;
   imports: [
     CommonModule, 
     FormsModule, 
-    HeaderComponent, 
+    HeaderComponent,
     IonContent, 
     IonHeader, 
     IonTitle, 
@@ -29,15 +28,12 @@ type RegionKey = keyof typeof RegisterPage.prototype.regionesYComunas;
     IonCheckbox, 
     IonButton, 
     IonLabel,
-    IonToast // NUEVO
+    IonToast
   ]
 })
 export class RegisterPage implements OnInit {
-  // NUEVAS INYECCIONES
   private userService = inject(UserService);
-  private router = inject(Router);
 
-  // CAMPOS DEL FORMULARIO (agregar estos)
   email: string = '';
   password: string = '';
   confirmPassword: string = '';
@@ -46,7 +42,6 @@ export class RegisterPage implements OnInit {
   selectedRegion: string = '';
   selectedComuna: string = '';
 
-  // MENSAJES (agregar estos)
   showToast: boolean = false;
   toastMessage: string = '';
   toastColor: string = 'success';
@@ -85,15 +80,12 @@ export class RegisterPage implements OnInit {
     this.comunas = this.regionesYComunas[regionSeleccionada] || [];
   }
 
-  // NUEVA FUNCIÓN: Registrar usuario
   onRegister() {
-    // Validación básica
     if (!this.email || !this.password || !this.username || !this.rut || !this.selectedRegion || !this.selectedComuna) {
       this.showToastMessage('Todos los campos son obligatorios', 'danger');
       return;
     }
 
-    // Validar que las contraseñas coincidan (si tienes confirmPassword)
     if (this.confirmPassword && this.password !== this.confirmPassword) {
       this.showToastMessage('Las contraseñas no coinciden', 'danger');
       return;
@@ -108,42 +100,35 @@ export class RegisterPage implements OnInit {
       comuna: this.selectedComuna
     };
 
-    // Llamada a la API
     this.userService.createUser(newUser).subscribe({
       next: (response) => {
         console.log('✅ Usuario registrado en API:', response);
         this.showToastMessage('¡Usuario registrado exitosamente!', 'success');
         
-        // Limpiar formulario
         this.clearForm();
         
-        // Navegar a login después de 2 segundos
+        // Forzar navegación con recarga de página
         setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+          window.location.href = '/login';
+        }, 1500);
       },
       error: (error) => {
         console.error('❌ Error al registrar:', error);
-        
-        // Mensaje de error más específico
         let errorMsg = 'Error al registrar usuario. Intenta de nuevo.';
         if (error.error?.message) {
           errorMsg = error.error.message;
         }
-        
         this.showToastMessage(errorMsg, 'danger');
       }
     });
   }
 
-  // NUEVA FUNCIÓN: Mostrar mensajes
   showToastMessage(message: string, color: string) {
     this.toastMessage = message;
     this.toastColor = color;
     this.showToast = true;
   }
 
-  // NUEVA FUNCIÓN: Limpiar formulario
   clearForm() {
     this.email = '';
     this.password = '';
