@@ -38,10 +38,11 @@
 
   <!-- Toast para mensajes -->
   <ion-toast
-    [isOpen]="showToast"
-    [message]="toastMessage"
-    [duration]="3000"
-    [color]="toastColor"
-    (didDismiss)="showToast = false">
-  </ion-toast>
+  [isOpen]="showToast"
+  [message]="toastMessage"
+  [duration]="3000"
+  [cssClass]="toastColor === 'success' ? 'success-toast' : 'danger-toast'"
+  position="top"
+  (didDismiss)="showToast = false">
+</ion-toast>
 </ion-content>
