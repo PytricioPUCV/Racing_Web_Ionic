@@ -1,8 +1,15 @@
 import express from 'express';
 import { db } from './models';
-import userRoutes from './routes/userRoutes'; // <-- 1. IMPORTA LAS RUTAS
+import userRoutes from './routes/userRoutes'; 
+import cors from 'cors';
 
 const app = express();
+
+app.use(cors({
+  origin: ['http://localhost:8100', 'http://localhost:8101'],
+  credentials: true
+}));
+
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
