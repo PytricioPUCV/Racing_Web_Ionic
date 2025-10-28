@@ -6,4 +6,4 @@ const db = {
   User,
 };
 
-export { db };
+export { db, User };
