@@ -10,7 +10,7 @@ import { ThemeService } from '../../services/theme';
   standalone: true,
   imports: [CommonModule, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon]
 })
-export class HeaderComponent  implements OnInit {
+export class HeaderComponent implements OnInit {
 
   isMobileMenuOpen = false;
 
