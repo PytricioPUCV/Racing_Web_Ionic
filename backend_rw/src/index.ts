@@ -1,11 +1,16 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import { db } from './models';
 import userRoutes from './routes/userRoutes'; 
-import cors from 'cors';
 import authRoutes from './routes/authRoutes';
 
 const app = express();
+const PORT = process.env.PORT || 3000;
+
+// ============================================
+// MIDDLEWARES
+// ============================================
 
 app.use(cors({
   origin: ['http://localhost:8100', 'http://localhost:8101'],
@@ -14,28 +19,42 @@ app.use(cors({
 
 app.use(express.json());
 
-app.use('/api/users', userRoutes);
-app.use('/api/auth', authRoutes); 
+// ============================================
+// RUTAS
+// ============================================
 
-const PORT = process.env.PORT || 3000;
+app.use('/api/auth', authRoutes);  // Rutas de autenticación (login, register)
+app.use('/api/users', userRoutes); // Rutas de usuarios (CRUD protegido)
 
-async function syncDatabase() {
-  try {
-    // Usa db.sequelize para sincronizar. Ahora sí conoce el modelo User.
-    await db.sequelize.sync();
-    console.log('✅ Modelos sincronizados con la base de datos.');
-  } catch (error) {
-    console.error('❌ Error al sincronizar modelos:', error);
-  }
-}
-
-syncDatabase();
-
-app.use('/api/users', userRoutes); // Cualquier petición a /api/users será manejada por userRoutes
+// Ruta de prueba
 app.get('/', (req, res) => {
   res.send('¡El servidor backend con TypeScript está funcionando!');
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
-});
+// ============================================
+// CONEXIÓN A BASE DE DATOS Y SERVIDOR
+// ============================================
+
+async function startServer() {
+  try {
+    // Verificar conexión a la base de datos
+    await db.sequelize.authenticate();
+    console.log('✅ Conexión a la base de datos de Supabase establecida correctamente.');
+
+    // Sincronizar modelos (sin alterar estructura en producción)
+    await db.sequelize.sync({ alter: false });
+    console.log('✅ Modelos sincronizados con la base de datos.');
+
+    // Iniciar servidor
+    app.listen(PORT, () => {
+      console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
+    });
+
+  } catch (error) {
+    console.error('❌ Error al conectar con la base de datos:', error);
+    process.exit(1); // Salir si no hay conexión
+  }
+}
+
+// Iniciar el servidor
+startServer();
