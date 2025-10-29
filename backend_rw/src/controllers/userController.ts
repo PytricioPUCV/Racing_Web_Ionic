@@ -2,6 +2,10 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { User } from '../models';
 
+// ============================================
+// CONTROLADORES DE USUARIOS (CRUD PROTEGIDO)
+// ============================================
+
 // GET /api/users - Listar todos los usuarios
 export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -9,12 +13,14 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
       attributes: { exclude: ['password'] } // No enviar contraseñas
     });
 
+    console.log(`✅ Listando ${users.length} usuarios`);
+
     res.json({
       message: 'Usuarios obtenidos exitosamente',
       users
     });
   } catch (error) {
-    console.error('Error al obtener usuarios:', error);
+    console.error('❌ Error al obtener usuarios:', error);
     res.status(500).json({ message: 'Error al obtener usuarios' });
   }
 };
@@ -33,12 +39,14 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    console.log(`✅ Usuario obtenido: ${user.email}`);
+
     res.json({
       message: 'Usuario obtenido exitosamente',
       user
     });
   } catch (error) {
-    console.error('Error al obtener usuario:', error);
+    console.error('❌ Error al obtener usuario:', error);
     res.status(500).json({ message: 'Error al obtener usuario' });
   }
 };
@@ -56,13 +64,15 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    // Actualizar campos
+    // Actualizar campos (email y password NO se actualizan por seguridad)
     await user.update({
       username: username || user.username,
       rut: rut || user.rut,
       region: region || user.region,
       comuna: comuna || user.comuna
     });
+
+    console.log(`✅ Usuario actualizado: ${user.email}`);
 
     res.json({
       message: 'Usuario actualizado exitosamente',
@@ -76,7 +86,7 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
       }
     });
   } catch (error) {
-    console.error('Error al actualizar usuario:', error);
+    console.error('❌ Error al actualizar usuario:', error);
     res.status(500).json({ message: 'Error al actualizar usuario' });
   }
 };
@@ -93,14 +103,17 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
+    const userEmail = user.email;
     await user.destroy();
+
+    console.log(`✅ Usuario eliminado: ${userEmail}`);
 
     res.json({
       message: 'Usuario eliminado exitosamente',
       userId: id
     });
   } catch (error) {
-    console.error('Error al eliminar usuario:', error);
+    console.error('❌ Error al eliminar usuario:', error);
     res.status(500).json({ message: 'Error al eliminar usuario' });
   }
 };

@@ -39,18 +39,39 @@ export class LoginPage implements OnInit {
   
   ngOnInit() { }
 
+  // ============================================
+  // FUNCIÓN DE VALIDACIÓN
+  // ============================================
+  
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  // ============================================
+  // FUNCIÓN DE LOGIN MEJORADA CON VALIDACIONES
+  // ============================================
+
   onLogin() {
+    // 1. Validar campos requeridos
     if (!this.email || !this.password) {
       this.showToastMessage('Email y contraseña son obligatorios', 'danger');
       return;
     }
 
+    // 2. Validar formato de email
+    if (!this.isValidEmail(this.email)) {
+      this.showToastMessage('Email inválido', 'danger');
+      return;
+    }
+
+    // 3. Preparar credenciales
     const credentials = {
       email: this.email,
       password: this.password
     };
 
-    // ✅ USAR AUTH SERVICE CON JWT
+    // 4. Realizar login con AuthService
     this.authService.login(credentials).subscribe({
       next: (response) => {
         console.log('✅ Login exitoso con JWT:', response);
@@ -66,9 +87,12 @@ export class LoginPage implements OnInit {
       error: (error) => {
         console.error('❌ Error al hacer login:', error);
         let errorMsg = 'Email o contraseña incorrectos';
+        
+        // Mostrar mensaje del backend si existe
         if (error.error?.message) {
           errorMsg = error.error.message;
         }
+        
         this.showToastMessage(errorMsg, 'danger');
       }
     });

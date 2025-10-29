@@ -80,14 +80,62 @@ export class RegisterPage implements OnInit {
     this.comunas = this.regionesYComunas[regionSeleccionada] || [];
   }
 
+  // ✅ AGREGAR FUNCIONES DE VALIDACIÓN
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  isValidPassword(password: string): boolean {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+    return passwordRegex.test(password);
+  }
+
+  isValidRut(rut: string): boolean {
+    const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
+    return rutRegex.test(rut);
+  }
+
+  isValidUsername(username: string): boolean {
+    const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
+    return usernameRegex.test(username);
+  }
+
+  // ✅ FUNCIÓN onRegister MEJORADA CON VALIDACIONES
   onRegister() {
+    // 1. Validar campos requeridos
     if (!this.email || !this.password || !this.username || !this.rut || !this.selectedRegion || !this.selectedComuna) {
       this.showToastMessage('Todos los campos son obligatorios', 'danger');
       return;
     }
 
+    // 2. Validar formato de email
+    if (!this.isValidEmail(this.email)) {
+      this.showToastMessage('Email inválido. Ejemplo: usuario@ejemplo.com', 'danger');
+      return;
+    }
+
+    // 3. Validar contraseña
+    if (!this.isValidPassword(this.password)) {
+      this.showToastMessage('La contraseña debe tener al menos 8 caracteres, incluyendo letras y números', 'danger');
+      return;
+    }
+
+    // 4. Validar confirmación de contraseña
     if (this.confirmPassword && this.password !== this.confirmPassword) {
       this.showToastMessage('Las contraseñas no coinciden', 'danger');
+      return;
+    }
+
+    // 5. Validar username
+    if (!this.isValidUsername(this.username)) {
+      this.showToastMessage('El nombre de usuario debe tener entre 3 y 20 caracteres (solo letras, números y guiones bajos)', 'danger');
+      return;
+    }
+
+    // 6. Validar RUT
+    if (!this.isValidRut(this.rut)) {
+      this.showToastMessage('RUT inválido. Formato: 12.345.678-9', 'danger');
       return;
     }
 
@@ -100,25 +148,24 @@ export class RegisterPage implements OnInit {
       comuna: this.selectedComuna
     };
 
-    // ✅ USAR AUTH SERVICE CON JWT
     this.authService.register(registerData).subscribe({
       next: (response) => {
         console.log('✅ Usuario registrado con JWT:', response);
-        console.log('✅ Token guardado:', response.token);
         this.showToastMessage('¡Usuario registrado exitosamente!', 'success');
-        
         this.clearForm();
         
         setTimeout(() => {
-          window.location.href = '/home'; // Ir directo a home después de registro
+          window.location.href = '/home';
         }, 1500);
       },
       error: (error) => {
         console.error('❌ Error al registrar:', error);
-        let errorMsg = 'Error al registrar usuario. Intenta de nuevo.';
+        let errorMsg = 'Error al registrar usuario';
+        
         if (error.error?.message) {
           errorMsg = error.error.message;
         }
+        
         this.showToastMessage(errorMsg, 'danger');
       }
     });
