@@ -34,6 +34,11 @@ export const routes: Routes = [
     canActivate: [loginGuard] // ✅ Si ya está autenticado → redirigir a home
   },
   {
+    path: 'shopcart',
+    loadComponent: () => import('./pages/shopcart/shopcart').then(m => m.ShopcartPage),
+    canActivate: [authGuard] // ✅ Proteger: requiere login
+  },
+  {
     path: '',
     redirectTo: 'login', // ✅ CAMBIO: redirigir a login por defecto
     pathMatch: 'full',

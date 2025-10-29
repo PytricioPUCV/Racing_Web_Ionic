@@ -12,11 +12,15 @@ ion-toolbar {
 }
 
 .desktop-nav {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 25px;
-  width: 100%;
+  z-index: 10;
 
   a {
     font-size: 14px;
