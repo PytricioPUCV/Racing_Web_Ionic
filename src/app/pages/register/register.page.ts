@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel, IonToast } from '@ionic/angular/standalone'; 
 import { HeaderComponent } from '../../components/header/header.component';
-import { UserService } from '../../services/user.service'; 
+import { AuthService } from '../../services/auth.service';
 
 type RegionKey = keyof typeof RegisterPage.prototype.regionesYComunas;
 
@@ -32,7 +32,7 @@ type RegionKey = keyof typeof RegisterPage.prototype.regionesYComunas;
   ]
 })
 export class RegisterPage implements OnInit {
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
 
   email: string = '';
   password: string = '';
@@ -91,7 +91,7 @@ export class RegisterPage implements OnInit {
       return;
     }
 
-    const newUser = {
+    const registerData = {
       email: this.email,
       password: this.password,
       username: this.username,
@@ -100,16 +100,17 @@ export class RegisterPage implements OnInit {
       comuna: this.selectedComuna
     };
 
-    this.userService.createUser(newUser).subscribe({
+    // ✅ USAR AUTH SERVICE CON JWT
+    this.authService.register(registerData).subscribe({
       next: (response) => {
-        console.log('✅ Usuario registrado en API:', response);
+        console.log('✅ Usuario registrado con JWT:', response);
+        console.log('✅ Token guardado:', response.token);
         this.showToastMessage('¡Usuario registrado exitosamente!', 'success');
         
         this.clearForm();
         
-        // Forzar navegación con recarga de página
         setTimeout(() => {
-          window.location.href = '/login';
+          window.location.href = '/home'; // Ir directo a home después de registro
         }, 1500);
       },
       error: (error) => {

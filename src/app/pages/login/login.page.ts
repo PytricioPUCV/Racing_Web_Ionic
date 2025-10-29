@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonButton, IonToast } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
-import { UserService } from '../../services/user.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +26,7 @@ import { UserService } from '../../services/user.service';
   ]
 })
 export class LoginPage implements OnInit {
-  private userService = inject(UserService);
+  private authService = inject(AuthService);
 
   email: string = '';
   password: string = '';
@@ -45,30 +45,31 @@ export class LoginPage implements OnInit {
       return;
     }
 
-    this.userService.getUsers().subscribe({
-      next: (users) => {
-        console.log('✅ Usuarios obtenidos de API:', users);
+    const credentials = {
+      email: this.email,
+      password: this.password
+    };
+
+    // ✅ USAR AUTH SERVICE CON JWT
+    this.authService.login(credentials).subscribe({
+      next: (response) => {
+        console.log('✅ Login exitoso con JWT:', response);
+        console.log('✅ Token guardado:', response.token);
+        console.log('✅ Usuario:', response.user);
         
-        const userFound = users.find(u => u.email === this.email);
+        this.showToastMessage(`¡Bienvenido ${response.user.username}!`, 'success');
         
-        if (userFound) {
-          console.log('✅ Usuario encontrado:', userFound);
-          this.showToastMessage(`¡Bienvenido ${userFound.username}!`, 'success');
-          
-          localStorage.setItem('currentUser', JSON.stringify(userFound));
-          
-          // CAMBIO: Usar window.location.href para forzar navegación
-          setTimeout(() => {
-            window.location.href = '/home';
-          }, 1500);
-        } else {
-          console.log('❌ Email no encontrado');
-          this.showToastMessage('Email o contraseña incorrectos', 'danger');
-        }
+        setTimeout(() => {
+          window.location.href = '/home';
+        }, 1500);
       },
       error: (error) => {
-        console.error('❌ Error al conectar con API:', error);
-        this.showToastMessage('Error al conectar con el servidor. ¿Está el backend corriendo?', 'danger');
+        console.error('❌ Error al hacer login:', error);
+        let errorMsg = 'Email o contraseña incorrectos';
+        if (error.error?.message) {
+          errorMsg = error.error.message;
+        }
+        this.showToastMessage(errorMsg, 'danger');
       }
     });
   }

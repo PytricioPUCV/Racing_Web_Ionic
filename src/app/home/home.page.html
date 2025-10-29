@@ -2,6 +2,16 @@
 
 <ion-content [fullscreen]="true">
 
+  <!-- Sección de usuario autenticado (opcional, sutil) -->
+  <div class="user-welcome" *ngIf="currentUser">
+    <div class="welcome-content">
+      <span class="welcome-text">¡Hola, <strong>{{ currentUser.username }}</strong>! 👋</span>
+      <ion-button size="small" fill="outline" color="danger" (click)="onLogout()">
+        Cerrar Sesión
+      </ion-button>
+    </div>
+  </div>
+
   <section class="hero">
     <img src="assets/hero.jpg" alt="RacingClothes Brand Model" class="hero-image">
   </section>
@@ -15,7 +25,6 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let product of products">
-          
           <a [href]="'/product/' + product.id">
             <ion-card class="product-item">
               <img [src]="product.image" [alt]="product.name">
@@ -28,9 +37,10 @@
               </div>
             </ion-card>
           </a>
-          </ion-col>
+        </ion-col>
       </ion-row>
     </ion-grid>
   </div>
+  
   <app-footer></app-footer>
 </ion-content>
