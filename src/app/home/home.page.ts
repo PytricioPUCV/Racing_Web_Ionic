@@ -7,6 +7,7 @@ import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
 import { ProductService } from '../services/product';
 import { AuthService } from '../services/auth.service';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +24,8 @@ import { AuthService } from '../services/auth.service';
     IonRow, 
     IonCol, 
     IonCard, 
-    IonButton
+    IonButton,
+    RouterLink
   ],
 })
 export class HomePage implements OnInit {
