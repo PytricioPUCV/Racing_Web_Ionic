@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import { db } from './models';
 import userRoutes from './routes/userRoutes'; 
 import cors from 'cors';
+import authRoutes from './routes/authRoutes';
 
 const app = express();
 
@@ -11,6 +13,10 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes); 
+
 const PORT = process.env.PORT || 3000;
 
 async function syncDatabase() {
