@@ -15,9 +15,12 @@
         <ion-icon slot="icon-only" name="sunny-outline" class="theme-icon-light"></ion-icon>
         <ion-icon slot="icon-only" name="moon-outline" class="theme-icon-dark"></ion-icon>
       </ion-button>
-      <ion-button href="/login">
-        <ion-icon slot="icon-only" name="person-outline"></ion-icon>
+      
+      <!-- ✅ BOTÓN DE PERFIL/LOGIN MEJORADO -->
+      <ion-button [href]="isLoggedIn ? '/profile' : '/login'">
+        <ion-icon slot="icon-only" [name]="isLoggedIn ? 'person-circle-outline' : 'person-outline'"></ion-icon>
       </ion-button>
+      
       <ion-button>
         <ion-icon slot="icon-only" name="search-outline"></ion-icon>
       </ion-button>
@@ -36,5 +39,7 @@
     <li><a href="/home">INICIO</a></li>
     <li><a href="/jackets">CHAQUETAS</a></li>
     <li><a href="/accessories">ACCESORIOS</a></li>
+    <li *ngIf="isLoggedIn"><a href="/profile">MI PERFIL</a></li>
+    <li *ngIf="!isLoggedIn"><a href="/login">INICIAR SESIÓN</a></li>
   </ul>
 </div>

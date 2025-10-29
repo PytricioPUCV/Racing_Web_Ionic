@@ -44,3 +44,17 @@
   
   <app-footer></app-footer>
 </ion-content>
+
+<div class="user-welcome" *ngIf="currentUser">
+  <div class="welcome-content">
+    <span class="welcome-text">¡Hola, <strong>{{ currentUser.username }}</strong>! 👋</span>
+    <div class="user-buttons">
+      <ion-button size="small" fill="outline" [routerLink]="['/profile']">
+        Mi Perfil
+      </ion-button>
+      <ion-button size="small" fill="outline" color="danger" (click)="onLogout()">
+        Cerrar Sesión
+      </ion-button>
+    </div>
+  </div>
+</div>
