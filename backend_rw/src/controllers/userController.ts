@@ -1,10 +1,56 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { User } from '../models';
+import bcrypt from 'bcrypt';  // ✅ Agregar esta importación al inicio
 
-// ============================================
-// CONTROLADORES DE USUARIOS (CRUD PROTEGIDO)
-// ============================================
+// PUT /api/users/:id/change-password - Cambiar contraseña
+export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    // Validaciones
+    if (!currentPassword || !newPassword) {
+      res.status(400).json({ message: 'Contraseña actual y nueva son requeridas' });
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      res.status(400).json({ message: 'La nueva contraseña debe tener al menos 6 caracteres' });
+      return;
+    }
+
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      res.status(404).json({ message: 'Usuario no encontrado' });
+      return;
+    }
+
+    // Verificar contraseña actual
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+    
+    if (!isPasswordValid) {
+      res.status(401).json({ message: 'Contraseña actual incorrecta' });
+      return;
+    }
+
+    // Hashear nueva contraseña
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Actualizar contraseña
+    await user.update({ password: hashedPassword });
+
+    console.log(`✅ Contraseña actualizada para: ${user.email}`);
+
+    res.json({
+      message: 'Contraseña actualizada exitosamente'
+    });
+  } catch (error) {
+    console.error('❌ Error al cambiar contraseña:', error);
+    res.status(500).json({ message: 'Error al cambiar contraseña' });
+  }
+};
 
 // GET /api/users - Listar todos los usuarios
 export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -55,7 +101,7 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
 export const updateUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { username, rut, region, comuna } = req.body;
+    const { username, email, rut, region, comuna } = req.body;  // ✅ AGREGAR email aquí
 
     const user = await User.findByPk(id);
 
@@ -64,9 +110,10 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    // Actualizar campos (email y password NO se actualizan por seguridad)
+    // ✅ Actualizar campos incluyendo email (password sigue sin actualizarse por seguridad)
     await user.update({
       username: username || user.username,
+      email: email || user.email,  // ✅ AGREGAR esta línea
       rut: rut || user.rut,
       region: region || user.region,
       comuna: comuna || user.comuna

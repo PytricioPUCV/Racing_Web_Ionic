@@ -158,4 +158,8 @@ export class ShopcartPage implements OnInit {
     // TODO: Navegar a checkout
     this.router.navigate(['/checkout']);
   }
+
+  continueShopping() {
+    window.location.href = '/home';
+  }
 }
