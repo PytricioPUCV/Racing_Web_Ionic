@@ -9,6 +9,11 @@ export const routes: Routes = [
     canActivate: [authGuard] // ✅ Proteger: requiere login
   },
   {
+    path: 'profile', // ✅ AGREGAR ESTA RUTA
+    loadComponent: () => import('./pages/profile/profile.page').then(m => m.ProfilePage),
+    canActivate: [authGuard]
+  },
+  {
     path: 'product/:id',
     loadComponent: () => import('./pages/product-detail/product-detail.page').then((m) => m.ProductDetailPage),
     canActivate: [authGuard] // ✅ Proteger: requiere login

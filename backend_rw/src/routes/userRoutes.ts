@@ -1,15 +1,20 @@
 import { Router } from 'express';
-import { getAllUsers, getUserById, updateUser, deleteUser } from '../controllers/userController';
+import { 
+  getAllUsers, 
+  getUserById, 
+  updateUser, 
+  deleteUser,
+  changePassword
+} from '../controllers/userController';
 import { authMiddleware } from '../middlewares/authMiddleware';
 
 const router = Router();
 
-// ============================================
-// RUTAS PROTEGIDAS (requieren JWT)
-// ============================================
-
 // Aplicar middleware de autenticación a TODAS las rutas de usuarios
 router.use(authMiddleware);
+
+// PUT: Cambiar contraseña - PROTEGIDO ✅ (DEBE IR PRIMERO)
+router.put('/:id/change-password', changePassword);
 
 // GET: Obtener todos los usuarios - PROTEGIDO ✅
 router.get('/', getAllUsers);
