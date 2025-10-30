@@ -1,22 +1,29 @@
 <app-header></app-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
   <div class="product-section">
     <div class="product-header">
       <h2>Accesorios</h2>
     </div>
     
-    <ion-grid>
+    <!-- Indicador de carga -->
+    <div *ngIf="loading" style="text-align: center; padding: 2rem;">
+      <ion-spinner></ion-spinner>
+      <p>Cargando accesorios...</p>
+    </div>
+
+    <!-- Grid de productos -->
+    <ion-grid *ngIf="!loading">
       <ion-row>
-        <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let product of accessories">
-          <!-- ✅ CAMBIAR: De [routerLink] a (click) -->
+        <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let product of products">
+          <!-- ✅ CAMBIO: Usar (click) en lugar de [href] -->
           <ion-card class="product-item" (click)="navegarAlProducto(product.id)">
             <img 
               [src]="product.image || product.imageUrl" 
               [alt]="product.name"
             >
             <div class="product-info">
-              <a class="product-name"><b>{{ product.name }}</b></a>
+              <span class="product-name"><b>{{ product.name }}</b></span>
               <div class="price-wrapper">
                 <span class="product-price-original" *ngIf="product.originalPrice">
                   ${{ product.originalPrice.toLocaleString('es-CL') }}

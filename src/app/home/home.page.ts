@@ -1,8 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner, IonButton } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
 import { ProductService, Product } from '../services/product';
@@ -24,19 +23,18 @@ import { RouterLink } from '@angular/router';
     IonRow, 
     IonCol, 
     IonCard, 
+    IonSpinner,
     IonButton,
     RouterLink
   ],
 })
 export class HomePage implements OnInit {
   private authService = inject(AuthService);
-  private router = inject(Router);
+  private productService = inject(ProductService);
   
   products: Product[] = [];
   currentUser: any = null;
   loading: boolean = true;
-
-  constructor(private productService: ProductService) {}
 
   ngOnInit() {
     this.loadAllProducts();
@@ -44,26 +42,22 @@ export class HomePage implements OnInit {
     console.log('✅ Usuario autenticado en Home:', this.currentUser);
   }
 
-  // ✅ NUEVO: Cargar productos desde backend
   loadAllProducts() {
     this.loading = true;
 
     this.productService.getAllProductsFromAPI().subscribe({
-      next: (products) => {
+      next: (products: Product[]) => {
         this.products = products;
         this.loading = false;
-        console.log('✅ Todos los productos cargados desde BACKEND:', this.products);
+        console.log('✅ Todos los productos cargados desde API:', this.products);
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('❌ Error al cargar productos:', error);
-        // Fallback a mock si falla
-        this.products = this.productService.getAllProducts();
         this.loading = false;
       }
     });
   }
 
-  // ✅ NUEVO: Navegar al producto con recarga de página
   navegarAlProducto(id: number | undefined) {
     if (id) {
       console.log('🔗 Navegando al producto:', id);
@@ -71,14 +65,14 @@ export class HomePage implements OnInit {
     }
   }
 
-  // Método para cerrar sesión y recargar
+  // ✅ MÉTODOS DE NAVEGACIÓN CON RECARGA
+  goToProfile() {
+    window.location.href = '/profile';
+  }
+
   onLogout() {
     this.authService.logout();
     console.log('✅ Sesión cerrada');
-    
-    // Redirigir a login y recargar la página
-    this.router.navigate(['/login']).then(() => {
-      window.location.reload();
-    });
+    window.location.href = '/login';
   }
 }

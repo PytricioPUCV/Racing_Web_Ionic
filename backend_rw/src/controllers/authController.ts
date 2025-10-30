@@ -131,7 +131,9 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       { 
         id: newUser.id, 
         email: newUser.email, 
-        username: newUser.username 
+        username: newUser.username,
+        rut: newUser.rut,
+        role: newUser.role
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
@@ -149,6 +151,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
         rut: newUser.rut,
         region: newUser.region,
         comuna: newUser.comuna,
+        role: newUser.role  // ✅ AGREGAR AQUÍ
       },
     });
 
@@ -194,7 +197,9 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       { 
         id: user.id, 
         email: user.email, 
-        username: user.username 
+        username: user.username,
+        rut: user.rut,
+        role: user.role
       },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
@@ -212,6 +217,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
         rut: user.rut,
         region: user.region,
         comuna: user.comuna,
+        role: user.role  // ✅ AGREGAR AQUÍ
       },
     });
 
@@ -261,6 +267,7 @@ export const verifyToken = async (req: Request, res: Response): Promise<void> =>
         rut: user.rut,
         region: user.region,
         comuna: user.comuna,
+        role: user.role  // ✅ AGREGAR AQUÍ
       },
     });
 

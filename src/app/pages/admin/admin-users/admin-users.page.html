@@ -1,0 +1,59 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <div class="admin-users-container">
+    <h1>👥 Gestión de Usuarios</h1>
+    <p>Total de usuarios registrados: <strong>{{ users.length }}</strong></p>
+
+    <!-- Indicador de carga -->
+    <div *ngIf="loading" style="text-align: center; padding: 2rem;">
+      <ion-spinner></ion-spinner>
+      <p>Cargando usuarios...</p>
+    </div>
+
+    <!-- Lista de usuarios -->
+    <ion-grid *ngIf="!loading">
+      <ion-row>
+        <ion-col *ngFor="let user of users" size="12" size-md="6" size-lg="4">
+          <ion-card class="user-card">
+            <ion-card-header>
+              <div class="user-header">
+                <h2>{{ user.username }}</h2>
+                <ion-badge [color]="user.role === 'admin' ? 'danger' : 'primary'">
+                  {{ user.role }}
+                </ion-badge>
+              </div>
+            </ion-card-header>
+
+            <ion-card-content>
+              <p><strong>Email:</strong> {{ user.email }}</p>
+              <p><strong>RUT:</strong> {{ user.rut || 'N/A' }}</p>
+              <p><strong>Región:</strong> {{ user.region || 'N/A' }}</p>
+              <p><strong>Estado:</strong> 
+                <ion-badge [color]="user.isActive ? 'success' : 'warning'">
+                  {{ user.isActive ? 'Activo' : 'Inactivo' }}
+                </ion-badge>
+              </p>
+
+              <div class="user-actions">
+                <ion-button 
+                  size="small" 
+                  color="primary"
+                  (click)="viewUserProfile(user.id)">
+                  Ver Perfil
+                </ion-button>
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <!-- Sin usuarios -->
+    <div *ngIf="!loading && users.length === 0" style="text-align: center; padding: 2rem;">
+      <p>No hay usuarios registrados</p>
+    </div>
+  </div>
+
+</ion-content>

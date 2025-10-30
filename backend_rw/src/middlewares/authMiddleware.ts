@@ -9,6 +9,7 @@ export interface AuthRequest extends Request {
   user?: {
     id: number;
     email: string;
+    username: string;
     rut: string;
     role: string;
   };
@@ -27,7 +28,7 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     // Verificar token
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     
-    // Agregar datos del usuario al request (formato antiguo)
+    // Agregar datos del usuario al request (formato antiguo - para compatibilidad)
     req.userId = decoded.id;
     req.userEmail = decoded.email;
 
@@ -35,13 +36,14 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     req.user = {
       id: decoded.id,
       email: decoded.email,
+      username: decoded.username,
       rut: decoded.rut,
-      role: decoded.role || 'user'
+      role: decoded.role || 'user' // ✅ NUEVO: Agregar rol desde el token
     };
 
-    console.log(`✅ Token verificado - Usuario ID: ${req.userId}`);
+    console.log(`✅ Token verificado - Usuario: ${req.user.email} (Rol: ${req.user.role})`);
     
-    next(); // Continuar con la siguiente función
+    next();
   } catch (error) {
     console.error('❌ Token inválido:', error);
     res.status(401).json({ message: 'Token inválido o expirado' });
