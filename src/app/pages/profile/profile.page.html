@@ -3,18 +3,23 @@
 <ion-content [fullscreen]="true" class="ion-padding">
   
   <div class="profile-container">
-    <ion-card class="profile-card">
+    <!-- Indicador de carga -->
+    <ion-spinner *ngIf="loading"></ion-spinner>
+
+    <ion-card class="profile-card" *ngIf="!loading && viewingUser">
       <ion-card-header>
         <div class="profile-header">
           <div class="profile-avatar">
             <ion-icon name="person-outline" size="large"></ion-icon>
           </div>
-          <ion-card-title>Mi Perfil</ion-card-title>
+          <!-- ✅ CAMBIO: Mostrar diferente titulo si es admin viendo otro user -->
+          <ion-card-title *ngIf="!isViewingOtherUser">Mi Perfil</ion-card-title>
+          <ion-card-title *ngIf="isViewingOtherUser">👤 {{ viewingUser.username }}</ion-card-title>
         </div>
       </ion-card-header>
 
       <ion-card-content>
-        <ion-list *ngIf="currentUser">
+        <ion-list *ngIf="viewingUser">
           
           <!-- RUT (NO editable - siempre readonly) -->
           <ion-item>
@@ -32,7 +37,7 @@
             <ion-icon name="mail-outline" slot="start"></ion-icon>
             <ion-label position="stacked">Email</ion-label>
             <ion-input 
-              [(ngModel)]="currentUser.email" 
+              [(ngModel)]="email" 
               [readonly]="!isEditing"
               placeholder="correo@ejemplo.com">
             </ion-input>
@@ -49,8 +54,8 @@
             </ion-input>
           </ion-item>
 
-          <!-- Contraseña actual (solo visible en modo edición) -->
-          <ion-item *ngIf="isEditing">
+          <!-- Contraseña actual (solo visible en modo edición y no admin) -->
+          <ion-item *ngIf="isEditing && !isViewingOtherUser">
             <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
             <ion-label position="stacked">Contraseña actual (opcional)</ion-label>
             <ion-input 
@@ -60,8 +65,8 @@
             </ion-input>
           </ion-item>
 
-          <!-- Nueva contraseña (solo visible en modo edición) -->
-          <ion-item *ngIf="isEditing">
+          <!-- Nueva contraseña (solo visible en modo edición y no admin) -->
+          <ion-item *ngIf="isEditing && !isViewingOtherUser">
             <ion-icon name="lock-open-outline" slot="start"></ion-icon>
             <ion-label position="stacked">Nueva contraseña (opcional)</ion-label>
             <ion-input 
@@ -121,7 +126,7 @@
               height: 48px;
             "
             (click)="toggleEdit()">
-            Editar Perfil
+            ✏️ Editar Perfil
           </ion-button>
 
           <div *ngIf="isEditing" class="edit-buttons">
@@ -151,6 +156,15 @@
               Cancelar
             </ion-button>
           </div>
+
+          <!-- ✅ Admin: Botón eliminar usuario -->
+          <ion-button 
+            *ngIf="isViewingOtherUser && !isEditing"
+            expand="block" 
+            color="danger"
+            (click)="deleteUser()">
+            🗑️ Eliminar Usuario
+          </ion-button>
         </div>
 
       </ion-card-content>

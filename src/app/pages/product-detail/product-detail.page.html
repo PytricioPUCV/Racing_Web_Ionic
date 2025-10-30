@@ -1,7 +1,13 @@
 <app-header></app-header>
 
 <ion-content>
-  <div *ngIf="product">
+  <!-- Indicador de carga -->
+  <div *ngIf="loading" class="ion-padding" style="text-align: center;">
+    <p>Cargando producto...</p>
+  </div>
+
+  <!-- Contenido del producto -->
+  <div *ngIf="!loading && product">
     
     <div class="breadcrumb">
       <a href="/tabs/tab1">Inicio</a> / <a href="#">Chaquetas</a> / {{ product.name }}
@@ -10,15 +16,18 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-md="6">
-          <img [src]="product.image" [alt]="product.name" class="product-image">
+          <img [src]="product.image || product.imageUrl" [alt]="product.name" class="product-image">
         </ion-col>
 
         <ion-col size="12" size-md="6" class="product-info">
-          <div class="product-brand">{{ product.brand }}</div>
+          <div class="product-brand" *ngIf="product.brand">{{ product.brand }}</div>
           <h1 class="product-title">{{ product.name }}</h1>
 
           <div class="price-wrapper">
-            <p class="product-price-original">${{ product.originalPrice.toLocaleString('es-CL') }}</p>
+            <!-- ✅ LÍNEA CORREGIDA -->
+            <p class="original" *ngIf="product.originalPrice">
+              ${{ product.originalPrice.toLocaleString('es-CL') }}
+            </p>
             <p class="product-price">${{ product.price.toLocaleString('es-CL') }}</p>
           </div>
           
@@ -38,7 +47,9 @@
               <span>{{ quantity }}</span>
               <ion-button fill="clear" (click)="changeQuantity(1)">+</ion-button>
             </div>
-            <ion-button expand="block" class="add-to-cart-btn">AÑADIR AL CARRITO</ion-button>
+            <ion-button expand="block" class="add-to-cart-btn" (click)="addToCart()">
+              AÑADIR AL CARRITO
+            </ion-button>
           </div>
 
           <ion-button expand="block" color="danger" class="buy-now-btn">COMPRAR AHORA</ion-button>
@@ -49,7 +60,7 @@
                 <ion-label>Descripción</ion-label>
               </ion-item>
               <div class="ion-padding" slot="content">
-                <p>{{ product.description }}</p>
+                <p>{{ product.description || 'Sin descripción disponible' }}</p>
               </div>
             </ion-accordion>
             <ion-accordion value="care">
@@ -78,9 +89,11 @@
     </ion-grid>
   </div>
 
-  <div *ngIf="!product" class="ion-padding">
+  <!-- Mensaje si no hay producto -->
+  <div *ngIf="!loading && !product" class="ion-padding">
     <h2>Producto no encontrado</h2>
     <p>El producto que buscas no existe o no está disponible.</p>
   </div>
-<app-footer></app-footer>
+
+  <app-footer></app-footer>
 </ion-content>
