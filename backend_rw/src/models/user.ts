@@ -1,7 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../database';
 
-// 1. Define todos los atributos que tendrá un usuario
 interface UserAttributes {
   id: number;
   rut: string;
@@ -10,26 +9,25 @@ interface UserAttributes {
   password: string;
   region: string;  
   comuna: string;
+  role: string; // 'user', 'admin', 'guest'
 }
 
-// 2. Define qué atributos son opcionales durante la creación
-interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role'> {}
 
-// 3. Crea la clase del Modelo con todas las propiedades
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   public id!: number;
   public rut!: string;
-  public username!: string; // Añadimos el nombre de usuario
+  public username!: string;
   public email!: string;
   public password!: string;
-  public region!: string;   // Añadimos la región
-  public comuna!: string;   // Añadimos la comuna
+  public region!: string;
+  public comuna!: string;
+  public role!: string;
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 }
 
-// 4. Inicializa el modelo con las nuevas columnas y reglas
 User.init({
   id: {
     type: DataTypes.INTEGER,
@@ -61,6 +59,10 @@ User.init({
   comuna: { 
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  role: {
+    type: DataTypes.ENUM('user', 'admin', 'guest'),
+    defaultValue: 'user',
   },
 }, {
   sequelize,
