@@ -1,7 +1,18 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from '../models/user.interface';
+
+export interface UserProfile {
+  id: number;
+  username: string;
+  email: string;
+  rut?: string;
+  region?: string;
+  comuna?: string;
+  role: 'user' | 'admin';
+  isActive?: boolean;
+  createdAt?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,28 +21,23 @@ export class UserService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:3000/api/users';
 
-  // GET: Obtener todos los usuarios
-  getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(this.apiUrl);
+  // ✅ Obtener todos los usuarios (Admin)
+  getAllUsers(): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(`${this.apiUrl}/admin/users`);
   }
 
-  // GET: Obtener un usuario por ID
-  getUserById(id: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/${id}`);
+  // ✅ Obtener usuario por ID (Admin)
+  getUserById(userId: number): Observable<UserProfile> {
+    return this.http.get<UserProfile>(`${this.apiUrl}/admin/users/${userId}`);
   }
 
-  // POST: Crear un nuevo usuario (Registro)
-  createUser(user: User): Observable<User> {
-    return this.http.post<User>(this.apiUrl, user);
+  // ✅ Actualizar usuario (Admin)
+  updateUser(userId: number, data: Partial<UserProfile>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/admin/users/${userId}`, data);
   }
 
-  // PUT: Actualizar un usuario
-  updateUser(id: number, user: User): Observable<User> {
-    return this.http.put<User>(`${this.apiUrl}/${id}`, user);
-  }
-
-  // DELETE: Eliminar un usuario
-  deleteUser(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+  // ✅ Eliminar usuario (Admin)
+  deleteUser(userId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/admin/users/${userId}`);
   }
 }

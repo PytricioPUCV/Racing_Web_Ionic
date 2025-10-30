@@ -1,11 +1,10 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner, IonButton } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
-import { ProductService } from '../services/product';
+import { ProductService, Product } from '../services/product';
 import { AuthService } from '../services/auth.service';
 import { RouterLink } from '@angular/router';
 
@@ -24,33 +23,56 @@ import { RouterLink } from '@angular/router';
     IonRow, 
     IonCol, 
     IonCard, 
+    IonSpinner,
     IonButton,
     RouterLink
   ],
 })
 export class HomePage implements OnInit {
   private authService = inject(AuthService);
-  private router = inject(Router);
+  private productService = inject(ProductService);
   
-  products: any[] = [];
+  products: Product[] = [];
   currentUser: any = null;
-
-  constructor(private productService: ProductService) {}
+  loading: boolean = true;
 
   ngOnInit() {
-    this.products = this.productService.getAllProducts();
+    this.loadAllProducts();
     this.currentUser = this.authService.getCurrentUser();
     console.log('✅ Usuario autenticado en Home:', this.currentUser);
   }
 
-  // Método para cerrar sesión y recargar
+  loadAllProducts() {
+    this.loading = true;
+
+    this.productService.getAllProductsFromAPI().subscribe({
+      next: (products: Product[]) => {
+        this.products = products;
+        this.loading = false;
+        console.log('✅ Todos los productos cargados desde API:', this.products);
+      },
+      error: (error: any) => {
+        console.error('❌ Error al cargar productos:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  navegarAlProducto(id: number | undefined) {
+    if (id) {
+      console.log('🔗 Navegando al producto:', id);
+      window.location.href = `/product/${id}`;
+    }
+  }
+
+  // ✅ MÉTODOS DE NAVEGACIÓN CON RECARGA
+  goToProfile() {
+    window.location.href = '/profile';
+  }
+
   onLogout() {
     this.authService.logout();
     console.log('✅ Sesión cerrada');
-    
-    // Redirigir a login y recargar la página
-    this.router.navigate(['/login']).then(() => {
-      window.location.reload(); // ✅ Recarga la página después de navegar
-    });
+    window.location.href = '/login';
   }
 }
