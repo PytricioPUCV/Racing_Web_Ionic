@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { 
   IonContent, 
   IonHeader, 
@@ -21,10 +21,12 @@ import {
   IonIcon,
   IonToast,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  IonSpinner
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
+import { UserService, UserProfile } from '../../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import { addIcons } from 'ionicons';
 import { personOutline, mailOutline, cardOutline, locationOutline, saveOutline, lockClosedOutline, lockOpenOutline } from 'ionicons/icons';
@@ -58,19 +60,26 @@ type RegionKey = keyof typeof ProfilePage.prototype.regionesYComunas;
     IonIcon,
     IonToast,
     IonButtons,
-    IonBackButton
+    IonBackButton,
+    IonSpinner
   ]
 })
 export class ProfilePage implements OnInit {
   private authService = inject(AuthService);
+  private userService = inject(UserService);
   private http = inject(HttpClient);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   // Usuario actual
   currentUser: any = null;
+  viewingUser: UserProfile | null = null;
+  isAdmin: boolean = false;
+  isViewingOtherUser: boolean = false;
   
   // Campos editables
   username: string = '';
+  email: string = '';
   rut: string = '';
   selectedRegion: string = '';
   selectedComuna: string = '';
@@ -79,6 +88,7 @@ export class ProfilePage implements OnInit {
 
   // Modo edición
   isEditing: boolean = false;
+  loading: boolean = false;
 
   // Toast
   showToast: boolean = false;
@@ -122,36 +132,74 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     this.regiones = Object.keys(this.regionesYComunas);
-    this.loadUserProfile();
+    this.currentUser = this.authService.getCurrentUser();
+    this.isAdmin = this.currentUser?.role === 'admin';
+
+    // Verificar si admin está viendo otro usuario
+    this.route.queryParams.subscribe(params => {
+      if (this.isAdmin && params['userId']) {
+        this.isViewingOtherUser = true;
+        this.loadUserProfile(+params['userId']);
+      } else {
+        this.loadMyProfile();
+      }
+    });
   }
 
-  loadUserProfile() {
-    this.currentUser = this.authService.getCurrentUser();
-    
+  // ✅ Cargar mi perfil
+  loadMyProfile() {
     if (this.currentUser) {
       this.username = this.currentUser.username;
+      this.email = this.currentUser.email;
       this.rut = this.currentUser.rut;
       this.selectedRegion = this.currentUser.region;
       this.selectedComuna = this.currentUser.comuna;
+      this.viewingUser = this.currentUser;
       
-      // Cargar comunas de la región actual
       this.comunas = this.regionesYComunas[this.selectedRegion as RegionKey] || [];
     }
+  }
+
+  // ✅ Admin: Cargar perfil de otro usuario
+  loadUserProfile(userId: number) {
+    this.loading = true;
+    
+    this.userService.getUserById(userId).subscribe({
+      next: (user) => {
+        this.viewingUser = user;
+        this.username = user.username;
+        this.email = user.email;
+        this.rut = user.rut || '';
+        this.selectedRegion = user.region || '';
+        this.selectedComuna = user.comuna || '';
+        
+        this.comunas = this.regionesYComunas[this.selectedRegion as RegionKey] || [];
+        this.loading = false;
+        console.log('✅ Perfil de usuario cargado:', user);
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar perfil:', error);
+        this.loading = false;
+      }
+    });
   }
 
   onRegionChange(event: any) {
     const regionSeleccionada = event.detail.value as RegionKey;
     this.selectedRegion = regionSeleccionada;
     this.comunas = this.regionesYComunas[regionSeleccionada] || [];
-    this.selectedComuna = ''; // Resetear comuna al cambiar región
+    this.selectedComuna = '';
   }
 
   toggleEdit() {
     this.isEditing = !this.isEditing;
     
     if (!this.isEditing) {
-      // Si cancela, restaurar valores originales y limpiar contraseñas
-      this.loadUserProfile();
+      if (this.isViewingOtherUser && this.viewingUser) {
+        this.loadUserProfile(this.viewingUser.id);
+      } else {
+        this.loadMyProfile();
+      }
       this.currentPassword = '';
       this.newPassword = '';
     }
@@ -168,8 +216,7 @@ export class ProfilePage implements OnInit {
   }
 
   onSaveProfile() {
-    // Validaciones
-    if (!this.username || !this.rut || !this.selectedRegion || !this.selectedComuna) {
+    if (!this.username || !this.email || !this.selectedRegion || !this.selectedComuna) {
       this.showToastMessage('Todos los campos son obligatorios', 'danger');
       return;
     }
@@ -184,53 +231,37 @@ export class ProfilePage implements OnInit {
       return;
     }
 
-    // Validar contraseñas si se ingresaron
-    if (this.currentPassword || this.newPassword) {
-      if (!this.currentPassword || !this.newPassword) {
-        this.showToastMessage('Debe ingresar ambas contraseñas para cambiarla', 'danger');
-        return;
-      }
-      
-      if (this.newPassword.length < 6) {
-        this.showToastMessage('La nueva contraseña debe tener al menos 6 caracteres', 'danger');
-        return;
-      }
-    }
-
     const updateData = {
       username: this.username,
-      email: this.currentUser.email,
+      email: this.email,
       rut: this.rut,
       region: this.selectedRegion,
       comuna: this.selectedComuna
     };
 
-    const apiUrl = `http://localhost:3000/api/users/${this.currentUser.id}`;
+    const userId = this.isViewingOtherUser && this.viewingUser ? this.viewingUser.id : this.currentUser.id;
+    const apiUrl = `http://localhost:3000/api/users/${userId}`;
 
     this.http.put(apiUrl, updateData).subscribe({
       next: (response: any) => {
         console.log('✅ Perfil actualizado:', response);
         
-        // Actualizar usuario en localStorage
-        const updatedUser = {
-          ...this.currentUser,
-          username: response.user.username,
-          email: response.user.email,
-          rut: response.user.rut,
-          region: response.user.region,
-          comuna: response.user.comuna
-        };
-        
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        this.currentUser = updatedUser;
-
-        // Si hay contraseñas, cambiar contraseña
-        if (this.currentPassword && this.newPassword) {
-          this.changePassword();
-        } else {
-          this.isEditing = false;
-          this.showToastMessage('Perfil actualizado exitosamente', 'success');
+        if (!this.isViewingOtherUser) {
+          const updatedUser = {
+            ...this.currentUser,
+            username: response.user.username,
+            email: response.user.email,
+            rut: response.user.rut,
+            region: response.user.region,
+            comuna: response.user.comuna
+          };
+          
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          this.currentUser = updatedUser;
         }
+
+        this.isEditing = false;
+        this.showToastMessage('Perfil actualizado exitosamente', 'success');
       },
       error: (error) => {
         console.error('❌ Error al actualizar perfil:', error);
@@ -245,31 +276,25 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  changePassword() {
-    const passwordData = {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword
-    };
+  // ✅ Admin: Eliminar usuario
+  deleteUser() {
+    if (!this.viewingUser || !this.isViewingOtherUser) return;
 
-    const apiUrl = `http://localhost:3000/api/users/${this.currentUser.id}/change-password`;
+    if (!confirm(`¿Estás seguro de que deseas eliminar a ${this.viewingUser.username}?`)) {
+      return;
+    }
 
-    this.http.put(apiUrl, passwordData).subscribe({
-      next: (response: any) => {
-        console.log('✅ Contraseña actualizada:', response);
-        this.currentPassword = '';
-        this.newPassword = '';
-        this.isEditing = false;
-        this.showToastMessage('Perfil y contraseña actualizados exitosamente', 'success');
+    this.userService.deleteUser(this.viewingUser.id).subscribe({
+      next: (response) => {
+        console.log('✅ Usuario eliminado:', response);
+        this.showToastMessage('Usuario eliminado exitosamente', 'success');
+        setTimeout(() => {
+          this.router.navigate(['/admin/users']);
+        }, 1500);
       },
       error: (error) => {
-        console.error('❌ Error al cambiar contraseña:', error);
-        let errorMsg = 'Error al cambiar contraseña';
-        
-        if (error.error?.message) {
-          errorMsg = error.error.message;
-        }
-        
-        this.showToastMessage(errorMsg, 'danger');
+        console.error('❌ Error al eliminar usuario:', error);
+        this.showToastMessage('Error al eliminar usuario', 'danger');
       }
     });
   }

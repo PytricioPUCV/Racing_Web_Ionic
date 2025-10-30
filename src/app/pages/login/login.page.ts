@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonButton, IonToast } from '@ionic/angular/standalone';
+import { IonContent, IonList, IonItem, IonInput, IonButton, IonToast } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 
@@ -15,9 +15,6 @@ import { AuthService } from '../../services/auth.service';
     FormsModule, 
     HeaderComponent, 
     IonContent, 
-    IonHeader, 
-    IonTitle, 
-    IonToolbar, 
     IonList, 
     IonItem, 
     IonInput, 
@@ -96,6 +93,16 @@ export class LoginPage implements OnInit {
         this.showToastMessage(errorMsg, 'danger');
       }
     });
+  }
+
+  // ✅ NUEVO: CONTINUAR COMO INVITADO
+  continueAsGuest() {
+    console.log('👤 Continuando como invitado...');
+    this.showToastMessage('¡Bienvenido invitado!', 'success');
+    
+    setTimeout(() => {
+      window.location.href = '/home';
+    }, 1000);
   }
 
   showToastMessage(message: string, color: string) {

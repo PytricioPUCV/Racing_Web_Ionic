@@ -1,7 +1,11 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { User } from '../models';
-import bcrypt from 'bcrypt';  // ✅ Agregar esta importación al inicio
+import bcrypt from 'bcrypt';
+
+// ============================================
+// FUNCIONES EXISTENTES (MANTENER)
+// ============================================
 
 // PUT /api/users/:id/change-password - Cambiar contraseña
 export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
@@ -55,11 +59,17 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
 // GET /api/users - Listar todos los usuarios
 export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    // ✅ NUEVO: Verificar si es admin
+    if (req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'No tienes permisos para ver todos los usuarios' });
+      return;
+    }
+
     const users = await User.findAll({
-      attributes: { exclude: ['password'] } // No enviar contraseñas
+      attributes: { exclude: ['password'] }
     });
 
-    console.log(`✅ Listando ${users.length} usuarios`);
+    console.log(`✅ Listando ${users.length} usuarios (Admin: ${req.user.email})`);
 
     res.json({
       message: 'Usuarios obtenidos exitosamente',
@@ -75,6 +85,12 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
 export const getUserById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+
+    // ✅ NUEVO: Solo admin o el mismo usuario puede ver su perfil
+    if (req.user?.id !== parseInt(id) && req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'No tienes permisos para ver este usuario' });
+      return;
+    }
 
     const user = await User.findByPk(id, {
       attributes: { exclude: ['password'] }
@@ -101,7 +117,13 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
 export const updateUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { username, email, rut, region, comuna } = req.body;  // ✅ AGREGAR email aquí
+    const { username, email, rut, region, comuna, role, isActive } = req.body;
+
+    // ✅ NUEVO: Solo admin o el mismo usuario puede actualizar su perfil
+    if (req.user?.id !== parseInt(id) && req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'No tienes permisos para actualizar este usuario' });
+      return;
+    }
 
     const user = await User.findByPk(id);
 
@@ -110,14 +132,32 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    // ✅ Actualizar campos incluyendo email (password sigue sin actualizarse por seguridad)
-    await user.update({
+    // ✅ NUEVO: Validar que el email no esté en uso
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ where: { email } });
+      if (existingUser) {
+        res.status(400).json({ message: 'El email ya está en uso' });
+        return;
+      }
+    }
+
+    // ✅ NUEVO: Solo admin puede cambiar role e isActive
+    const updateData: any = {
       username: username || user.username,
-      email: email || user.email,  // ✅ AGREGAR esta línea
+      email: email || user.email,
       rut: rut || user.rut,
       region: region || user.region,
       comuna: comuna || user.comuna
-    });
+    };
+
+    // Solo admin puede actualizar rol
+    if (req.user?.role === 'admin') {
+      if (role && ['user', 'admin', 'guest'].includes(role)) {
+        updateData.role = role;
+      }
+    }
+
+    await user.update(updateData);
 
     console.log(`✅ Usuario actualizado: ${user.email}`);
 
@@ -129,7 +169,8 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
         username: user.username,
         rut: user.rut,
         region: user.region,
-        comuna: user.comuna
+        comuna: user.comuna,
+        role: user.role
       }
     });
   } catch (error) {
@@ -143,6 +184,17 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
   try {
     const { id } = req.params;
 
+    // ✅ NUEVO: Solo admin puede eliminar usuarios (y no a sí mismo)
+    if (req.user?.role !== 'admin') {
+      res.status(403).json({ message: 'No tienes permisos para eliminar usuarios' });
+      return;
+    }
+
+    if (req.user?.id === parseInt(id)) {
+      res.status(400).json({ message: 'No puedes eliminarte a ti mismo' });
+      return;
+    }
+
     const user = await User.findByPk(id);
 
     if (!user) {
@@ -153,11 +205,12 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
     const userEmail = user.email;
     await user.destroy();
 
-    console.log(`✅ Usuario eliminado: ${userEmail}`);
+    console.log(`✅ Usuario eliminado: ${userEmail} (por Admin: ${req.user.email})`);
 
     res.json({
       message: 'Usuario eliminado exitosamente',
-      userId: id
+      userId: id,
+      deletedUser: userEmail
     });
   } catch (error) {
     console.error('❌ Error al eliminar usuario:', error);

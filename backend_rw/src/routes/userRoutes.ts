@@ -16,7 +16,7 @@ router.use(authMiddleware);
 // PUT: Cambiar contraseña - PROTEGIDO ✅ (DEBE IR PRIMERO)
 router.put('/:id/change-password', changePassword);
 
-// GET: Obtener todos los usuarios - PROTEGIDO ✅
+// GET: Obtener todos los usuarios - PROTEGIDO ✅ (SOLO ADMIN)
 router.get('/', getAllUsers);
 
 // GET: Obtener un usuario específico por ID - PROTEGIDO ✅
@@ -25,7 +25,7 @@ router.get('/:id', getUserById);
 // PUT: Actualizar un usuario existente - PROTEGIDO ✅
 router.put('/:id', updateUser);
 
-// DELETE: Eliminar un usuario - PROTEGIDO ✅
+// DELETE: Eliminar un usuario - PROTEGIDO ✅ (SOLO ADMIN)
 router.delete('/:id', deleteUser);
 
 export default router;
