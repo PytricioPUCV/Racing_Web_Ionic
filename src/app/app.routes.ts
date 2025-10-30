@@ -40,12 +40,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/admin/admin.page').then(m => m.AdminPage),
     canActivate: [adminGuard]
   },
-  {
-    path: 'admin/users',
+  /*{    FIXEAR PARA ENTREGA 3 GENERA WARNING PERO EJECUTA IGUAL YA QUE NO ESTA POR AHORA
+    path: 'admin/admin-users',
     loadComponent: () => import('./pages/admin/admin-users/admin-users.page').then(m => m.AdminUsersPage),
     canActivate: [adminGuard]
   },
-
+  */
   // ✅ AUTENTICACIÓN (SIN GUARD - ACCESO LIBRE)
   {
     path: 'register',
