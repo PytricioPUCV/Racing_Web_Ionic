@@ -6,6 +6,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
 export interface AuthRequest extends Request {
   userId?: number;
   userEmail?: string;
+  user?: {
+    id: number;
+    email: string;
+    rut: string;
+    role: string;
+  };
 }
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
@@ -21,9 +27,17 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     // Verificar token
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     
-    // Agregar datos del usuario al request
+    // Agregar datos del usuario al request (formato antiguo)
     req.userId = decoded.id;
     req.userEmail = decoded.email;
+
+    // Agregar datos del usuario al request (formato nuevo - para los nuevos controladores)
+    req.user = {
+      id: decoded.id,
+      email: decoded.email,
+      rut: decoded.rut,
+      role: decoded.role || 'user'
+    };
 
     console.log(`✅ Token verificado - Usuario ID: ${req.userId}`);
     
