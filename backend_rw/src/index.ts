@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import sequelize from './database';
 import { db } from './models';
 import userRoutes from './routes/userRoutes'; 
 import authRoutes from './routes/authRoutes';
@@ -38,16 +39,33 @@ app.get('/', (req, res) => {
 async function startServer() {
   try {
     // Verificar conexión a la base de datos
-    await db.sequelize.authenticate();
+    await sequelize.authenticate();
     console.log('✅ Conexión a la base de datos de Supabase establecida correctamente.');
 
-    // Sincronizar modelos (sin alterar estructura en producción)
-    await db.sequelize.sync({ alter: false });
+    // Sincronizar modelos
+    // alter: true = intenta actualizar las tablas sin borrar datos
+    // alter: false = solo crea tablas si no existen (seguro para producción)
+    // Para desarrollo: usar alter: true para ver cambios
+    // Para producción: usar alter: false
+    
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    
+    await sequelize.sync({ alter: isDevelopment });
+    
     console.log('✅ Modelos sincronizados con la base de datos.');
+    console.log('✅ Tablas creadas/actualizadas:');
+    console.log('   ✓ Users');
+    console.log('   ✓ Categories');
+    console.log('   ✓ Products');
+    console.log('   ✓ Orders');
+    console.log('   ✓ OrderItems');
+    console.log('   ✓ Carts');
+    console.log('   ✓ CartItems');
 
     // Iniciar servidor
     app.listen(PORT, () => {
       console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
+      console.log(`📝 Entorno: ${isDevelopment ? 'DESARROLLO' : 'PRODUCCIÓN'}`);
     });
 
   } catch (error) {
