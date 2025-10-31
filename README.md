@@ -1,11 +1,11 @@
 # Presentado por:
 - Bastián Mejías
 - Vicente Cisternas
-- Patricio hernandez
+- Patricio Hernández
 
 # RacingConEstilo - E-Commerce
 
-##  Índice
+## Índice
 1. [Resumen del Proyecto](#resumen-del-proyecto)
 2. [Requerimientos](#requerimientos)
 3. [Arquitectura de la Información](#arquitectura-de-la-información)
@@ -13,7 +13,8 @@
 5. [Principios de UX Aplicados](#principios-de-ux-aplicados)
 6. [Tecnologías Utilizadas](#tecnologías-utilizadas)
 7. [Arquitectura del Sistema](#arquitectura-del-sistema)
-8. [Instalación y Ejecución](#instalación-y-ejecución)
+8. [Modelo Entidad-Relación (MER)](#modelo-entidad-relación-mer)
+9. [Instalación y Ejecución](#instalación-y-ejecución)
 
 ---
 
@@ -75,10 +76,10 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 ---
 
 ## Principios de UX Aplicados
-1.  **Consistencia**: Se diseñaron componentes reutilizables para el encabezado y el pie de página que aparecen en todas las páginas. Esto nos asegura que elementos clave como el logo, los menús de navegación y los íconos de usuario y tema estén siempre en el mismo lugar, creando una experiencia predecible y familiar.
-2.  **Feedback**: En la página de detalle de producto, cuando el usuario selecciona una talla, el botón correspondiente cambia de estilo, dándole la confirmación visual de su elección. Se implementaron mensajes toast para proporcionar retroalimentación inmediata al usuario en acciones como login, registro y operaciones del carrito. Con el mismo fin los botones y enlaces presentan efectos visuales sutiles al pasar el mouse para indicar que son interactivos.
-3.  **Simplicidad y Claridad**: En el formulario de registro, el campo "Comuna" permanece deshabilitado hasta que se seleccione primero el campo "Región", evitando errores y reduciendo la carga cognitiva del usuario al no mostrar opciones irrelevantes. El sistema maneja automáticamente el redireccionamiento después de login/registro para una experiencia fluida.
-4.  **Accesibilidad**: Se implementó un tema oscuro y claro. Esto no es solo una preferencia estética, sino una característica de accesibilidad clave para usuarios con sensibilidad a la luz. Además, se utilizó un buen contraste de colores en ambos temas y se emplearon componentes semánticos de Ionic, que son compatibles con lectores de pantalla.
+1. **Consistencia**: Se diseñaron componentes reutilizables para el encabezado y el pie de página que aparecen en todas las páginas. Esto nos asegura que elementos clave como el logo, los menús de navegación y los íconos de usuario y tema estén siempre en el mismo lugar, creando una experiencia predecible y familiar.
+2. **Feedback**: En la página de detalle de producto, cuando el usuario selecciona una talla, el botón correspondiente cambia de estilo, dándole la confirmación visual de su elección. Se implementaron mensajes toast para proporcionar retroalimentación inmediata al usuario en acciones como login, registro y operaciones del carrito. Con el mismo fin los botones y enlaces presentan efectos visuales sutiles al pasar el mouse para indicar que son interactivos.
+3. **Simplicidad y Claridad**: En el formulario de registro, el campo "Comuna" permanece deshabilitado hasta que se seleccione primero el campo "Región", evitando errores y reduciendo la carga cognitiva del usuario al no mostrar opciones irrelevantes. El sistema maneja automáticamente el redireccionamiento después de login/registro para una experiencia fluida.
+4. **Accesibilidad**: Se implementó un tema oscuro y claro. Esto no es solo una preferencia estética, sino una característica de accesibilidad clave para usuarios con sensibilidad a la luz. Además, se utilizó un buen contraste de colores en ambos temas y se emplearon componentes semánticos de Ionic, que son compatibles con lectores de pantalla.
 
 ---
 
@@ -95,8 +96,9 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 ### Backend
 - **Node.js**: Entorno de ejecución para JavaScript del lado del servidor.
 - **Express**: Framework minimalista para crear APIs REST.
+- **Sequelize**: ORM para PostgreSQL.
 - **PostgreSQL**: Sistema de gestión de bases de datos relacional en la nube.
-- **bcrypt**: Librería para el hash y encriptación de contraseñas.
+- **bcryptjs**: Librería para el hash y encriptación de contraseñas.
 - **jsonwebtoken (JWT)**: Para la generación y validación de tokens de autenticación.
 - **cors**: Middleware para habilitar CORS (Cross-Origin Resource Sharing).
 
@@ -108,42 +110,141 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 
 El backend está construido con Node.js y Express, proporcionando una API RESTful completa para gestionar las operaciones del e-commerce.
 
-#### Características Principales
+#### EP 2.1: Servidor Node.js con Express
 
-- **Base de Datos PostgreSQL en la Nube**: La aplicación utiliza una base de datos PostgreSQL alojada en la nube para garantizar disponibilidad y persistencia de datos.
+- Servidor configurado en puerto 3000
+- Estructura modular con carpetas de controllers, routes, models y middlewares
+- Variables de entorno configuradas via `.env`
+- Manejo centralizado de errores
 
-- **Sistema de Autenticación JWT**: Implementa tokens JWT para mantener sesiones seguras. Los tokens se generan en el login/registro y se validan en cada petición a endpoints protegidos.
+#### EP 2.2: Base de Datos PostgreSQL
 
-- **Encriptación de Contraseñas**: Todas las contraseñas se almacenan utilizando bcrypt con hash seguro antes de guardarse en la base de datos.
+- Base de datos relacional alojada en la nube
+- Modelos de datos implementados con Sequelize:
+  - **Users**: Gestión de usuarios con roles (user, admin, guest)
+  - **Products**: Catálogo de productos con atributos (nombre, descripción, precio, stock, talla, color, marca)
+  - **Categories**: Clasificación de productos
+  - **Carts**: Carritos de compra asociados a usuarios
+  - **CartItems**: Ítems dentro del carrito
+  - **Orders**: Órdenes de compra con estado y detalles de envío
+  - **OrderItems**: Ítems dentro de las órdenes
 
-- **CRUD Completo**: El backend proporciona endpoints para todas las operaciones CRUD (Create, Read, Update, Delete) sobre:
-  - Usuarios
-  - Productos
-  - Carrito de compras
-  - Órdenes de compra
+- Relaciones establecidas entre modelos (1:N, 1:1)
+- Encriptación segura de datos sensibles
 
-- **Endpoints Protegidos**: Ciertos endpoints requieren autenticación mediante JWT, validando el token en cada petición.
+#### EP 2.3: API REST con Endpoints
 
-#### Estructura de la API
+**Autenticación:**
+- `POST /api/auth/register` - Registro de nuevos usuarios con validaciones
+- `POST /api/auth/login` - Inicio de sesión con retorno de JWT
 
-  - POST /api/auth/register - Registro de nuevos usuarios
-  - POST /api/auth/login - Inicio de sesión
-  - GET /api/products - Listar productos
-  - GET /api/products/:id - Obtener detalle de producto
-  - POST /api/products - Crear producto (protegido)
-  - PUT /api/products/:id - Actualizar producto (protegido)
-  - DELETE /api/products/:id - Eliminar producto (protegido)
-  - GET /api/cart - Obtener carrito del usuario (protegido)
-  - POST /api/cart - Agregar al carrito (protegido)
+**Productos:**
+- `GET /api/products` - Listar todos los productos
+- `GET /api/products/:id` - Obtener detalle de producto específico
+- `POST /api/products` - Crear producto (admin)
+- `PUT /api/products/:id` - Actualizar producto (admin)
+- `DELETE /api/products/:id` - Eliminar producto (admin)
+
+**Categorías:**
+- `GET /api/categories` - Listar todas las categorías
+- `GET /api/categories/:id` - Obtener categoría específica
+- `POST /api/categories` - Crear categoría (admin)
+
+**Carrito:**
+- `GET /api/cart` - Obtener carrito del usuario autenticado
+- `POST /api/cart/items` - Agregar ítem al carrito
+- `PUT /api/cart/items/:itemId` - Actualizar cantidad del ítem
+- `DELETE /api/cart/items/:itemId` - Eliminar ítem del carrito
+- `DELETE /api/cart` - Vaciar carrito
+
+**Órdenes:**
+- `POST /api/orders` - Crear nueva orden
+- `GET /api/orders` - Listar órdenes del usuario
+- `GET /api/orders/:id` - Obtener detalles de orden específica
+
+- Validación de datos en todas las peticiones
+- Respuestas en formato JSON con status HTTP apropiados
+- Manejo robusto de errores (400, 401, 403, 404, 500)
+
+#### EP 2.4: Consumo de API desde Frontend
+
+- Servicio `ApiService` centralizado para todas las peticiones HTTP
+- Servicio `AuthService` para gestionar autenticación
+- Servicio `ProductService` para operaciones de productos
+- Servicio `CartService` para gestionar carrito
+- Servicio `OrderService` para gestionar órdenes
+- Uso de Observables y RxJS para manejo asincrónico
+- HttpClient para peticiones HTTP seguras
+
+#### EP 2.5: Autenticación con JWT
+
+**Backend:**
+- Implementación de JWT para autenticación segura
+- Encriptación de contraseñas con bcryptjs
+- Validación de credenciales en login
+- Generación de tokens con expiración
+- Middleware `verifyToken` para proteger rutas
+- Validación de roles (usuario, administrador)
+
+**Frontend:**
+- Almacenamiento seguro de tokens en localStorage
+- Guardado de datos de usuario en sesión
+- Interceptores HTTP para incluir token en peticiones protegidas
+- Formularios de login/registro con validaciones
+- Mensajes de feedback (toast) en acciones de autenticación
+- Logout con limpieza de tokens y datos
+
+#### EP 2.6: Validación de Usuarios y Manejo de Sesiones
+
+**Backend:**
+- Middleware de validación de JWT en todas las rutas protegidas
+- Control de roles para autorizar operaciones específicas
+- Validación de entrada de datos
+- Manejo de tokens expirados
+
+**Frontend:**
+- Guardia de rutas (Route Guards) para proteger páginas
+- Mostrar/ocultar elementos según autenticación y rol
+- Persistencia de sesión al recargar la página
+- Auto-logout cuando token expira
+- Visualización del perfil de usuario autenticado
 
 ### Frontend - Integración con Backend
 
-El frontend de Angular consume la API del backend mediante el servicio HttpClient:
+- **HttpClient**: Comunicación segura con la API
+- **Interceptores HTTP**: Inyección automática de tokens JWT
+- **Guards**: Protección de rutas según autenticación y rol
+- **Servicios**: Lógica de negocio centralizada
+- **Componentes**: Consumo de datos mediante async pipe y observables
+- **Validaciones**: Feedback inmediato en formularios
 
-- **Servicio de Autenticación**: Maneja login, registro y validación de tokens.
-- **Persistencia de Sesión**: El token JWT se almacena localmente para mantener la sesión del usuario.
-- **Interceptores HTTP**: Se implementan para agregar automáticamente el token JWT a las peticiones protegidas.
-- **Manejo de Estados**: Los componentes reaccionan a los cambios de autenticación para mostrar/ocultar funcionalidades según el rol del usuario.
+---
+
+## Modelo Entidad-Relación (MER)
+
+El diagrama MER de la base de datos que muestra la estructura relacional de la aplicación.
+
+[![Diagrama MER](https://i.imgur.com/KxustCL.png)](https://i.imgur.com/KxustCL.png)
+
+### Entidades principales:
+
+- **Users**: Usuarios del sistema con roles diferenciados
+- **Products**: Productos disponibles en el catálogo
+- **Categories**: Categorías para clasificar productos
+- **Carts**: Carritos de compra de usuarios
+- **CartItems**: Ítems dentro del carrito
+- **Orders**: Órdenes de compra realizadas
+- **OrderItems**: Ítems dentro de las órdenes
+
+### Relaciones:
+
+- **Users ↔ Carts** (1:1): Un usuario tiene un carrito
+- **Users ↔ Orders** (1:N): Un usuario puede tener múltiples órdenes
+- **Categories ↔ Products** (1:N): Una categoría contiene múltiples productos
+- **Carts ↔ CartItems** (1:N): Un carrito contiene múltiples ítems
+- **Products ↔ CartItems** (1:N): Un producto puede estar en múltiples carritos
+- **Orders ↔ OrderItems** (1:N): Una orden contiene múltiples ítems
+- **Products ↔ OrderItems** (1:N): Un producto puede estar en múltiples órdenes
 
 ---
 
@@ -158,27 +259,28 @@ Sigue estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
     ```
     npm install -g @ionic/cli
     ```
+* Base de datos PostgreSQL (local o en la nube)
 
 ### Instalación
 
-1.  **Clona el repositorio:**
+1. **Clona el repositorio:**
     ```
     git clone https://github.com/PytricioPUCV/Racing_Web_Ionic.git
     ```
 
-2.  **Navega a la carpeta del proyecto:**
+2. **Navega a la carpeta del proyecto:**
     ```
     cd Racing_Web_Ionic
     ```
 
-3.  **Instala las dependencias del frontend:**
+3. **Instala las dependencias del frontend:**
     ```
     npm install
     ```
 
-4.  **Instala las dependencias del backend:**
+4. **Instala las dependencias del backend:**
     ```
-    cd backend
+    cd backend_rw
     npm install
     cd ..
     ```
@@ -187,39 +289,56 @@ Sigue estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
 
 #### Ejecutar el Backend
 
-1.  **Navega a la carpeta del backend:**
+1. **Navega a la carpeta del backend:**
     ```
-    cd backend
-    ```
-
-2.  **Configura las variables de entorno:**
-    Crea un archivo `.env` con las credenciales de tu base de datos PostgreSQL:
-    ```
-    DB_HOST=tu_host
-    DB_PORT=5432
-    DB_USER=tu_usuario
-    DB_PASSWORD=tu_contraseña
-    DB_NAME=nombre_bd
-    JWT_SECRET=tu_clave_secreta
+    cd backend_rw
     ```
 
-3.  **Inicia el servidor backend:**
+2. **Configura las variables de entorno:**
+    Crea un archivo `.env` en la carpeta `backend_rw/` con las siguientes variables:
     ```
-    npm start
+    DB_URL=postgres://usuario:contraseña@host:puerto/nombre_bd
+    JWT_SECRET=tu_clave_secreta_segura
+    NODE_ENV=development
+    ```
+
+3. **Inicia el servidor backend:**
+    ```
+    npm run dev
     ```
     El servidor se ejecutará en `http://localhost:3000`.
 
 #### Ejecutar el Frontend
 
-1.  **En otra terminal, desde la raíz del proyecto, inicia el servidor de desarrollo:**
+1. **En otra terminal, desde la raíz del proyecto, inicia el servidor de desarrollo:**
     ```
     ionic serve
     ```
 
-2.  Abre tu navegador y ve a `http://localhost:8100`. La aplicación se recargará automáticamente cada vez que guardes un cambio en el código.
+2. Abre tu navegador y ve a `http://localhost:8100`. La aplicación se recargará automáticamente cada vez que guardes un cambio en el código.
 
 ### Notas Importantes
 
-- Asegúrate de que el backend esté ejecutándose antes de iniciar el frontend.
+- **Asegúrate de que el backend esté ejecutándose antes de iniciar el frontend.**
 - El frontend está configurado para conectarse al backend en `http://localhost:3000` por defecto.
-- La base de datos debe estar configurada con las tablas necesarias antes de ejecutar la aplicación.
+- La base de datos debe estar creada y accesible antes de ejecutar la aplicación.
+- Los modelos de Sequelize se sincronizarán automáticamente con la base de datos en la primera ejecución.
+
+### Testing de la API
+
+Para probar los endpoints de la API, puedes usar herramientas como **Postman** o **Insomnia**:
+
+1. Registra un nuevo usuario: `POST /api/auth/register`
+2. Inicia sesión: `POST /api/auth/login`
+3. Copia el token retornado y úsalo en el header `Authorization: Bearer <token>`
+4. Prueba endpoints protegidos como `GET /api/products`, `POST /api/cart`, etc.
+
+---
+
+## Información de la Entrega
+
+**Entrega Parcial 2**: Integración Frontend + Backend y Autenticación
+- Fecha de entrega: [Completar con fecha límite]
+- Estado: En desarrollo
+- Rama principal: `main`
+- Rama de desarrollo: `backend-integration`
