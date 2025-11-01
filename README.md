@@ -20,7 +20,7 @@
 
 ## Resumen del Proyecto
 
-Este es un proyecto universitario para el ramo de "Web y Móvil", desarrollado con el framework Ionic y Angular. La aplicación es un e-commerce para la marca "RacingConEstilo", una tienda de streetwear inspirada en la cultura de las carreras de autos.
+Este es un proyecto universitario para el ramo de "Web y Móvil", desarrollado con el framework Ionic y Angular. La aplicación es un e-commerce para la marca "RacingConEstilo", una tienda inspirada en la cultura de las carreras de autos.
 
 [![Captura de pantalla de la página de inicio](https://i.imgur.com/ehaGOR7.png)](https://racing-web-ionic.vercel.app/)
 
@@ -110,14 +110,14 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 
 El backend está construido con Node.js y Express, proporcionando una API RESTful completa para gestionar las operaciones del e-commerce.
 
-#### EP 2.1: Servidor Node.js con Express
+#### Servidor Node.js con Express
 
 - Servidor configurado en puerto 3000
 - Estructura modular con carpetas de controllers, routes, models y middlewares
 - Variables de entorno configuradas via `.env`
 - Manejo centralizado de errores
 
-#### EP 2.2: Base de Datos PostgreSQL
+#### Base de Datos PostgreSQL
 
 - Base de datos relacional alojada en la nube
 - Modelos de datos implementados con Sequelize:
@@ -132,7 +132,7 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
 - Relaciones establecidas entre modelos (1:N, 1:1)
 - Encriptación segura de datos sensibles
 
-#### EP 2.3: API REST con Endpoints
+#### API REST con Endpoints
 
 **Autenticación:**
 - `POST /api/auth/register` - Registro de nuevos usuarios con validaciones
@@ -166,7 +166,7 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
 - Respuestas en formato JSON con status HTTP apropiados
 - Manejo robusto de errores (400, 401, 403, 404, 500)
 
-#### EP 2.4: Consumo de API desde Frontend
+#### Consumo de API desde Frontend
 
 - Servicio `ApiService` centralizado para todas las peticiones HTTP
 - Servicio `AuthService` para gestionar autenticación
@@ -176,7 +176,7 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
 - Uso de Observables y RxJS para manejo asincrónico
 - HttpClient para peticiones HTTP seguras
 
-#### EP 2.5: Autenticación con JWT
+#### Autenticación con JWT
 
 **Backend:**
 - Implementación de JWT para autenticación segura
@@ -194,7 +194,7 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
 - Mensajes de feedback (toast) en acciones de autenticación
 - Logout con limpieza de tokens y datos
 
-#### EP 2.6: Validación de Usuarios y Manejo de Sesiones
+#### Validación de Usuarios y Manejo de Sesiones
 
 **Backend:**
 - Middleware de validación de JWT en todas las rutas protegidas
@@ -250,12 +250,12 @@ El diagrama MER de la base de datos que muestra la estructura relacional de la a
 
 ## Instalación y Ejecución
 
-Sigue estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
+Siga estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
 
 ### Prerrequisitos
 
-* Tener instalado [Node.js](https://nodejs.org/) (que incluye npm).
-* Tener instalado el CLI de Ionic:
+* Tenga instalado [Node.js](https://nodejs.org/) (que incluye npm).
+* Tenga instalado el CLI de Ionic:
     ```
     npm install -g @ionic/cli
     ```
@@ -263,46 +263,71 @@ Sigue estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
 
 ### Instalación
 
-1. **Clona el repositorio:**
+1. **Clone el repositorio:**
     ```
-    git clone https://github.com/PytricioPUCV/Racing_Web_Ionic.git
+    git clone [https://github.com/PytricioPUCV/Racing_Web_Ionic.git](https://github.com/PytricioPUCV/Racing_Web_Ionic.git)
     ```
 
-2. **Navega a la carpeta del proyecto:**
+2. **Navegue a la carpeta del proyecto:**
     ```
     cd Racing_Web_Ionic
     ```
 
-3. **Instala las dependencias del frontend:**
+3. **Instale las dependencias del frontend:**
     ```
     npm install
     ```
 
-4. **Instala las dependencias del backend:**
+4. **Instale las dependencias del backend:**
     ```
     cd backend_rw
     npm install
     cd ..
     ```
 
+### Dependencias del Backend
+
+Al ejecutar `npm install` en la carpeta `backend_rw/`, se instalarán las siguientes dependencias:
+
+**Dependencias de Producción:**
+- **express** (v5.1.0) - Framework web minimalista para Node.js que maneja rutas y middlewares
+- **sequelize** (v6.37.7) - ORM (Object-Relational Mapping) para PostgreSQL
+- **pg** (v8.16.3) - Driver PostgreSQL para Node.js
+- **pg-hstore** (v2.3.4) - Serializador/deserializador para datos HStore de PostgreSQL
+- **bcryptjs** (v3.0.2) - Librería para encriptar contraseñas
+- **bcrypt** (v6.0.0) - Alternativa para hash de contraseñas
+- **@types/bcryptjs** (v2.4.6) - Tipos TypeScript para bcryptjs
+- **jsonwebtoken** (v9.0.2) - Genera y valida tokens JWT para autenticación
+- **cors** (v2.8.5) - Middleware para habilitar CORS (Cross-Origin Resource Sharing)
+- **dotenv** (v17.2.3) - Carga variables de entorno desde archivo `.env`
+
+**Dependencias de Desarrollo:**
+- **typescript** (v5.9.3) - Lenguaje de tipado estático para JavaScript
+- **ts-node** (v10.9.2) - Ejecuta archivos TypeScript directamente
+- **@types/express** (v5.0.3) - Tipos TypeScript para Express
+- **@types/jsonwebtoken** (v9.0.10) - Tipos TypeScript para JWT
+- **@types/cors** (v2.8.19) - Tipos TypeScript para CORS
+- **@types/bcrypt** (v6.0.0) - Tipos TypeScript para bcrypt
+
+
 ### Ejecutar la Aplicación
 
 #### Ejecutar el Backend
 
-1. **Navega a la carpeta del backend:**
+1. **Navegue a la carpeta del backend:**
     ```
     cd backend_rw
     ```
 
-2. **Configura las variables de entorno:**
-    Crea un archivo `.env` en la carpeta `backend_rw/` con las siguientes variables:
+2. **Configure las variables de entorno:**
+    Cree un archivo `.env` en la carpeta `backend_rw/` con las siguientes variables:
     ```
     DB_URL=postgres://usuario:contraseña@host:puerto/nombre_bd
     JWT_SECRET=tu_clave_secreta_segura
     NODE_ENV=development
     ```
 
-3. **Inicia el servidor backend:**
+3. **Inicie el servidor backend:**
     ```
     npm run dev
     ```
@@ -310,35 +335,37 @@ Sigue estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
 
 #### Ejecutar el Frontend
 
-1. **En otra terminal, desde la raíz del proyecto, inicia el servidor de desarrollo:**
+1. **En otra terminal, desde la raíz del proyecto, inicie el servidor de desarrollo:**
     ```
     ionic serve
     ```
 
-2. Abre tu navegador y ve a `http://localhost:8100`. La aplicación se recargará automáticamente cada vez que guardes un cambio en el código.
+2. Abra su navegador y vaya a `http://localhost:8100`. La aplicación se recargará automáticamente cada vez que guarde un cambio en el código.
 
 ### Notas Importantes
 
-- **Asegúrate de que el backend esté ejecutándose antes de iniciar el frontend.**
+- **Asegúrese de que el backend esté ejecutándose antes de iniciar el frontend.**
 - El frontend está configurado para conectarse al backend en `http://localhost:3000` por defecto.
 - La base de datos debe estar creada y accesible antes de ejecutar la aplicación.
 - Los modelos de Sequelize se sincronizarán automáticamente con la base de datos en la primera ejecución.
 
 ### Testing de la API
 
-Para probar los endpoints de la API, puedes usar herramientas como **Postman** o **Insomnia**:
+Para probar los endpoints de la API, puede usar herramientas como **Postman** o **Insomnia**:
 
-1. Registra un nuevo usuario: `POST /api/auth/register`
-2. Inicia sesión: `POST /api/auth/login`
-3. Copia el token retornado y úsalo en el header `Authorization: Bearer <token>`
-4. Prueba endpoints protegidos como `GET /api/products`, `POST /api/cart`, etc.
+1. Registre un nuevo usuario: `POST /api/auth/register`
+2. Inicie sesión: `POST /api/auth/login`
+3. Copie el token retornado y úselo en el header `Authorization: Bearer <token>`
+4. Pruebe endpoints protegidos como `GET /api/products`, `POST /api/cart`, etc.
+
+**Alternativamente**, puede probar la funcionalidad completa a través del frontend de la aplicación:
+
+1. Diríjase a `http://localhost:8100`
+2. Registre una nueva cuenta mediante el formulario de registro
+3. Inicie sesión con sus credenciales
+4. Explore el catálogo de productos, agregue artículos al carrito y complete una compra
+5. Los datos se sincronizarán automáticamente con el backend
 
 ---
 
-## Información de la Entrega
-
-**Entrega Parcial 2**: Integración Frontend + Backend y Autenticación
-- Fecha de entrega: [Completar con fecha límite]
-- Estado: En desarrollo
-- Rama principal: `main`
 - Rama de desarrollo: `backend-integration`
