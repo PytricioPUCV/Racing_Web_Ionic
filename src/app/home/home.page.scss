@@ -1,8 +1,110 @@
+<<<<<<< Updated upstream
+=======
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden; /* Previene scroll del host */
+}
+
+ion-content {
+  --overflow: auto;
+  flex: 1;
+}
+
+
+.hero-banner {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 400px;
+  margin-bottom: 2rem;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.7);
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero-title {
+  font-size: clamp(1rem, 6vw, 5rem); /* Tamaño adaptable con límites */
+  font-weight: 900;
+  font-family: 'Racing Sans One', system-ui, sans-serif;
+  margin: 0;
+  letter-spacing: 3px;
+  line-height: 1.2;
+  animation: fadeInDown 1s ease-out;
+  background: linear-gradient(135deg, rgb(23, 3, 3), rgb(166, 49, 3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter:
+    drop-shadow(0 0 10px rgba(105, 15, 15, 0.849))
+    drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.13);
+  paint-order: stroke fill;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+}
+
+.hero-subtitle {
+  font-size: clamp(1rem, 4vw, 2.5rem);
+  margin: 1rem 0 2rem 0;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+/* Media query para pantallas muy pequeñas */
+@media (max-width: 400px) {
+  .hero-title {
+    font-size: 3rem !important;
+  }
+  .hero-subtitle {
+    font-size: 1.5rem !important;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 300px;
+  }
+
+  /* Ajuste moderado para móviles, evita tamaños gigantes */
+  .hero-title {
+    font-size: clamp(1.5rem, 8vw, 3rem);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(1rem, 6vw, 2rem);
+  }
+}
+
+/* Otros estilos existentes */
+
+>>>>>>> Stashed changes
 .hero {
   width: 100%;
-  height: calc(100vh - 110px);
-  max-height: 700px;
-  overflow: hidden;
+  height: auto;
+  min-height: 500px;
   position: relative;
 }
 .hero-image {
@@ -43,7 +145,7 @@
   box-shadow: none;
   background-color: var(--card-bg);
   transition: transform 0.3s ease;
-  
+
   &:hover {
     transform: translateY(-5px);
   }
@@ -55,7 +157,7 @@
     border-radius: var(--product-image-radius);
     transition: transform 0.3s;
   }
-  
+
   &:hover img {
     transform: scale(1.05);
   }

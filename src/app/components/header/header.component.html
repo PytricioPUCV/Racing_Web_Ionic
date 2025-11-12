@@ -1,7 +1,27 @@
+<<<<<<< Updated upstream
 <ion-header class="ion-no-border">
   <ion-toolbar>
     <ion-buttons slot="start">
       <a href="/home"><img src="assets/logo.svg" alt="RCNG Logo" class="header-logo"></a>
+=======
+<ion-header>
+  <ion-toolbar>
+    <!-- Logo (SIN CLICK) -->
+    <div class="header-title-group" slot="start">
+      <img 
+        src="assets/logo.jpg"
+        alt="Logo"
+        class="header-logo"
+      />
+      <h2>RacingConEstilo</h2>
+    </div>
+
+    <!-- Navegación en desktop -->
+    <ion-buttons slot="end" class="desktop-nav">
+      <a (click)="goToHome()" class="nav-link">Inicio</a>
+      <a (click)="goToJackets()" class="nav-link">Chaquetas</a>
+      <a (click)="goToAccessories()" class="nav-link">Accesorios</a>
+>>>>>>> Stashed changes
     </ion-buttons>
 
     <div class="desktop-nav ion-hide-md-down">
@@ -10,6 +30,7 @@
       <a href="/accessories"><b>ACCESORIOS</b></a>
     </div>
 
+<<<<<<< Updated upstream
     <ion-buttons slot="end">
       <ion-button (click)="toggleTheme()">
         <ion-icon slot="icon-only" name="sunny-outline" class="theme-icon-light"></ion-icon>
@@ -26,6 +47,42 @@
       </ion-button>
       <ion-button class="ion-hide-md-up" (click)="toggleMobileMenu()">
         <ion-icon slot="icon-only" name="menu-outline"></ion-icon>
+=======
+      <!-- ✅ USER (Autenticado, no admin) -->
+      <ng-container *ngIf="isLoggedIn && !isAdmin">
+        <ion-button (click)="goToCart()" color="light">
+          🛒 Carrito
+        </ion-button>
+        <ion-button (click)="goToProfile()" color="light">
+           Perfil
+        </ion-button>
+        <ion-button color="light" (click)="logout()">
+          Salir
+        </ion-button>
+      </ng-container>
+
+      <!-- ✅ ADMIN -->
+      <ng-container *ngIf="isAdmin">
+        <ion-button [routerLink]="['/admin']" color="danger">
+          ⚙️ Admin
+        </ion-button>
+        <ion-button (click)="goToAdminUsers()" color="danger">
+          👥 Usuarios
+        </ion-button>
+        <ion-button (click)="goToProfile()" color="light">
+          👤 Perfil
+        </ion-button>
+        <ion-button color="light" (click)="logout()">
+          Salir
+        </ion-button>
+      </ng-container>
+    </ion-buttons>
+
+    <!-- Menú móvil -->
+    <ion-buttons slot="end" class="mobile-menu-btn">
+      <ion-button (click)="toggleMobileMenu()">
+        <ion-icon name="menu"></ion-icon>
+>>>>>>> Stashed changes
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
