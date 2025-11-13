@@ -17,10 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
+app.use(helmet());
 
 const corsOptions = {
   origin: [
