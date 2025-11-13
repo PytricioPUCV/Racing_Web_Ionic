@@ -2,9 +2,20 @@
 
 <ion-content [fullscreen]="true">
 
-  <section class="hero">
-    <img src="assets/hero.jpg" alt="RacingClothes Brand Model" class="hero-image">
-  </section>
+  <!-- Sección de usuario autenticado -->
+  <div class="user-welcome" *ngIf="currentUser">
+    <div class="welcome-content">
+      <span class="welcome-text">¡Hola, <strong>{{ currentUser.username }}</strong>! 👋</span>
+      <div class="user-buttons">
+        <ion-button size="small" fill="outline" (click)="goToProfile()">
+          Mi Perfil
+        </ion-button>
+        <ion-button size="small" fill="outline" color="danger" (click)="onLogout()">
+          Cerrar Sesión
+        </ion-button>
+      </div>
+    </div>
+  </div>
 
   <div class="product-section">
     <div class="product-header">
@@ -12,25 +23,37 @@
       <ion-button class="buy-btn">Comprar</ion-button>
     </div>
     
-    <ion-grid>
+    <!-- Indicador de carga -->
+    <div *ngIf="loading" style="text-align: center; padding: 2rem;">
+      <ion-spinner></ion-spinner>
+      <p>Cargando productos...</p>
+    </div>
+
+    <!-- Grid de productos -->
+    <ion-grid *ngIf="!loading">
       <ion-row>
         <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let product of products">
-          
-          <a [href]="'/product/' + product.id">
-            <ion-card class="product-item">
-              <img [src]="product.image" [alt]="product.name">
-              <div class="product-info">
-                <span class="product-name"><b>{{ product.name }}</b></span>
-                <div class="price-wrapper">
-                  <span class="product-price-original">${{ product.originalPrice.toLocaleString('es-CL') }}</span>
-                  <span class="product-price"><b>${{ product.price.toLocaleString('es-CL') }}</b> <span class="discount" *ngIf="product.discount">{{ product.discount }}</span></span>
-                </div>
+          <ion-card class="product-item" (click)="navegarAlProducto(product.id)">
+            <img 
+              [src]="product.image || product.imageUrl" 
+              [alt]="product.name"
+            >
+            <div class="product-info">
+              <span class="product-name"><b>{{ product.name }}</b></span>
+              <div class="price-wrapper">
+                <span class="product-price-original" *ngIf="product.originalPrice">
+                  ${{ product.originalPrice.toLocaleString('es-CL') }}
+                </span>
+                <span class="product-price">
+                  <b>${{ product.price.toLocaleString('es-CL') }}</b>
+                </span>
               </div>
-            </ion-card>
-          </a>
-          </ion-col>
+            </div>
+          </ion-card>
+        </ion-col>
       </ion-row>
     </ion-grid>
   </div>
+  
   <app-footer></app-footer>
 </ion-content>
