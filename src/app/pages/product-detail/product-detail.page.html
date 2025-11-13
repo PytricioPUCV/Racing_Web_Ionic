@@ -1,12 +1,10 @@
 <app-header></app-header>
 
 <ion-content>
-  <!-- Indicador de carga -->
   <div *ngIf="loading" class="ion-padding" style="text-align: center;">
     <p>Cargando producto...</p>
   </div>
 
-  <!-- Contenido del producto -->
   <div *ngIf="!loading && product">
     
     <div class="breadcrumb">
@@ -16,7 +14,14 @@
     <ion-grid>
       <ion-row>
         <ion-col size="12" size-md="6">
-          <img [src]="product.image || product.imageUrl" [alt]="product.name" class="product-image">
+          <img 
+            [src]="product.image || product.imageUrl" 
+            [alt]="product.name" 
+            class="product-image"
+            loading="lazy"
+            width="600"
+            height="600"
+          >
         </ion-col>
 
         <ion-col size="12" size-md="6" class="product-info">
@@ -24,7 +29,6 @@
           <h1 class="product-title">{{ product.name }}</h1>
 
           <div class="price-wrapper">
-            <!-- ✅ LÍNEA CORREGIDA -->
             <p class="original" *ngIf="product.originalPrice">
               ${{ product.originalPrice.toLocaleString('es-CL') }}
             </p>
@@ -78,8 +82,8 @@
               <div class="ion-padding" slot="content">
                 <p>LARGO - PECHO - ALTURA RECOMENDADA</p>
                 <ul>
-                  <li>Talla M - 68 cm - 116 cm - [165,170] cm</li>
-                  <li>Talla L - 70 cm - 120 cm - [170,175] cm</li>
+                  <li>Talla M - 68 cm - 116 cm -  cm</li>
+                  <li>Talla L - 70 cm - 120 cm -  cm</li>
                 </ul>
               </div>
             </ion-accordion>
@@ -89,7 +93,6 @@
     </ion-grid>
   </div>
 
-  <!-- Mensaje si no hay producto -->
   <div *ngIf="!loading && !product" class="ion-padding">
     <h2>Producto no encontrado</h2>
     <p>El producto que buscas no existe o no está disponible.</p>
