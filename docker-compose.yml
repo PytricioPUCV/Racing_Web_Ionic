@@ -1,0 +1,68 @@
+services:
+  # Base de datos PostgreSQL
+  database:
+    image: postgres:16-alpine
+    container_name: racing_database
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER:-racing_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-racing_password}
+      POSTGRES_DB: ${DB_NAME:-racing_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - racing_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U racing_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend Node.js + TypeScript
+  backend:
+    build:
+      context: ./backend_rw        # ← Carpeta backend dentro de Racing_Web
+      dockerfile: Dockerfile
+    container_name: racing_backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:-racing_user}
+      DB_PASSWORD: ${DB_PASSWORD:-racing_password}
+      DB_NAME: ${DB_NAME:-racing_db}
+      JWT_SECRET: ${JWT_SECRET:-default-secret-change-me}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-default-encryption-key-change-me}
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - racing_network
+
+  # Frontend Ionic Angular
+  frontend:
+    build:
+      context: .                   # ← Carpeta actual (Racing_Web)
+      dockerfile: Dockerfile
+    container_name: racing_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - racing_network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  racing_network:
+    driver: bridge
