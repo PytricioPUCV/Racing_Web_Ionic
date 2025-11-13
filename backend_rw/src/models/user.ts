@@ -1,5 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../database';
+import { encrypt, decrypt } from '../utils/encryption';
 
 interface UserAttributes {
   id: number;
@@ -9,7 +10,7 @@ interface UserAttributes {
   password: string;
   region: string;  
   comuna: string;
-  role: string; // 'user', 'admin', 'guest'
+  role: string;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'role'> {}
@@ -26,6 +27,18 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public getDecryptedRegion(): string {
+    return this.region ? decrypt(this.region) : '';
+  }
+
+  public getDecryptedComuna(): string {
+    return this.comuna ? decrypt(this.comuna) : '';
+  }
+
+  public getDecryptedRut(): string {
+    return this.rut ? decrypt(this.rut) : '';
+  }
 }
 
 User.init({
@@ -35,7 +48,7 @@ User.init({
     primaryKey: true,
   },
   rut: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
     unique: true,
   },
@@ -53,11 +66,11 @@ User.init({
     allowNull: false,
   },
   region: { 
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   comuna: { 
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   role: {
