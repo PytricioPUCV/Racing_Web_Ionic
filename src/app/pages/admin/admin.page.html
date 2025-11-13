@@ -1,0 +1,83 @@
+<app-header></app-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <div class="admin-panel">
+    <h1>⚙️ Panel de Administrador</h1>
+    <p style="color: #666; margin-bottom: 2rem;">Gestiona todos los aspectos de la plataforma desde aquí</p>
+    
+    <ion-grid>
+      <ion-row>
+        <ion-col size="12" size-md="6">
+          <ion-card class="admin-card">
+            <ion-card-header>
+              <ion-card-title>👥 Gestión de Usuarios</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Ver, editar y eliminar usuarios del sistema</p>
+              <ion-button 
+                [routerLink]="['/admin/users']" 
+                color="primary"
+                expand="block">
+                Ver Usuarios
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card class="admin-card">
+            <ion-card-header>
+              <ion-card-title>📦 Gestión de Productos</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Crear, editar y eliminar productos del catálogo</p>
+              <ion-button 
+                [routerLink]="['/admin/products']" 
+                color="secondary"
+                expand="block"
+                disabled>
+                Ver Productos (Próximamente)
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card class="admin-card">
+            <ion-card-header>
+              <ion-card-title>📊 Órdenes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Ver y gestionar órdenes de clientes</p>
+              <ion-button 
+                color="tertiary"
+                expand="block"
+                disabled>
+                Ver Órdenes (Próximamente)
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+
+        <ion-col size="12" size-md="6">
+          <ion-card class="admin-card">
+            <ion-card-header>
+              <ion-card-title>📈 Reportes</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <p>Ver estadísticas y reportes de ventas</p>
+              <ion-button 
+                color="success"
+                expand="block"
+                disabled>
+                Ver Reportes (Próximamente)
+              </ion-button>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </div>
+
+</ion-content>
