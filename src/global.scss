@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
-
 /* =================== RESET Y ESTILOS GENERALES =================== */
 * {
   margin: 0;
@@ -20,5 +19,52 @@ ul {
 }
 
 body {
-    overflow-x: hidden;
+  overflow-x: hidden;
+}
+
+/* Estilos para toast de éxito */
+ion-toast.success-toast {
+  --background: #2dd36f; /* Verde de éxito */
+  --color: #ffffff; /* Texto blanco */
+  --border-radius: 12px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  
+  &::part(message) {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  &::part(container) {
+    padding: 16px;
+  }
+}
+
+/* Estilos para toast de error */
+ion-toast.danger-toast {
+  --background: #eb445a; /* Rojo de error */
+  --color: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  
+  &::part(message) {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  &::part(container) {
+    padding: 16px;
+  }
+}
+
+/* Estilos para toast de advertencia */
+ion-toast.warning-toast {
+  --background: #ffc409; /* Amarillo de advertencia */
+  --color: #000000; /* Texto negro para mejor contraste */
+  --border-radius: 12px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  
+  &::part(message) {
+    font-weight: 600;
+    font-size: 16px;
+  }
 }
