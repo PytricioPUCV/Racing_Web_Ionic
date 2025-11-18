@@ -27,7 +27,7 @@ const corsOptions = {
     'http://localhost:4200',
     'https://racing-web-ionic.vercel.app'
   ],
-  credentials: true,
+  //credentials: true, comenteado ya que  no se usan cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
