@@ -8,6 +8,7 @@ import {
   IonCardContent,
   IonButton,
   IonIcon,
+  IonImg,  // ← AGREGADO
   AlertController,
   ToastController
 } from '@ionic/angular/standalone';
@@ -31,7 +32,8 @@ import { Subscription } from 'rxjs';
     IonCardHeader,
     IonCardContent,
     IonButton,
-    IonIcon
+    IonIcon,
+    IonImg  // ← AGREGADO
   ]
 })
 export class ShopcartPage implements OnInit {
@@ -54,7 +56,6 @@ export class ShopcartPage implements OnInit {
 
   ionViewWillEnter() {
     this.scrollToTop();
-    // Recargar carrito cada vez que se entra a la página
     this.cartService.loadUserCart();
   }
 
@@ -63,7 +64,6 @@ export class ShopcartPage implements OnInit {
   }
 
   ngOnDestroy() {
-    // Limpiar suscripción al destruir componente
     if (this.cartSubscription) {
       this.cartSubscription.unsubscribe();
     }
@@ -78,7 +78,6 @@ export class ShopcartPage implements OnInit {
   }
 
   loadCart() {
-    // Suscribirse al observable del carrito
     this.cartSubscription = this.cartService.cartItems$.subscribe({
       next: (items) => {
         this.cartItems = items;
@@ -90,7 +89,6 @@ export class ShopcartPage implements OnInit {
       }
     });
 
-    // Cargar carrito desde el backend
     this.cartService.loadUserCart();
   }
 
@@ -148,7 +146,6 @@ export class ShopcartPage implements OnInit {
               next: async () => {
                 await this.presentToast('Producto eliminado del carrito', 'success');
                 this.cartService.loadUserCart();
-
               },
               error: async (err) => {
                 console.error('❌ Error eliminando item:', err);
@@ -189,7 +186,6 @@ export class ShopcartPage implements OnInit {
       return;
     }
 
-    // TODO: Navegar a checkout
     this.router.navigate(['/checkout']);
   }
 

@@ -8,6 +8,7 @@ import {
   IonCol, 
   IonLabel, 
   IonButton, 
+  IonImg,
   IonAccordionGroup, 
   IonAccordion, 
   IonItem,
@@ -18,7 +19,6 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { ProductService, Product } from '../../services/product';
 import { CartService, CartItem } from '../../services/cart.service';
 import { firstValueFrom } from 'rxjs';
-
 
 @Component({
   selector: 'app-product-detail',
@@ -34,7 +34,8 @@ import { firstValueFrom } from 'rxjs';
     IonRow, 
     IonCol, 
     IonLabel, 
-    IonButton, 
+    IonButton,
+    IonImg,  // ← AGREGAR ESTA LÍNEA
     IonAccordionGroup, 
     IonAccordion, 
     IonItem
@@ -59,9 +60,6 @@ export class ProductDetailPage implements OnInit {
 
   ngOnInit() {
     console.log('🔍 ngOnInit ejecutado');
-    
-    // Cargar el carrito del usuario para obtener el cartId
-    //this.loadUserCart();
     
     this.route.paramMap.subscribe((params) => {
       const productId = params.get('id');
@@ -91,7 +89,6 @@ export class ProductDetailPage implements OnInit {
       },
       error: (err) => {
         console.error('❌ Error cargando carrito:', err);
-        // Si no existe carrito, crear uno nuevo
         this.cartService.createCart().subscribe({
           next: (newCart) => {
             this.userCartId = newCart.id;
@@ -157,76 +154,63 @@ export class ProductDetailPage implements OnInit {
   }
 
   async addToCart(): Promise<void> {
-  if (!this.product) {
-    await this.presentToast('❌ Error: Producto no disponible', 'danger');
-    return;
-  }
+    if (!this.product) {
+      await this.presentToast('❌ Error: Producto no disponible', 'danger');
+      return;
+    }
 
-  // ✅ Si no hay cartId, crear o cargar carrito primero
-  if (!this.userCartId) {
-    console.log('⏳ Carrito no inicializado, cargando...');
-    
-    try {
-      // Intentar obtener carrito existente
-      const response = await firstValueFrom(this.cartService.getUserCart());
+    if (!this.userCartId) {
+      console.log('⏳ Carrito no inicializado, cargando...');
       
-      // ✅ CORRECCIÓN: Acceder a response.cart.id en lugar de response.id
-      this.userCartId = response.cart.id;
-      console.log('✅ Carrito cargado, ID:', this.userCartId);
-    } catch (err) {
-      // Si falla, crear nuevo carrito
-      console.log('📦 Creando nuevo carrito...');
       try {
-        const newCartResponse = await firstValueFrom(this.cartService.createCart());
-        
-        // ✅ También aquí, acceder a .cart.id
-        this.userCartId = newCartResponse.cart?.id || newCartResponse.id;
-        console.log('✅ Nuevo carrito creado, ID:', this.userCartId);
-      } catch (createErr) {
-        console.error('❌ Error creando carrito:', createErr);
-        await this.presentToast('❌ Error al inicializar carrito', 'danger');
-        return;
+        const response = await firstValueFrom(this.cartService.getUserCart());
+        this.userCartId = response.cart.id;
+        console.log('✅ Carrito cargado, ID:', this.userCartId);
+      } catch (err) {
+        console.log('📦 Creando nuevo carrito...');
+        try {
+          const newCartResponse = await firstValueFrom(this.cartService.createCart());
+          this.userCartId = newCartResponse.cart?.id || newCartResponse.id;
+          console.log('✅ Nuevo carrito creado, ID:', this.userCartId);
+        } catch (createErr) {
+          console.error('❌ Error creando carrito:', createErr);
+          await this.presentToast('❌ Error al inicializar carrito', 'danger');
+          return;
+        }
       }
     }
-  }
 
-  // Validar productId
-  const productId = this.product.id;
-  
-  if (!productId) {
-    await this.presentToast('❌ Error: ID de producto inválido', 'danger');
-    return;
-  }
-
-  // Crear el item del carrito
-  const cartItem: CartItem = {
-    cartId: this.userCartId!,
-    productId: productId,
-    quantity: this.quantity,
-    size: this.selectedSize
-  };
-
-  console.log('🛒 Añadiendo al carrito:', cartItem);
-
-  // Añadir al carrito
-  this.cartService.addCartItem(cartItem).subscribe({
-    next: async () => {
-      await this.presentToast(
-        `✅ ${this.product!.name} añadido (x${this.quantity}, ${this.selectedSize})`, 
-        'success'
-      );
-      this.cartService.loadUserCart(); // Actualizar estado del carrito
-      this.quantity = 1;
-    },
-    error: async (err) => {
-      console.error('❌ Error añadiendo al carrito:', err);
-      await this.presentToast('❌ Error al añadir producto', 'danger');
+    const productId = this.product.id;
+    
+    if (!productId) {
+      await this.presentToast('❌ Error: ID de producto inválido', 'danger');
+      return;
     }
-  });
-}
 
+    const cartItem: CartItem = {
+      cartId: this.userCartId!,
+      productId: productId,
+      quantity: this.quantity,
+      size: this.selectedSize
+    };
 
+    console.log('🛒 Añadiendo al carrito:', cartItem);
 
+    this.cartService.addCartItem(cartItem).subscribe({
+      next: async () => {
+        await this.presentToast(
+          `✅ ${this.product!.name} añadido (x${this.quantity}, ${this.selectedSize})`, 
+          'success'
+        );
+        this.cartService.loadUserCart();
+        this.quantity = 1;
+      },
+      error: async (err) => {
+        console.error('❌ Error añadiendo al carrito:', err);
+        await this.presentToast('❌ Error al añadir producto', 'danger');
+      }
+    });
+  }
 
   private async presentToast(message: string, color: 'success' | 'danger' = 'success'): Promise<void> {
     const toast = await this.toastController.create({

@@ -25,13 +25,15 @@
         <ion-card *ngFor="let item of cartItems; let i = index" class="cart-item">
           <ion-card-content>
             <div class="item-content">
-              <!-- Imagen del producto - USA item.product?.image -->
+              <!-- Imagen del producto - OPTIMIZADO CON ion-img -->
               <div class="item-image">
-                <img [src]="item.product?.image || item.product?.imageUrl || 'assets/placeholder.jpg'" 
-                     [alt]="item.product?.name || 'Producto'">
+                <ion-img 
+                  [src]="item.product?.image || item.product?.imageUrl || 'assets/placeholder.jpg'" 
+                  [alt]="item.product?.name || 'Producto'"
+                ></ion-img>
               </div>
 
-              <!-- Info del producto - USA item.product?.name -->
+              <!-- Info del producto -->
               <div class="item-info">
                 <h3>{{ item.product?.name || 'Producto sin nombre' }}</h3>
                 <p class="item-size">Talla: {{ item.size }}</p>
@@ -50,7 +52,7 @@
                   </ion-button>
                 </div>
 
-                <!-- Subtotal - USA item.product?.price -->
+                <!-- Subtotal -->
                 <p class="item-subtotal">
                   {{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}
                 </p>
