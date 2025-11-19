@@ -25,16 +25,17 @@
         <ion-card *ngFor="let item of cartItems; let i = index" class="cart-item">
           <ion-card-content>
             <div class="item-content">
-              <!-- Imagen del producto -->
+              <!-- Imagen del producto - USA item.product?.image -->
               <div class="item-image">
-                <img [src]="item.image" [alt]="item.name">
+                <img [src]="item.product?.image || item.product?.imageUrl || 'assets/placeholder.jpg'" 
+                     [alt]="item.product?.name || 'Producto'">
               </div>
 
-              <!-- Info del producto -->
+              <!-- Info del producto - USA item.product?.name -->
               <div class="item-info">
-                <h3>{{ item.name }}</h3>
+                <h3>{{ item.product?.name || 'Producto sin nombre' }}</h3>
                 <p class="item-size">Talla: {{ item.size }}</p>
-                <p class="item-price">{{ item.price | currency:'CLP':'symbol-narrow' }}</p>
+                <p class="item-price">{{ item.product?.price | currency:'CLP':'symbol-narrow' }}</p>
               </div>
 
               <!-- Controles de cantidad -->
@@ -49,9 +50,9 @@
                   </ion-button>
                 </div>
 
-                <!-- Subtotal -->
+                <!-- Subtotal - USA item.product?.price -->
                 <p class="item-subtotal">
-                  {{ item.price * item.quantity | currency:'CLP':'symbol-narrow' }}
+                  {{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}
                 </p>
 
                 <!-- Botón eliminar -->

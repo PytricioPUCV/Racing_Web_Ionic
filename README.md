@@ -15,6 +15,12 @@
 7. [Arquitectura del Sistema](#arquitectura-del-sistema)
 8. [Modelo Entidad-Relación (MER)](#modelo-entidad-relación-mer)
 9. [Instalación y Ejecución](#instalación-y-ejecución)
+    - 9.1 [Prerrequisitos](#prerrequisitos)
+    - 9.2 [Instalación](#instalación)
+    - 9.3 [Dependencias del Backend](#dependencias-del-backend)
+    - 9.4 [Ejecución Manual (Frontend y Backend separados)](#ejecución-manual-frontend-y-backend-separados)
+    - 9.5 [Ejecución con Docker (Recomendado)](#ejecución-con-docker-recomendado)
+    - 9.6 [Testing de la API](#testing-de-la-api)
 
 ---
 
@@ -24,7 +30,9 @@ Este es un proyecto universitario para el ramo de "Web y Móvil", desarrollado c
 
 [![Captura de pantalla de la página de inicio](https://i.imgur.com/ehaGOR7.png)](https://racing-web-ionic.vercel.app/)
 
-El proyecto implementa una arquitectura cliente-servidor completa, con un frontend desarrollado en Ionic/Angular y un backend en Node.js con Express. La aplicación incluye funcionalidades esenciales de un e-commerce moderno: catálogo de productos, detalle de producto, autenticación de usuarios con JWT, gestión de carrito de compras y operaciones CRUD protegidas. La arquitectura se centra en componentes reutilizables y servicios para la gestión de datos, asegurando la escalabilidad del sistema.
+El proyecto implementa una arquitectura cliente-servidor completa, con un frontend desarrollado en Ionic/Angular y un backend en Node.js con Express. La aplicación incluye funcionalidades esenciales de un e-commerce moderno: catálogo de productos, detalle de producto, autenticación de usuarios con JWT, gestión de carrito de compras y operaciones CRUD protegidas.
+
+La arquitectura se centra en componentes reutilizables y servicios para la gestión de datos, asegurando la escalabilidad del sistema. Recientemente, se ha incorporado **Docker** para facilitar el despliegue y la configuración del entorno, y se han mejorado las prácticas de seguridad mediante la encriptación de datos sensibles (AES) y la implementación de headers de seguridad con `helmet`.
 
 ---
 
@@ -49,18 +57,19 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 
 ### Requerimientos No Funcionales
 
-- **RNF1 (Rendimiento)**: La aplicación debe cargar la página de inicio y el catálogo de productos en menos de 2 segundos en una conexión de internet estándar.
+- **RNF1 (Rendimiento)**: La aplicación debe cargar la página de inicio y el catálogo de productos en menos de 2 segundos en una conexión de internet estándar. *Mejorado mediante la implementación de 'lazy loading' en las imágenes de productos.*
 - **RNF2 (Usabilidad)**: La interfaz debe ser intuitiva, permitiendo que un usuario nuevo pueda seleccionar un producto y sus opciones en menos de 3 clics.
 - **RNF3 (Diseño Responsivo)**: El sistema debe adaptarse y ser completamente funcional en pantallas de dispositivos móviles (iOS, Android) y de escritorio.
 - **RNF4 (Compatibilidad)**: La aplicación web debe ser compatible con las últimas versiones de los navegadores como Google Chrome, Firefox y Safari.
-- **RNF5 (Seguridad)**: Las contraseñas de los usuarios deben ser almacenadas en la base de datos de forma encriptada para proteger su información.
+- **RNF5 (Seguridad)**: Las contraseñas de los usuarios deben ser almacenadas en la base de datos de forma encriptada (hash bcrypt) para proteger su información. *Mejorado con encriptación AES para otros datos sensibles del usuario.*
 - **RNF6 (Mantenibilidad)**: El código debe estar organizado en componentes reutilizables para facilitar futuras actualizaciones y correcciones.
 - **RNF7 (Persistencia de Tema)**: La elección del usuario entre el tema claro y oscuro debe guardarse en su dispositivo para que se mantenga en futuras visitas.
 - **RNF8 (Autenticación)**: El sistema debe implementar tokens JWT para mantener sesiones de usuario de forma segura.
+- **RNF9 (Seguridad de API)**: El backend debe implementar medidas de seguridad estándar, como headers HTTP seguros (CSP, XSS-Protection) para prevenir ataques comunes.
 
 ---
 
-## Arquitectura de la Información 
+## Arquitectura de la Información
 [Estructura de Navegación - Página](https://whimsical.com/estructura-de-navegacion-pagina-FfecMFJYgrHrKuPHLwcUia)
 [![Captura de pantalla del Flujo de Navegación Página](https://i.imgur.com/VWcv3yP.jpeg)](https://whimsical.com/estructura-de-navegacion-pagina-FfecMFJYgrHrKuPHLwcUia)
 
@@ -69,7 +78,7 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 
 ---
 
-## Prototipo de Diseño 
+## Prototipo de Diseño
 [MockUps - Racing Jackets (Figma)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
 [![Captura de pantalla del prototipo de Figma](https://i.imgur.com/2QRz8cs.png)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
 
@@ -97,10 +106,17 @@ El proyecto implementa una arquitectura cliente-servidor completa, con un fronte
 - **Node.js**: Entorno de ejecución para JavaScript del lado del servidor.
 - **Express**: Framework minimalista para crear APIs REST.
 - **Sequelize**: ORM para PostgreSQL.
-- **PostgreSQL**: Sistema de gestión de bases de datos relacional en la nube.
+- **PostgreSQL**: Sistema de gestión de bases de datos relacional.
 - **bcryptjs**: Librería para el hash y encriptación de contraseñas.
 - **jsonwebtoken (JWT)**: Para la generación y validación de tokens de autenticación.
 - **cors**: Middleware para habilitar CORS (Cross-Origin Resource Sharing).
+- **helmet**: Middleware para securizar la aplicación Express (ej. headers HTTP).
+- **crypto-js**: Librería para encriptación simétrica (AES) de datos sensibles.
+- **dotenv**: Para la gestión de variables de entorno.
+
+### DevOps
+- **Docker / Docker Compose**: Para la containerización y orquestación de los servicios de frontend y backend.
+- **Nginx**: Utilizado como servidor web para el frontend y proxy inverso para la API en el entorno de Docker.
 
 ---
 
@@ -116,10 +132,11 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
 - Estructura modular con carpetas de controllers, routes, models y middlewares
 - Variables de entorno configuradas via `.env`
 - Manejo centralizado de errores
+- **Seguridad mejorada**: Implementación de `helmet` para proteger contra vulnerabilidades web comunes (headers HTTP) y configuración de CORS actualizada.
 
 #### Base de Datos PostgreSQL
 
-- Base de datos relacional alojada en la nube
+- Base de datos relacional alojada en la nube (SupaBase) o local (Docker)
 - Modelos de datos implementados con Sequelize:
   - **Users**: Gestión de usuarios con roles (user, admin, guest)
   - **Products**: Catálogo de productos con atributos (nombre, descripción, precio, stock, talla, color, marca)
@@ -130,7 +147,7 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
   - **OrderItems**: Ítems dentro de las órdenes
 
 - Relaciones establecidas entre modelos (1:N, 1:1)
-- Encriptación segura de datos sensibles
+- **Encriptación segura de datos sensibles**: Además del hash de contraseñas (bcrypt), se aplica encriptación simétrica (AES) a campos sensibles del usuario como RUT, región y comuna, utilizando `crypto-js`.
 
 #### API REST con Endpoints
 
@@ -217,6 +234,7 @@ El backend está construido con Node.js y Express, proporcionando una API RESTfu
 - **Servicios**: Lógica de negocio centralizada
 - **Componentes**: Consumo de datos mediante async pipe y observables
 - **Validaciones**: Feedback inmediato en formularios
+- **Optimización**: Carga perezosa (*lazy loading*) y atributos de dimensión explícitos en imágenes de productos para mejorar el rendimiento y el *layout stability*.
 
 ---
 
@@ -259,7 +277,8 @@ Siga estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
     ```
     npm install -g @ionic/cli
     ```
-* Base de datos PostgreSQL (local o en la nube)
+* Tenga instalado [Docker](https://www.docker.com/products/docker-desktop/) y Docker Compose (V2).
+* Base de datos PostgreSQL (local, en la nube, o via Docker).
 
 ### Instalación
 
@@ -287,30 +306,30 @@ Siga estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
 
 ### Dependencias del Backend
 
-Al ejecutar `npm install` en la carpeta `backend_rw/`, se instalarán las siguientes dependencias:
+Al ejecutar `npm install` en la carpeta `backend_rw/`, se instalarán las siguientes dependencias clave:
 
 **Dependencias de Producción:**
-- **express** (v5.1.0) - Framework web minimalista para Node.js que maneja rutas y middlewares
+- **express** (v5.1.0) - Framework web minimalista para Node.js
 - **sequelize** (v6.37.7) - ORM (Object-Relational Mapping) para PostgreSQL
 - **pg** (v8.16.3) - Driver PostgreSQL para Node.js
-- **pg-hstore** (v2.3.4) - Serializador/deserializador para datos HStore de PostgreSQL
+- **pg-hstore** (v2.3.4) - Serializador/deserializador para datos HStore
 - **bcryptjs** (v3.0.2) - Librería para encriptar contraseñas
-- **bcrypt** (v6.0.0) - Alternativa para hash de contraseñas
-- **@types/bcryptjs** (v2.4.6) - Tipos TypeScript para bcryptjs
-- **jsonwebtoken** (v9.0.2) - Genera y valida tokens JWT para autenticación
-- **cors** (v2.8.5) - Middleware para habilitar CORS (Cross-Origin Resource Sharing)
-- **dotenv** (v17.2.3) - Carga variables de entorno desde archivo `.env`
+- **jsonwebtoken** (v9.0.2) - Genera y valida tokens JWT
+- **cors** (v2.8.5) - Middleware para habilitar CORS
+- **dotenv** (v17.2.3) - Carga variables de entorno desde `.env`
+- **helmet** (v7.2.0) - Middleware para securizar headers HTTP
+- **crypto-js** (v4.2.0) - Librería para encriptación simétrica (AES)
 
 **Dependencias de Desarrollo:**
-- **typescript** (v5.9.3) - Lenguaje de tipado estático para JavaScript
+- **typescript** (v5.9.3) - Lenguaje de tipado estático
 - **ts-node** (v10.9.2) - Ejecuta archivos TypeScript directamente
 - **@types/express** (v5.0.3) - Tipos TypeScript para Express
 - **@types/jsonwebtoken** (v9.0.10) - Tipos TypeScript para JWT
 - **@types/cors** (v2.8.19) - Tipos TypeScript para CORS
-- **@types/bcrypt** (v6.0.0) - Tipos TypeScript para bcrypt
+- **@types/bcryptjs** (v2.4.6) - Tipos TypeScript para bcryptjs
+- **@types/crypto-js** (v4.2.5) - Tipos TypeScript para crypto-js
 
-
-### Ejecutar la Aplicación
+### Ejecución Manual (Frontend y Backend separados)
 
 #### Ejecutar el Backend
 
@@ -320,11 +339,12 @@ Al ejecutar `npm install` en la carpeta `backend_rw/`, se instalarán las siguie
     ```
 
 2. **Configure las variables de entorno:**
-    Cree un archivo `.env` en la carpeta `backend_rw/` con las siguientes variables:
+    Cree un archivo `.env` en la carpeta `backend_rw/` (puede copiar de `.env.example`) con las siguientes variables:
     ```
     DB_URL=postgres://usuario:contraseña@host:puerto/nombre_bd
-    JWT_SECRET=tu_clave_secreta_segura
-    NODE_ENV=development
+    Clave secreta para firmar los JWT
+    Clave secreta para encriptación AES (32 caracteres)
+    
     ```
 
 3. **Inicie el servidor backend:**
@@ -340,14 +360,39 @@ Al ejecutar `npm install` en la carpeta `backend_rw/`, se instalarán las siguie
     ionic serve
     ```
 
-2. Abra su navegador y vaya a `http://localhost:8100`. La aplicación se recargará automáticamente cada vez que guarde un cambio en el código.
+2. Abra su navegador y vaya a `http://localhost:8100`.
 
+### Ejecución con Docker (Recomendado)
+
+El proyecto está configurado para ejecutarse en contenedores usando Docker Compose, lo que simplifica la configuración del entorno (incluyendo la base de datos PostgreSQL).
+
+1. **Configure las variables de entorno:**
+- **Raíz del proyecto**: Copie `.env.example` a `.env` y configure la `ENCRYPTION_KEY` y `JWT_SECRET`.
+- **Carpeta `backend_rw/`**: Copie `.env.example` a `.env`. Asegúrese de que `DB_URL` apunte al servicio de Docker:
+  ```
+  # Conexión al servicio 'db' definido en docker-compose.yml
+  DB_URL=postgres://admin:admin123@db:5432/racingconestilo
+  JWT_SECRET=tu_clave_secreta_segura
+  ENCRYPTION_KEY=tu_clave_de_encriptacion_aes_32
+  NODE_ENV=development
+  ```
+
+2. **Construya y levante los servicios:**
+Desde la raíz del proyecto, ejecute:
+  ```
+  docker-compose up --build
+  ```
+Esto creará los contenedores para el frontend (con Nginx), el backend (Node.js) y la base de datos (PostgreSQL).
+
+3. **Acceda a la aplicación:**
+- **Frontend**: `http://localhost:80` (servido por Nginx)
+- **Backend API**: `http://localhost:3000`
+  
 ### Notas Importantes
 
-- **Asegúrese de que el backend esté ejecutándose antes de iniciar el frontend.**
+- **Asegúrese de que el backend (manual o Docker) esté ejecutándose antes de probar el frontend.**
 - El frontend está configurado para conectarse al backend en `http://localhost:3000` por defecto.
-- La base de datos debe estar creada y accesible antes de ejecutar la aplicación.
-- Los modelos de Sequelize se sincronizarán automáticamente con la base de datos en la primera ejecución.
+- En la ejecución manual, la base de datos debe estar creada y accesible antes de ejecutar la aplicación.
 
 ### Testing de la API
 
@@ -358,14 +403,14 @@ Para probar los endpoints de la API, puede usar herramientas como **Postman** o 
 3. Copie el token retornado y úselo en el header `Authorization: Bearer <token>`
 4. Pruebe endpoints protegidos como `GET /api/products`, `POST /api/cart`, etc.
 
-**Alternativamente**, puede probar la funcionalidad completa a través del frontend de la aplicación:
+**Alternativamente**, puede probar la funcionalidad completa a través del frontend:
 
-1. Diríjase a `http://localhost:8100`
+1. Diríjase a `http://localhost:8100` (manual) o `http://localhost:80` (Docker)
 2. Registre una nueva cuenta mediante el formulario de registro
-3. Inicie sesión con sus credenciales
+3. Inicie sesión con sus credentials
 4. Explore el catálogo de productos, agregue artículos al carrito y complete una compra
 5. Los datos se sincronizarán automáticamente con el backend
 
 ---
 
-- Rama de desarrollo: `backend-integration`
+- Rama de desarrollo: `release/v3.0-entrega3`

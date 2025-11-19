@@ -8,19 +8,13 @@ import {
   IonCardContent,
   IonButton,
   IonIcon,
-  AlertController
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
-
-interface CartItem {
-  id: number;
-  name: string;
-  image: string;
-  size: string;
-  price: number;
-  quantity: number;
-}
+import { CartService, CartItem } from '../../services/cart.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-shopcart',
@@ -45,10 +39,13 @@ export class ShopcartPage implements OnInit {
 
   cartItems: CartItem[] = [];
   shippingCost: number = 5000;
+  private cartSubscription?: Subscription;
 
   constructor(
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastController: ToastController,
+    private cartService: CartService
   ) {}
 
   ngOnInit() {
@@ -57,10 +54,19 @@ export class ShopcartPage implements OnInit {
 
   ionViewWillEnter() {
     this.scrollToTop();
+    // Recargar carrito cada vez que se entra a la página
+    this.cartService.loadUserCart();
   }
 
   ionViewDidEnter() {
     this.scrollToTop();
+  }
+
+  ngOnDestroy() {
+    // Limpiar suscripción al destruir componente
+    if (this.cartSubscription) {
+      this.cartSubscription.unsubscribe();
+    }
   }
 
   scrollToTop() {
@@ -72,40 +78,60 @@ export class ShopcartPage implements OnInit {
   }
 
   loadCart() {
-    // Datos de ejemplo
-    this.cartItems = [
-      {
-        id: 1,
-        name: 'Ferrari Black Racing Jacket',
-        image: 'assets/product1.jpg',
-        size: 'L',
-        price: 60000,
-        quantity: 1
+    // Suscribirse al observable del carrito
+    this.cartSubscription = this.cartService.cartItems$.subscribe({
+      next: (items) => {
+        this.cartItems = items;
+        console.log('🛒 Carrito actualizado:', items);
       },
-      {
-        id: 2,
-        name: 'Ford Racing Jacket',
-        image: 'assets/product3.jpg',
-        size: 'M',
-        price: 60000,
-        quantity: 2
+      error: (err) => {
+        console.error('❌ Error cargando carrito:', err);
+        this.presentToast('Error al cargar el carrito', 'danger');
       }
-    ];
+    });
+
+    // Cargar carrito desde el backend
+    this.cartService.loadUserCart();
   }
 
   increaseQuantity(index: number) {
-    this.cartItems[index].quantity++;
-    this.saveCart();
+    const item = this.cartItems[index];
+    if (!item.id) return;
+
+    const newQuantity = item.quantity + 1;
+
+    this.cartService.updateCartItem(item.id, newQuantity).subscribe({
+      next: () => {
+        console.log('✅ Cantidad actualizada');
+      },
+      error: (err) => {
+        console.error('❌ Error actualizando cantidad:', err);
+        this.presentToast('Error al actualizar cantidad', 'danger');
+      }
+    });
   }
 
   decreaseQuantity(index: number) {
-    if (this.cartItems[index].quantity > 1) {
-      this.cartItems[index].quantity--;
-      this.saveCart();
-    }
+    const item = this.cartItems[index];
+    if (!item.id || item.quantity <= 1) return;
+
+    const newQuantity = item.quantity - 1;
+
+    this.cartService.updateCartItem(item.id, newQuantity).subscribe({
+      next: () => {
+        console.log('✅ Cantidad actualizada');
+      },
+      error: (err) => {
+        console.error('❌ Error actualizando cantidad:', err);
+        this.presentToast('Error al actualizar cantidad', 'danger');
+      }
+    });
   }
 
   async removeItem(index: number) {
+    const item = this.cartItems[index];
+    if (!item.id) return;
+
     const alert = await this.alertController.create({
       header: 'Eliminar producto',
       message: '¿Estás seguro de que deseas eliminar este producto del carrito?',
@@ -118,8 +144,17 @@ export class ShopcartPage implements OnInit {
           text: 'Eliminar',
           role: 'destructive',
           handler: () => {
-            this.cartItems.splice(index, 1);
-            this.saveCart();
+            this.cartService.removeCartItem(item.id!).subscribe({
+              next: async () => {
+                await this.presentToast('Producto eliminado del carrito', 'success');
+                this.cartService.loadUserCart();
+
+              },
+              error: async (err) => {
+                console.error('❌ Error eliminando item:', err);
+                await this.presentToast('Error al eliminar producto', 'danger');
+              }
+            });
           }
         }
       ]
@@ -133,15 +168,14 @@ export class ShopcartPage implements OnInit {
   }
 
   getSubtotal(): number {
-    return this.cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return this.cartItems.reduce((total, item) => {
+      const price = item.product?.price || 0;
+      return total + (price * item.quantity);
+    }, 0);
   }
 
   getTotal(): number {
     return this.getSubtotal() + this.shippingCost;
-  }
-
-  saveCart() {
-    // TODO: Guardar en localStorage o servicio
   }
 
   async checkout() {
@@ -160,6 +194,17 @@ export class ShopcartPage implements OnInit {
   }
 
   continueShopping() {
-    window.location.href = '/home';
+    this.router.navigate(['/home']);
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger' = 'success'): Promise<void> {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2000,
+      position: 'top',
+      color: color,
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
   }
 }

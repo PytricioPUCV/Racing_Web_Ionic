@@ -6,9 +6,11 @@ async function seedDatabase() {
   try {
     console.log('🌱 Iniciando migración de datos mock a base de datos...');
 
+    // 1. Sincronizar base de datos
     await sequelize.sync({ alter: true });
     console.log('✅ Base de datos sincronizada');
 
+    // 2. Crear usuario de prueba si no existe
     const existingUser = await User.findOne({ where: { email: 'test@example.com' } });
     if (!existingUser) {
       const hashedPassword = await bcrypt.hash('123456', 10);
@@ -24,6 +26,7 @@ async function seedDatabase() {
       console.log('✅ Usuario de prueba creado: test@example.com / 123456');
     }
 
+    // 3. Crear categorías
     let categoryJackets = await Category.findOne({ where: { name: 'Chaquetas' } });
     if (!categoryJackets) {
       categoryJackets = await Category.create({
@@ -42,6 +45,7 @@ async function seedDatabase() {
       console.log('✅ Categoría "Accesorios" creada');
     }
 
+    // 4. Datos mock originales - CHAQUETAS
     const mockJackets = [
       { id: 1, name: 'Ferrari Black Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product1.jpg', type: 'chaqueta' },
       { id: 2, name: 'Jack Daniels Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product2.jpg', type: 'chaqueta' },
@@ -53,6 +57,7 @@ async function seedDatabase() {
       { id: 8, name: 'Subaru Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product8.jpg', type: 'chaqueta' },
     ];
 
+    // 5. Insertar chaquetas en la base de datos
     for (const jacket of mockJackets) {
       const exists = await Product.findOne({ where: { name: jacket.name } });
       if (!exists) {
@@ -62,16 +67,17 @@ async function seedDatabase() {
           price: jacket.price,
           categoryId: categoryJackets.id,
           imageUrl: jacket.image,
-          stock: 10,
-          size: 'L',
-          brand: jacket.name.split(' ')[0],
-          color: 'Negro',
+          stock: 10, // Stock por defecto
+          size: 'L', // Talla por defecto
+          brand: jacket.name.split(' ')[0], // Extraer marca del nombre
+          color: 'Negro', // Color por defecto
           isActive: true
         });
       }
     }
     console.log('✅ Chaquetas migradas (8 productos)');
 
+    // 6. Datos mock originales - ACCESORIOS
     const mockAccessories = [
       { id: 9, name: 'Gorra F1 Racing Black', price: 25000, originalPrice: 30000, image: 'assets/acc1.jpg', type: 'accesorio' },
       { id: 10, name: 'Guantes F1 Racing', price: 35000, originalPrice: 45000, image: 'assets/acc2.jpg', type: 'accesorio' },
@@ -83,6 +89,7 @@ async function seedDatabase() {
       { id: 16, name: 'Gafas de Sol Aviador', price: 40000, originalPrice: 50000, image: 'assets/acc8.jpg', type: 'accesorio' },
     ];
 
+    // 7. Insertar accesorios en la base de datos
     for (const accessory of mockAccessories) {
       const exists = await Product.findOne({ where: { name: accessory.name } });
       if (!exists) {
@@ -92,10 +99,10 @@ async function seedDatabase() {
           price: accessory.price,
           categoryId: categoryAccessories.id,
           imageUrl: accessory.image,
-          stock: 15,
-          size: 'Único',
+          stock: 15, // Stock por defecto
+          size: 'Único', // Talla única para accesorios
           brand: accessory.name.includes('F1') ? 'F1' : accessory.name.split(' ')[0],
-          color: 'Negro',
+          color: 'Negro', // Color por defecto
           isActive: true
         });
       }
