@@ -5,7 +5,6 @@ dotenv.config();
 
 let sequelize: Sequelize;
 
-// Priorizar DB_URL si existe (funciona para Docker y local)
 if (process.env.DB_URL) {
   console.log('🔗 Conectando con DB_URL (NeonDB)...');
   
@@ -28,7 +27,6 @@ if (process.env.DB_URL) {
   });
   
 } else {
-  // Fallback a parámetros individuales (PostgreSQL local sin SSL)
   console.log('🐳 Conectando con parámetros individuales (PostgreSQL local)...');
   
   sequelize = new Sequelize({

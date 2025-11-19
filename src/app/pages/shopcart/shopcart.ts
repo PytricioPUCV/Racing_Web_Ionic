@@ -8,7 +8,7 @@ import {
   IonCardContent,
   IonButton,
   IonIcon,
-  IonImg,  // ← AGREGADO
+  IonImg,
   AlertController,
   ToastController
 } from '@ionic/angular/standalone';
@@ -33,7 +33,7 @@ import { Subscription } from 'rxjs';
     IonCardContent,
     IonButton,
     IonIcon,
-    IonImg  // ← AGREGADO
+    IonImg
   ]
 })
 export class ShopcartPage implements OnInit {

@@ -2,7 +2,6 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { CartItem } from '../models';
 
-// POST /api/cart-items - Agregar item al carrito
 export const addCartItem = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { cartId, productId, quantity, size } = req.body;
@@ -12,13 +11,11 @@ export const addCartItem = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    // Verificar si el item ya existe
     const existing = await CartItem.findOne({
       where: { cartId, productId, size }
     });
 
     if (existing) {
-      // Actualizar cantidad si ya existe
       await existing.update({ quantity: existing.quantity + quantity });
       console.log(`✅ Cantidad actualizada en carrito`);
       res.json({
@@ -26,7 +23,6 @@ export const addCartItem = async (req: AuthRequest, res: Response): Promise<void
         cartItem: existing
       });
     } else {
-      // Crear nuevo item
       const cartItem = await CartItem.create({
         cartId,
         productId,
@@ -47,7 +43,6 @@ export const addCartItem = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// PUT /api/cart-items/:id - Actualizar cantidad
 export const updateCartItem = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -79,7 +74,6 @@ export const updateCartItem = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-// DELETE /api/cart-items/:id - Eliminar item del carrito
 export const removeCartItem = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

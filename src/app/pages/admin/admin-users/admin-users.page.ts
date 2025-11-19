@@ -52,7 +52,6 @@ export class AdminUsersPage implements OnInit {
     });
   }
 
-  // ✅ Ver perfil del usuario
   viewUserProfile(userId: number) {
     this.router.navigate(['/profile'], { queryParams: { userId } });
   }

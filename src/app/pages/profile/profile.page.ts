@@ -71,13 +71,11 @@ export class ProfilePage implements OnInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  // Usuario actual
   currentUser: any = null;
   viewingUser: UserProfile | null = null;
   isAdmin: boolean = false;
   isViewingOtherUser: boolean = false;
   
-  // Campos editables
   username: string = '';
   email: string = '';
   rut: string = '';
@@ -86,16 +84,13 @@ export class ProfilePage implements OnInit {
   currentPassword: string = '';
   newPassword: string = '';
 
-  // Modo edición
   isEditing: boolean = false;
   loading: boolean = false;
 
-  // Toast
   showToast: boolean = false;
   toastMessage: string = '';
   toastColor: string = 'success';
 
-  // Regiones y comunas
   regionesYComunas = {
     "Arica y Parinacota": ["Arica", "Camarones", "Putre", "General Lagos"],
     "Tarapacá": ["Iquique", "Alto Hospicio", "Pozo Almonte", "Camiña", "Colchane", "Huara", "Pica"],
@@ -135,7 +130,6 @@ export class ProfilePage implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     this.isAdmin = this.currentUser?.role === 'admin';
 
-    // Verificar si admin está viendo otro usuario
     this.route.queryParams.subscribe(params => {
       if (this.isAdmin && params['userId']) {
         this.isViewingOtherUser = true;
@@ -146,7 +140,6 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  // ✅ Cargar mi perfil
   loadMyProfile() {
     if (this.currentUser) {
       this.username = this.currentUser.username;
@@ -160,7 +153,6 @@ export class ProfilePage implements OnInit {
     }
   }
 
-  // ✅ Admin: Cargar perfil de otro usuario
   loadUserProfile(userId: number) {
     this.loading = true;
     
@@ -276,7 +268,6 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  // ✅ Admin: Eliminar usuario
   deleteUser() {
     if (!this.viewingUser || !this.isViewingOtherUser) return;
 
