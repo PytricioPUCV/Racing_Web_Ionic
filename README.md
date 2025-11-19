@@ -7,20 +7,21 @@
 
 ## Índice
 1. [Resumen del Proyecto](#resumen-del-proyecto)
-2. [Requerimientos](#requerimientos)
-3. [Arquitectura de la Información](#arquitectura-de-la-información)
-4. [Prototipo de Diseño](#prototipo-de-diseño)
-5. [Principios de UX Aplicados](#principios-de-ux-aplicados)
-6. [Tecnologías Utilizadas](#tecnologías-utilizadas)
-7. [Arquitectura del Sistema](#arquitectura-del-sistema)
-8. [Modelo Entidad-Relación (MER)](#modelo-entidad-relación-mer)
-9. [Instalación y Ejecución](#instalación-y-ejecución)
-    - 9.1 [Prerrequisitos](#prerrequisitos)
-    - 9.2 [Instalación](#instalación)
-    - 9.3 [Dependencias del Backend](#dependencias-del-backend)
-    - 9.4 [Ejecución Manual (Frontend y Backend separados)](#ejecución-manual-frontend-y-backend-separados)
-    - 9.5 [Ejecución con Docker (Recomendado)](#ejecución-con-docker-recomendado)
-    - 9.6 [Testing de la API](#testing-de-la-api)
+2. [Cumplimiento de Objetivos (Entrega Final)](#cumplimiento-de-objetivos-entrega-final)
+3. [Requerimientos](#requerimientos)
+4. [Arquitectura de la Información](#arquitectura-de-la-información)
+5. [Prototipo de Diseño](#prototipo-de-diseño)
+6. [Principios de UX Aplicados](#principios-de-ux-aplicados)
+7. [Tecnologías Utilizadas](#tecnologías-utilizadas)
+8. [Arquitectura del Sistema](#arquitectura-del-sistema)
+9. [Modelo Entidad-Relación (MER)](#modelo-entidad-relación-mer)
+10. [Instalación y Ejecución](#instalación-y-ejecución)
+    - 10.1 [Prerrequisitos](#prerrequisitos)
+    - 10.2 [Instalación](#instalación)
+    - 10.3 [Dependencias del Backend](#dependencias-del-backend)
+    - 10.4 [Ejecución Manual](#ejecución-manual-frontend-y-backend-separados)
+    - 10.5 [Ejecución con Docker (Recomendado)](#ejecución-con-docker-recomendado)
+    - 10.6 [Testing de la API](#testing-de-la-api)
 
 ---
 
@@ -30,42 +31,49 @@ Este es un proyecto universitario para el ramo de "Web y Móvil", desarrollado c
 
 [![Captura de pantalla de la página de inicio](https://i.imgur.com/ehaGOR7.png)](https://racing-web-ionic.vercel.app/)
 
-El proyecto implementa una arquitectura cliente-servidor completa, con un frontend desarrollado en Ionic/Angular y un backend en Node.js con Express. La aplicación incluye funcionalidades esenciales de un e-commerce moderno: catálogo de productos, detalle de producto, autenticación de usuarios con JWT, gestión de carrito de compras y operaciones CRUD protegidas.
+El proyecto implementa una arquitectura cliente-servidor completa y robusta. Recientemente, se ha evolucionado hacia una arquitectura contenedorizada con **Docker**, mejorando significativamente la seguridad mediante encriptación de datos sensibles y cabeceras HTTP seguras, y optimizando el rendimiento mediante indexación de base de datos y compresión de respuestas.
 
-La arquitectura se centra en componentes reutilizables y servicios para la gestión de datos, asegurando la escalabilidad del sistema. Recientemente, se ha incorporado **Docker** para facilitar el despliegue y la configuración del entorno, y se han mejorado las prácticas de seguridad mediante la encriptación de datos sensibles (AES) y la implementación de headers de seguridad con `helmet`.
+---
+
+## Cumplimiento de Objetivos (Entrega Final)
+
+El proyecto cumple con los siguientes hitos de evaluación:
+
+- **EF 1: Funcionalidades Completas**: Sistema CRUD completo para productos, carrito de compras, y autenticación. Implementación de almacenamiento local (Tokens y preferencias) y notificaciones visuales (Toasts).
+- **EF 2: Mejoras UI/UX y Rendimiento**: Implementación de componente `IonImg` para carga eficiente de imágenes, *lazy loading*, y atributos dimensionales para evitar saltos de layout.
+- **EF 3: Seguridad Avanzada**:
+    - Protección contra inyección SQL mediante ORM (Sequelize).
+    - Implementación de **Helmet** para cabeceras HTTP seguras.
+    - Encriptación de contraseñas con **Bcrypt**.
+    - **Encriptación AES** para datos sensibles del usuario (RUT, Región, Comuna).
+    - Configuración de CORS seguro.
+- **EF 4: Optimización de Consultas**: Implementación de **Índices en Base de Datos** (Users, Products, Orders) para acelerar consultas y uso de middleware de **Compresión (Gzip)** para respuestas HTTP más ligeras.
+- **EF 5: Integración de Servicios Externos**: Integración con base de datos en la nube (**NeonDB / Supabase**) y gestión de zonas horarias mediante librería externa (**Luxon**).
+- **EF 6: Despliegue con Docker**: Orquestación completa de servicios (Frontend Nginx, Backend Node.js, Base de Datos PostgreSQL) mediante `docker-compose`.
 
 ---
 
 ## Requerimientos
 
 ### Roles del Sistema
-- **Cliente**: Un usuario que navega por el e-commerce, gestiona un carrito y puede realizar compras.
-- **Administrador**: Un usuario con privilegios para gestionar el catálogo de productos, el inventario y las órdenes de compra.
+- **Cliente**: Navegación, gestión de carrito, compras y perfil.
+- **Administrador**: Gestión total del catálogo, inventario y órdenes.
 
 ### Requerimientos Funcionales
+- **RF1 - RF4 (Cliente)**: Catálogo, detalle, atributos y carrito de compras.
+- **RF5 - RF7 (Administrador)**: CRUD de productos, inventario y visualización de órdenes.
 
-#### Rol-Cliente
-- **RF1: Visualizar Catálogo de Productos**: El usuario puede ver en la página de inicio una cuadrícula con todas las chaquetas disponibles para la venta.
-- **RF2: Ver Detalle de Producto**: Al hacer clic en un producto, el usuario puede acceder a una página dedicada con más información, imágenes y opciones.
-- **RF3: Seleccionar Atributos de Producto**: El usuario puede elegir una talla específica y la cantidad de unidades que desea de un producto.
-- **RF4: Gestionar Carrito de Compras**: El usuario puede agregar productos a un carrito, ver el resumen de su compra y modificarlo antes de pagar.
+### Requerimientos No Funcionales (Actualizados)
 
-#### Rol-Administrador
-- **RF5: Gestionar Productos**: El administrador puede agregar nuevos productos al catálogo, editar la información de los existentes (precio, nombre, descripción) y eliminarlos.
-- **RF6: Gestionar Inventario**: El administrador puede actualizar la cantidad de stock disponible para cada talla de un producto.
-- **RF7: Visualizar Órdenes de Compra**: El administrador puede ver una lista de todos los pedidos realizados por los clientes para gestionar su despacho.
-
-### Requerimientos No Funcionales
-
-- **RNF1 (Rendimiento)**: La aplicación debe cargar la página de inicio y el catálogo de productos en menos de 2 segundos en una conexión de internet estándar. *Mejorado mediante la implementación de 'lazy loading' en las imágenes de productos.*
-- **RNF2 (Usabilidad)**: La interfaz debe ser intuitiva, permitiendo que un usuario nuevo pueda seleccionar un producto y sus opciones en menos de 3 clics.
-- **RNF3 (Diseño Responsivo)**: El sistema debe adaptarse y ser completamente funcional en pantallas de dispositivos móviles (iOS, Android) y de escritorio.
-- **RNF4 (Compatibilidad)**: La aplicación web debe ser compatible con las últimas versiones de los navegadores como Google Chrome, Firefox y Safari.
-- **RNF5 (Seguridad)**: Las contraseñas de los usuarios deben ser almacenadas en la base de datos de forma encriptada (hash bcrypt) para proteger su información. *Mejorado con encriptación AES para otros datos sensibles del usuario.*
-- **RNF6 (Mantenibilidad)**: El código debe estar organizado en componentes reutilizables para facilitar futuras actualizaciones y correcciones.
-- **RNF7 (Persistencia de Tema)**: La elección del usuario entre el tema claro y oscuro debe guardarse en su dispositivo para que se mantenga en futuras visitas.
-- **RNF8 (Autenticación)**: El sistema debe implementar tokens JWT para mantener sesiones de usuario de forma segura.
-- **RNF9 (Seguridad de API)**: El backend debe implementar medidas de seguridad estándar, como headers HTTP seguros (CSP, XSS-Protection) para prevenir ataques comunes.
+- **RNF1 (Rendimiento Optimizado)**: 
+    - Uso de `IonImg` en Ionic para gestión inteligente de imágenes.
+    - Backend con **Compression Middleware** para reducir el tamaño de las respuestas JSON.
+    - Índices en la base de datos para optimizar tiempos de respuesta en consultas complejas.
+- **RNF5 (Seguridad Reforzada)**: 
+    - Contraseñas hasheadas con `bcrypt`.
+    - Datos personales (PII) encriptados en reposo usando **AES-256**.
+    - Headers de seguridad implementados con `helmet`.
+- **RNF9 (Internacionalización)**: Manejo de zonas horarias consistente utilizando `Luxon` para asegurar que las fechas de las órdenes correspondan a la hora local de Chile.
 
 ---
 
@@ -80,225 +88,83 @@ La arquitectura se centra en componentes reutilizables y servicios para la gesti
 
 ## Prototipo de Diseño
 [MockUps - Racing Jackets (Figma)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
-[![Captura de pantalla del prototipo de Figma](https://i.imgur.com/2QRz8cs.png)](https://www.figma.com/design/oAG1GI9Ct5XgXj3GKipiSc/MockUps-Racing-Jackets?node-id=0-1&t=QJukTLq0sVg6Lppk-1)
-
----
-
-## Principios de UX Aplicados
-1. **Consistencia**: Se diseñaron componentes reutilizables para el encabezado y el pie de página que aparecen en todas las páginas. Esto nos asegura que elementos clave como el logo, los menús de navegación y los íconos de usuario y tema estén siempre en el mismo lugar, creando una experiencia predecible y familiar.
-2. **Feedback**: En la página de detalle de producto, cuando el usuario selecciona una talla, el botón correspondiente cambia de estilo, dándole la confirmación visual de su elección. Se implementaron mensajes toast para proporcionar retroalimentación inmediata al usuario en acciones como login, registro y operaciones del carrito. Con el mismo fin los botones y enlaces presentan efectos visuales sutiles al pasar el mouse para indicar que son interactivos.
-3. **Simplicidad y Claridad**: En el formulario de registro, el campo "Comuna" permanece deshabilitado hasta que se seleccione primero el campo "Región", evitando errores y reduciendo la carga cognitiva del usuario al no mostrar opciones irrelevantes. El sistema maneja automáticamente el redireccionamiento después de login/registro para una experiencia fluida.
-4. **Accesibilidad**: Se implementó un tema oscuro y claro. Esto no es solo una preferencia estética, sino una característica de accesibilidad clave para usuarios con sensibilidad a la luz. Además, se utilizó un buen contraste de colores en ambos temas y se emplearon componentes semánticos de Ionic, que son compatibles con lectores de pantalla.
 
 ---
 
 ## Tecnologías Utilizadas
 
 ### Frontend
-- **Ionic Framework**: Kit de herramientas de UI para construir aplicaciones multiplataforma.
-- **Angular**: Plataforma de desarrollo para construir aplicaciones web eficientes.
-- **TypeScript**: Superconjunto de JavaScript con tipado estático.
-- **Sass (SCSS)**: Preprocesador de CSS para estilos avanzados.
-- **Angular Router**: Para gestionar la navegación y las rutas de la aplicación.
-- **HttpClient**: Para la comunicación con el backend mediante peticiones HTTP.
+- **Ionic Framework & Angular**: Core de la aplicación.
+- **IonImg**: Componente nativo de Ionic utilizado para optimizar la carga de imágenes en Home y Catálogo.
+- **TypeScript / SCSS**: Lógica y estilos.
+- **HttpClient & Interceptors**: Comunicación segura con API.
 
 ### Backend
-- **Node.js**: Entorno de ejecución para JavaScript del lado del servidor.
-- **Express**: Framework minimalista para crear APIs REST.
-- **Sequelize**: ORM para PostgreSQL.
-- **PostgreSQL**: Sistema de gestión de bases de datos relacional.
-- **bcryptjs**: Librería para el hash y encriptación de contraseñas.
-- **jsonwebtoken (JWT)**: Para la generación y validación de tokens de autenticación.
-- **cors**: Middleware para habilitar CORS (Cross-Origin Resource Sharing).
-- **helmet**: Middleware para securizar la aplicación Express (ej. headers HTTP).
-- **crypto-js**: Librería para encriptación simétrica (AES) de datos sensibles.
-- **dotenv**: Para la gestión de variables de entorno.
+- **Node.js & Express**: API REST.
+- **Sequelize**: ORM para PostgreSQL con optimización de consultas.
+- **PostgreSQL**: Base de datos (Versión local Docker o Nube NeonDB).
+- **Luxon**: Manejo avanzado de fechas y zonas horarias.
+- **Compression**: Middleware para gzip de respuestas.
+- **Helmet**: Seguridad en headers HTTP.
+- **Crypto-js**: Encriptación AES para datos sensibles.
+- **Bcryptjs & JWT**: Autenticación y autorización.
 
 ### DevOps
-- **Docker / Docker Compose**: Para la containerización y orquestación de los servicios de frontend y backend.
-- **Nginx**: Utilizado como servidor web para el frontend y proxy inverso para la API en el entorno de Docker.
+- **Docker / Docker Compose**: Containerización de servicios.
+- **Nginx**: Servidor web proxy inverso para el frontend en producción Docker.
 
 ---
 
 ## Arquitectura del Sistema
 
-### Backend - API REST
+### Optimizaciones de Backend (Entrega Final)
 
-El backend está construido con Node.js y Express, proporcionando una API RESTful completa para gestionar las operaciones del e-commerce.
+1.  **Optimización de Consultas (Indexing):**
+    Se implementaron migraciones para añadir índices a las tablas críticas (`Users`, `Products`, `Orders`, `CartItems`). Esto reduce drásticamente el tiempo de búsqueda (`Scan`) en la base de datos.
 
-#### Servidor Node.js con Express
+2.  **Seguridad de Datos (AES + Helmet):**
+    Además de proteger las contraseñas, el sistema ahora utiliza `crypto-js` para encriptar campos sensibles como el RUT y la dirección antes de guardarlos en la base de datos. `Helmet` se ha configurado (v7.2.0) para mitigar ataques XSS y sniffing.
 
-- Servidor configurado en puerto 3000
-- Estructura modular con carpetas de controllers, routes, models y middlewares
-- Variables de entorno configuradas via `.env`
-- Manejo centralizado de errores
-- **Seguridad mejorada**: Implementación de `helmet` para proteger contra vulnerabilidades web comunes (headers HTTP) y configuración de CORS actualizada.
+3.  **Manejo de Tiempo (Timezone Middleware):**
+    Se integró `Luxon` y un middleware personalizado para normalizar las fechas de las transacciones a la zona horaria de Chile, independientemente de la hora del servidor (UTC).
 
-#### Base de Datos PostgreSQL
+4.  **Compresión:**
+    Todas las respuestas JSON de la API pasan por un middleware de compresión, reduciendo el payload de red y mejorando la velocidad en conexiones móviles.
 
-- Base de datos relacional alojada en la nube (SupaBase) o local (Docker)
-- Modelos de datos implementados con Sequelize:
-  - **Users**: Gestión de usuarios con roles (user, admin, guest)
-  - **Products**: Catálogo de productos con atributos (nombre, descripción, precio, stock, talla, color, marca)
-  - **Categories**: Clasificación de productos
-  - **Carts**: Carritos de compra asociados a usuarios
-  - **CartItems**: Ítems dentro del carrito
-  - **Orders**: Órdenes de compra con estado y detalles de envío
-  - **OrderItems**: Ítems dentro de las órdenes
-
-- Relaciones establecidas entre modelos (1:N, 1:1)
-- **Encriptación segura de datos sensibles**: Además del hash de contraseñas (bcrypt), se aplica encriptación simétrica (AES) a campos sensibles del usuario como RUT, región y comuna, utilizando `crypto-js`.
-
-#### API REST con Endpoints
-
-**Autenticación:**
-- `POST /api/auth/register` - Registro de nuevos usuarios con validaciones
-- `POST /api/auth/login` - Inicio de sesión con retorno de JWT
-
-**Productos:**
-- `GET /api/products` - Listar todos los productos
-- `GET /api/products/:id` - Obtener detalle de producto específico
-- `POST /api/products` - Crear producto (admin)
-- `PUT /api/products/:id` - Actualizar producto (admin)
-- `DELETE /api/products/:id` - Eliminar producto (admin)
-
-**Categorías:**
-- `GET /api/categories` - Listar todas las categorías
-- `GET /api/categories/:id` - Obtener categoría específica
-- `POST /api/categories` - Crear categoría (admin)
-
-**Carrito:**
-- `GET /api/cart` - Obtener carrito del usuario autenticado
-- `POST /api/cart/items` - Agregar ítem al carrito
-- `PUT /api/cart/items/:itemId` - Actualizar cantidad del ítem
-- `DELETE /api/cart/items/:itemId` - Eliminar ítem del carrito
-- `DELETE /api/cart` - Vaciar carrito
-
-**Órdenes:**
-- `POST /api/orders` - Crear nueva orden
-- `GET /api/orders` - Listar órdenes del usuario
-- `GET /api/orders/:id` - Obtener detalles de orden específica
-
-- Validación de datos en todas las peticiones
-- Respuestas en formato JSON con status HTTP apropiados
-- Manejo robusto de errores (400, 401, 403, 404, 500)
-
-#### Consumo de API desde Frontend
-
-- Servicio `ApiService` centralizado para todas las peticiones HTTP
-- Servicio `AuthService` para gestionar autenticación
-- Servicio `ProductService` para operaciones de productos
-- Servicio `CartService` para gestionar carrito
-- Servicio `OrderService` para gestionar órdenes
-- Uso de Observables y RxJS para manejo asincrónico
-- HttpClient para peticiones HTTP seguras
-
-#### Autenticación con JWT
-
-**Backend:**
-- Implementación de JWT para autenticación segura
-- Encriptación de contraseñas con bcryptjs
-- Validación de credenciales en login
-- Generación de tokens con expiración
-- Middleware `verifyToken` para proteger rutas
-- Validación de roles (usuario, administrador)
-
-**Frontend:**
-- Almacenamiento seguro de tokens en localStorage
-- Guardado de datos de usuario en sesión
-- Interceptores HTTP para incluir token en peticiones protegidas
-- Formularios de login/registro con validaciones
-- Mensajes de feedback (toast) en acciones de autenticación
-- Logout con limpieza de tokens y datos
-
-#### Validación de Usuarios y Manejo de Sesiones
-
-**Backend:**
-- Middleware de validación de JWT en todas las rutas protegidas
-- Control de roles para autorizar operaciones específicas
-- Validación de entrada de datos
-- Manejo de tokens expirados
-
-**Frontend:**
-- Guardia de rutas (Route Guards) para proteger páginas
-- Mostrar/ocultar elementos según autenticación y rol
-- Persistencia de sesión al recargar la página
-- Auto-logout cuando token expira
-- Visualización del perfil de usuario autenticado
-
-### Frontend - Integración con Backend
-
-- **HttpClient**: Comunicación segura con la API
-- **Interceptores HTTP**: Inyección automática de tokens JWT
-- **Guards**: Protección de rutas según autenticación y rol
-- **Servicios**: Lógica de negocio centralizada
-- **Componentes**: Consumo de datos mediante async pipe y observables
-- **Validaciones**: Feedback inmediato en formularios
-- **Optimización**: Carga perezosa (*lazy loading*) y atributos de dimensión explícitos en imágenes de productos para mejorar el rendimiento y el *layout stability*.
+### API REST
+El backend expone endpoints seguros para Autenticación, Productos, Categorías, Carritos y Órdenes, protegidos por middlewares de verificación de Token y Roles.
 
 ---
 
 ## Modelo Entidad-Relación (MER)
 
-El diagrama MER de la base de datos que muestra la estructura relacional de la aplicación.
+El diagrama MER muestra la estructura relacional. Se han añadido índices de rendimiento en las claves foráneas y campos de búsqueda frecuente.
 
 [![Diagrama MER](https://i.imgur.com/KxustCL.png)](https://i.imgur.com/KxustCL.png)
-
-### Entidades principales:
-
-- **Users**: Usuarios del sistema con roles diferenciados
-- **Products**: Productos disponibles en el catálogo
-- **Categories**: Categorías para clasificar productos
-- **Carts**: Carritos de compra de usuarios
-- **CartItems**: Ítems dentro del carrito
-- **Orders**: Órdenes de compra realizadas
-- **OrderItems**: Ítems dentro de las órdenes
-
-### Relaciones:
-
-- **Users ↔ Carts** (1:1): Un usuario tiene un carrito
-- **Users ↔ Orders** (1:N): Un usuario puede tener múltiples órdenes
-- **Categories ↔ Products** (1:N): Una categoría contiene múltiples productos
-- **Carts ↔ CartItems** (1:N): Un carrito contiene múltiples ítems
-- **Products ↔ CartItems** (1:N): Un producto puede estar en múltiples carritos
-- **Orders ↔ OrderItems** (1:N): Una orden contiene múltiples ítems
-- **Products ↔ OrderItems** (1:N): Un producto puede estar en múltiples órdenes
 
 ---
 
 ## Instalación y Ejecución
 
-Siga estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
-
 ### Prerrequisitos
-
-* Tenga instalado [Node.js](https://nodejs.org/) (que incluye npm).
-* Tenga instalado el CLI de Ionic:
-    ```
-    npm install -g @ionic/cli
-    ```
-* Tenga instalado [Docker](https://www.docker.com/products/docker-desktop/) y Docker Compose (V2).
-* Base de datos PostgreSQL (local, en la nube, o via Docker).
+* Node.js & npm
+* Ionic CLI (`npm install -g @ionic/cli`)
+* Docker Desktop (Para ejecución recomendada)
 
 ### Instalación
 
-1. **Clone el repositorio:**
-    ```
+1.  **Clone el repositorio:**
+    ```bash
     git clone [https://github.com/PytricioPUCV/Racing_Web_Ionic.git](https://github.com/PytricioPUCV/Racing_Web_Ionic.git)
-    ```
-
-2. **Navegue a la carpeta del proyecto:**
-    ```
     cd Racing_Web_Ionic
     ```
 
-3. **Instale las dependencias del frontend:**
-    ```
+2.  **Instale dependencias:**
+    ```bash
+    # Frontend
     npm install
-    ```
-
-4. **Instale las dependencias del backend:**
-    ```
+    
+    # Backend
     cd backend_rw
     npm install
     cd ..
@@ -306,111 +172,50 @@ Siga estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
 
 ### Dependencias del Backend
 
-Al ejecutar `npm install` en la carpeta `backend_rw/`, se instalarán las siguientes dependencias clave:
+Las dependencias han sido actualizadas para soportar las nuevas funcionalidades de seguridad y rendimiento:
+- `compression`: Optimización de respuestas.
+- `helmet` (v7.2.0): Seguridad HTTP.
+- `crypto-js`: Encriptación AES.
+- `luxon`: Manejo de fechas.
+- `sequelize` & `pg`: Gestión de base de datos.
 
-**Dependencias de Producción:**
-- **express** (v5.1.0) - Framework web minimalista para Node.js
-- **sequelize** (v6.37.7) - ORM (Object-Relational Mapping) para PostgreSQL
-- **pg** (v8.16.3) - Driver PostgreSQL para Node.js
-- **pg-hstore** (v2.3.4) - Serializador/deserializador para datos HStore
-- **bcryptjs** (v3.0.2) - Librería para encriptar contraseñas
-- **jsonwebtoken** (v9.0.2) - Genera y valida tokens JWT
-- **cors** (v2.8.5) - Middleware para habilitar CORS
-- **dotenv** (v17.2.3) - Carga variables de entorno desde `.env`
-- **helmet** (v7.2.0) - Middleware para securizar headers HTTP
-- **crypto-js** (v4.2.0) - Librería para encriptación simétrica (AES)
+### Ejecución con Docker (Recomendado - EF 6)
 
-**Dependencias de Desarrollo:**
-- **typescript** (v5.9.3) - Lenguaje de tipado estático
-- **ts-node** (v10.9.2) - Ejecuta archivos TypeScript directamente
-- **@types/express** (v5.0.3) - Tipos TypeScript para Express
-- **@types/jsonwebtoken** (v9.0.10) - Tipos TypeScript para JWT
-- **@types/cors** (v2.8.19) - Tipos TypeScript para CORS
-- **@types/bcryptjs** (v2.4.6) - Tipos TypeScript para bcryptjs
-- **@types/crypto-js** (v4.2.5) - Tipos TypeScript para crypto-js
+Esta es la forma más rápida de levantar el entorno completo (Frontend + Backend + BD).
+
+1.  **Configuración de Entorno:**
+    Cree los archivos `.env` en la raíz y en `backend_rw/` basándose en `.env.example`.
+    *Asegúrese de definir `ENCRYPTION_KEY` (32 chars) y `JWT_SECRET`.*
+
+2.  **Levantar Servicios:**
+    ```bash
+    docker-compose up --build
+    ```
+    
+3.  **Acceso:**
+    - **Frontend (Nginx):** `http://localhost:80`
+    - **Backend API:** `http://localhost:3000`
+    - **Base de Datos:** Puerto 5432 expuesto localmente.
 
 ### Ejecución Manual (Frontend y Backend separados)
 
-#### Ejecutar el Backend
-
-1. **Navegue a la carpeta del backend:**
-    ```
-    cd backend_rw
-    ```
-
-2. **Configure las variables de entorno:**
-    Cree un archivo `.env` en la carpeta `backend_rw/` (puede copiar de `.env.example`) con las siguientes variables:
-    ```
-    DB_URL=postgres://usuario:contraseña@host:puerto/nombre_bd
-    Clave secreta para firmar los JWT
-    Clave secreta para encriptación AES (32 caracteres)
-    
-    ```
-
-3. **Inicie el servidor backend:**
-    ```
+1.  **Backend:**
+    En `backend_rw/`, configure `.env` con su URL de base de datos (NeonDB o local) y ejecute:
+    ```bash
     npm run dev
     ```
-    El servidor se ejecutará en `http://localhost:3000`.
+    *(Servidor en http://localhost:3000)*
 
-#### Ejecutar el Frontend
-
-1. **En otra terminal, desde la raíz del proyecto, inicie el servidor de desarrollo:**
-    ```
+2.  **Frontend:**
+    En la raíz del proyecto:
+    ```bash
     ionic serve
     ```
-
-2. Abra su navegador y vaya a `http://localhost:8100`.
-
-### Ejecución con Docker (Recomendado)
-
-El proyecto está configurado para ejecutarse en contenedores usando Docker Compose, lo que simplifica la configuración del entorno (incluyendo la base de datos PostgreSQL).
-
-1. **Configure las variables de entorno:**
-- **Raíz del proyecto**: Copie `.env.example` a `.env` y configure la `ENCRYPTION_KEY` y `JWT_SECRET`.
-- **Carpeta `backend_rw/`**: Copie `.env.example` a `.env`. Asegúrese de que `DB_URL` apunte al servicio de Docker:
-  ```
-  # Conexión al servicio 'db' definido en docker-compose.yml
-  DB_URL=postgres://admin:admin123@db:5432/racingconestilo
-  JWT_SECRET=tu_clave_secreta_segura
-  ENCRYPTION_KEY=tu_clave_de_encriptacion_aes_32
-  NODE_ENV=development
-  ```
-
-2. **Construya y levante los servicios:**
-Desde la raíz del proyecto, ejecute:
-  ```
-  docker-compose up --build
-  ```
-Esto creará los contenedores para el frontend (con Nginx), el backend (Node.js) y la base de datos (PostgreSQL).
-
-3. **Acceda a la aplicación:**
-- **Frontend**: `http://localhost:80` (servido por Nginx)
-- **Backend API**: `http://localhost:3000`
-  
-### Notas Importantes
-
-- **Asegúrese de que el backend (manual o Docker) esté ejecutándose antes de probar el frontend.**
-- El frontend está configurado para conectarse al backend en `http://localhost:3000` por defecto.
-- En la ejecución manual, la base de datos debe estar creada y accesible antes de ejecutar la aplicación.
+    *(Servidor en http://localhost:8100)*
 
 ### Testing de la API
-
-Para probar los endpoints de la API, puede usar herramientas como **Postman** o **Insomnia**:
-
-1. Registre un nuevo usuario: `POST /api/auth/register`
-2. Inicie sesión: `POST /api/auth/login`
-3. Copie el token retornado y úselo en el header `Authorization: Bearer <token>`
-4. Pruebe endpoints protegidos como `GET /api/products`, `POST /api/cart`, etc.
-
-**Alternativamente**, puede probar la funcionalidad completa a través del frontend:
-
-1. Diríjase a `http://localhost:8100` (manual) o `http://localhost:80` (Docker)
-2. Registre una nueva cuenta mediante el formulario de registro
-3. Inicie sesión con sus credentials
-4. Explore el catálogo de productos, agregue artículos al carrito y complete una compra
-5. Los datos se sincronizarán automáticamente con el backend
+Puede probar el flujo completo: Registro -> Login (Obtención de JWT) -> Navegación (IonImg) -> Añadir al Carrito -> Generar Orden. Los datos sensibles se guardarán encriptados en la base de datos.
 
 ---
 
-- Rama de desarrollo: `release/v3.0-entrega3`
+- Rama de desarrollo principal: `release/v3.0-entrega3`
