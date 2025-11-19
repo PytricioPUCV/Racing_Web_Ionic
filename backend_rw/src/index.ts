@@ -1,63 +1,67 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import { Settings } from 'luxon';
 import sequelize from './database';
-import { db } from './models';
-import userRoutes from './routes/userRoutes'; 
+import userRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoutes';
 import categoryRoutes from './routes/categoryRoutes';
 import productRoutes from './routes/productRoutes';
-import orderRoutes from './routes/orderRoutes';             // ✅ AGREGAR
-import orderItemRoutes from './routes/orderItemRoutes';     // ✅ AGREGAR
-import cartRoutes from './routes/cartRoutes';               // ✅ AGREGAR
-import cartItemRoutes from './routes/cartItemRoutes';       // ✅ AGREGAR
+import orderRoutes from './routes/orderRoutes';
+import orderItemRoutes from './routes/orderItemRoutes';
+import cartRoutes from './routes/cartRoutes';
+import cartItemRoutes from './routes/cartItemRoutes';
+import { timezoneMiddleware } from './middlewares/timezone.middleware';
+
+process.env.TZ = 'America/Santiago';
+Settings.defaultZone = 'America/Santiago';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isDevelopment = process.env.NODE_ENV === 'development';
 
-// ============================================
-// MIDDLEWARES
-// ============================================
+app.use(helmet());
 
-app.use(cors({
-  origin: ['http://localhost:8100', 'http://localhost:8101'],
-  credentials: true
-}));
+const corsOptions = {
+  origin: [
+    'http://localhost:8080',
+    'http://localhost:8100',
+    'http://localhost:8101',
+    'http://localhost:4200',
+    'https://racing-web-ionic.vercel.app'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Timezone']
+};
+app.use(cors(corsOptions));
+
+app.use(compression());
 
 app.use(express.json());
 
-// ============================================
-// RUTAS
-// ============================================
+app.use(timezoneMiddleware);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
-app.use('/api/orders', orderRoutes);                        // ✅ AGREGAR
-app.use('/api/order-items', orderItemRoutes);               // ✅ AGREGAR
-app.use('/api/carts', cartRoutes);                          // ✅ AGREGAR
-app.use('/api/cart-items', cartItemRoutes);                 // ✅ AGREGAR
+app.use('/api/orders', orderRoutes);
+app.use('/api/order-items', orderItemRoutes);
+app.use('/api/carts', cartRoutes);
+app.use('/api/cart-items', cartItemRoutes);
 
-// Ruta de prueba
 app.get('/', (req, res) => {
   res.send('¡El servidor backend con TypeScript está funcionando!');
 });
 
-// ============================================
-// CONEXIÓN A BASE DE DATOS Y SERVIDOR
-// ============================================
-
 async function startServer() {
   try {
-    // Verificar conexión a la base de datos
     await sequelize.authenticate();
-    console.log('✅ Conexión a la base de datos de Supabase establecida correctamente.');
+    console.log('✅ Conexión a la base de datos de NeonDB establecida correctamente.');
 
-    // Sincronizar modelos
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    
-    await sequelize.sync({ alter: isDevelopment });
+    await sequelize.sync({ alter: isDevelopment }); 
     
     console.log('✅ Modelos sincronizados con la base de datos.');
     console.log('✅ Tablas creadas/actualizadas:');
@@ -69,26 +73,27 @@ async function startServer() {
     console.log('   ✓ Carts');
     console.log('   ✓ CartItems');
 
-    // Iniciar servidor
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor iniciado en http://localhost:${PORT}`);
+      console.log(`\n🚀 Servidor iniciado en http://localhost:${PORT}`);
       console.log(`📝 Entorno: ${isDevelopment ? 'DESARROLLO' : 'PRODUCCIÓN'}`);
+      console.log(`🌍 Timezone: ${Settings.defaultZone.name}`);
+      console.log('🔒 Seguridad: Helmet + CORS configurado');
+      console.log('⚡ Optimización: Compresión Gzip activada');
       console.log('\n📋 Endpoints disponibles:');
-      console.log('   /api/auth        - Autenticación');
-      console.log('   /api/users       - Usuarios');
-      console.log('   /api/categories  - Categorías');
-      console.log('   /api/products    - Productos');
-      console.log('   /api/orders      - Pedidos');
-      console.log('   /api/order-items - Items de pedidos');
-      console.log('   /api/carts       - Carritos');
-      console.log('   /api/cart-items  - Items de carritos');
+      console.log('    /api/auth         - Autenticación');
+      console.log('    /api/users        - Usuarios');
+      console.log('    /api/categories   - Categorías');
+      console.log('    /api/products     - Productos');
+      console.log('    /api/orders       - Pedidos');
+      console.log('    /api/order-items  - Items de pedidos');
+      console.log('    /api/carts        - Carritos');
+      console.log('    /api/cart-items   - Items de carritos');
     });
 
   } catch (error) {
-    console.error('❌ Error al conectar con la base de datos:', error);
+    console.error('❌ Error al conectar o iniciar el servidor:', error);
     process.exit(1);
   }
 }
 
-// Iniciar el servidor
 startServer();

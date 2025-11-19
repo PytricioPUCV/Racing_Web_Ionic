@@ -5,7 +5,7 @@ interface OrderAttributes {
   id: number;
   userId: number;
   totalAmount: number;
-  status: string; // 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'
+  status: string;
   shippingAddress: string;
   shippingRegion: string;
   shippingComuna: string;
@@ -74,7 +74,30 @@ Order.init({
   },
 }, {
   sequelize,
-  tableName: 'Orders'
+  tableName: 'Orders',
+  timestamps: true,
+  indexes: [
+    {
+      fields: ['userId'],
+      name: 'orders_user_id_index'
+    },
+    {
+      fields: ['status'],
+      name: 'orders_status_index'
+    },
+    {
+      fields: ['createdAt'],
+      name: 'orders_created_at_index'
+    },
+    {
+      fields: ['orderDate'],
+      name: 'orders_order_date_index'
+    },
+    {
+      fields: ['userId', 'status'],
+      name: 'orders_user_status_index'
+    }
+  ]
 });
 
 export default Order;

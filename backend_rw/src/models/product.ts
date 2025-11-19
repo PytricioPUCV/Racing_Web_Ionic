@@ -9,8 +9,8 @@ interface ProductAttributes {
   categoryId: number;
   imageUrl: string;
   stock: number;
-  size: string; // S, M, L, XL
-  brand: string; // Ferrari, Ford, Mercedes, etc.
+  size: string;
+  brand: string;
   color: string;
   isActive: boolean;
 }
@@ -87,7 +87,34 @@ Product.init({
   },
 }, {
   sequelize,
-  tableName: 'Products'
+  tableName: 'Products',
+  timestamps: true,
+  indexes: [
+    {
+      fields: ['categoryId'],
+      name: 'products_category_id_index'
+    },
+    {
+      fields: ['isActive'],
+      name: 'products_is_active_index'
+    },
+    {
+      fields: ['price'],
+      name: 'products_price_index'
+    },
+    {
+      fields: ['brand'],
+      name: 'products_brand_index'
+    },
+    {
+      fields: ['categoryId', 'isActive'],
+      name: 'products_category_active_index'
+    },
+    {
+      fields: ['name'],
+      name: 'products_name_index'
+    }
+  ]
 });
 
 export default Product;

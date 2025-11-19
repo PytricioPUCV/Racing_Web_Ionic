@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: ./backend_rw
+      dockerfile: Dockerfile
+    container_name: racing_backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_URL: ${DB_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      TZ: America/Santiago
+    ports:
+      - "3000:3000"
+    networks:
+      - racing_network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000', (r) => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: racing_frontend
+    restart: always
+    environment:
+      - API_URL=http://localhost:3000
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - racing_network
+
+networks:
+  racing_network:
+    driver: bridge

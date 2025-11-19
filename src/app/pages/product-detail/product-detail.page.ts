@@ -8,13 +8,17 @@ import {
   IonCol, 
   IonLabel, 
   IonButton, 
+  IonImg,
   IonAccordionGroup, 
   IonAccordion, 
-  IonItem
+  IonItem,
+  ToastController
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { ProductService, Product } from '../../services/product';
+import { CartService, CartItem } from '../../services/cart.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-product-detail',
@@ -30,7 +34,8 @@ import { ProductService, Product } from '../../services/product';
     IonRow, 
     IonCol, 
     IonLabel, 
-    IonButton, 
+    IonButton,
+    IonImg,
     IonAccordionGroup, 
     IonAccordion, 
     IonItem
@@ -41,40 +46,58 @@ export class ProductDetailPage implements OnInit {
   selectedSize: string = 'L';
   quantity: number = 1;
   loading: boolean = true;
+  private userCartId: number | null = null;
 
   constructor(
     private route: ActivatedRoute, 
     private productService: ProductService,
+    private cartService: CartService,
+    private toastController: ToastController,
     private cdr: ChangeDetectorRef
   ) {
     console.log('✅ ProductDetailPage constructor ejecutado');
   }
 
   ngOnInit() {
-  console.log('🔍 ngOnInit ejecutado');
-  
-  this.route.paramMap.subscribe((params) => {
-    const productId = params.get('id');
-    console.log('📍 ID recibido:', productId);
+    console.log('🔍 ngOnInit ejecutado');
     
-    if (productId) {
-      // ✅ Destruir y recrear el componente
-      this.product = null;
-      this.loading = true;
-      this.quantity = 1;
-      this.selectedSize = 'L';
+    this.route.paramMap.subscribe((params) => {
+      const productId = params.get('id');
+      console.log('📍 ID recibido:', productId);
       
-      // ✅ Forzar render antes de cargar
-      this.cdr.markForCheck();
-      this.cdr.detectChanges();
-      
-      // ✅ Cargar con pequeño delay para asegurar que se renderiza
-      setTimeout(() => {
-        this.loadProduct(+productId);
-      }, 100);
-    }
-  });
-}
+      if (productId) {
+        this.product = null;
+        this.loading = true;
+        this.quantity = 1;
+        this.selectedSize = 'L';
+        
+        this.cdr.markForCheck();
+        this.cdr.detectChanges();
+        
+        setTimeout(() => {
+          this.loadProduct(+productId);
+        }, 100);
+      }
+    });
+  }
+
+  loadUserCart(): void {
+    this.cartService.getUserCart().subscribe({
+      next: (cart) => {
+        this.userCartId = cart.id;
+        console.log('🛒 Cart ID cargado:', this.userCartId);
+      },
+      error: (err) => {
+        console.error('❌ Error cargando carrito:', err);
+        this.cartService.createCart().subscribe({
+          next: (newCart) => {
+            this.userCartId = newCart.id;
+            console.log('✅ Nuevo carrito creado:', this.userCartId);
+          }
+        });
+      }
+    });
+  }
 
   loadProduct(id: number): void {
     console.log('🔍 loadProduct llamado con ID:', id);
@@ -92,7 +115,6 @@ export class ProductDetailPage implements OnInit {
           this.selectedSize = this.product?.size || 'L';
           this.loading = false;
           this.cdr.detectChanges();
-          console.log('✅ Estado actualizado - loading:', this.loading, 'product:', this.product);
         },
         error: (error: any) => {
           console.error('❌ Error en getProductByIdFromAPI:', error);
@@ -111,7 +133,6 @@ export class ProductDetailPage implements OnInit {
         this.selectedSize = this.product?.size || 'L';
         this.loading = false;
         this.cdr.detectChanges();
-        console.log('✅ Estado actualizado - loading:', this.loading);
       } else {
         console.error('❌ Producto no encontrado en MOCK');
         this.loading = false;
@@ -132,9 +153,73 @@ export class ProductDetailPage implements OnInit {
     }
   }
 
-  addToCart(): void {
-    if (this.product) {
-      alert(`${this.product.name} agregado al carrito\nCantidad: ${this.quantity}\nTalla: ${this.selectedSize}`);
+  async addToCart(): Promise<void> {
+    if (!this.product) {
+      await this.presentToast('❌ Error: Producto no disponible', 'danger');
+      return;
     }
+
+    if (!this.userCartId) {
+      console.log('⏳ Carrito no inicializado, cargando...');
+      
+      try {
+        const response = await firstValueFrom(this.cartService.getUserCart());
+        this.userCartId = response.cart.id;
+        console.log('✅ Carrito cargado, ID:', this.userCartId);
+      } catch (err) {
+        console.log('📦 Creando nuevo carrito...');
+        try {
+          const newCartResponse = await firstValueFrom(this.cartService.createCart());
+          this.userCartId = newCartResponse.cart?.id || newCartResponse.id;
+          console.log('✅ Nuevo carrito creado, ID:', this.userCartId);
+        } catch (createErr) {
+          console.error('❌ Error creando carrito:', createErr);
+          await this.presentToast('❌ Error al inicializar carrito', 'danger');
+          return;
+        }
+      }
+    }
+
+    const productId = this.product.id;
+    
+    if (!productId) {
+      await this.presentToast('❌ Error: ID de producto inválido', 'danger');
+      return;
+    }
+
+    const cartItem: CartItem = {
+      cartId: this.userCartId!,
+      productId: productId,
+      quantity: this.quantity,
+      size: this.selectedSize
+    };
+
+    console.log('🛒 Añadiendo al carrito:', cartItem);
+
+    this.cartService.addCartItem(cartItem).subscribe({
+      next: async () => {
+        await this.presentToast(
+          `✅ ${this.product!.name} añadido (x${this.quantity}, ${this.selectedSize})`, 
+          'success'
+        );
+        this.cartService.loadUserCart();
+        this.quantity = 1;
+      },
+      error: async (err) => {
+        console.error('❌ Error añadiendo al carrito:', err);
+        await this.presentToast('❌ Error al añadir producto', 'danger');
+      }
+    });
+  }
+
+  private async presentToast(message: string, color: 'success' | 'danger' = 'success'): Promise<void> {
+    const toast = await this.toastController.create({
+      message: message,
+      duration: 2500,
+      position: 'top',
+      color: color,
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
   }
 }

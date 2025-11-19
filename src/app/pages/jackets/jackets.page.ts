@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner } from '@ionic/angular/standalone';
+import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner, IonImg } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { ProductService, Product } from '../../services/product';
@@ -19,7 +19,8 @@ import { ProductService, Product } from '../../services/product';
     IonRow,
     IonCol,
     IonCard,
-    IonSpinner
+    IonSpinner,
+    IonImg  // ← AGREGADO
   ],
 })
 export class JacketsPage implements OnInit {

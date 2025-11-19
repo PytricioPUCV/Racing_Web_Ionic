@@ -61,7 +61,18 @@ OrderItem.init({
   },
 }, {
   sequelize,
-  tableName: 'OrderItems'
+  tableName: 'OrderItems',
+  timestamps: true,
+  indexes: [
+    {
+      fields: ['orderId'],
+      name: 'order_items_order_id_index'
+    },
+    {
+      fields: ['productId'],
+      name: 'order_items_product_id_index'
+    }
+  ]
 });
 
 export default OrderItem;

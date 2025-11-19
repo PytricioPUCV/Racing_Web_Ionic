@@ -22,6 +22,10 @@ export interface Product {
     id: number;
     name: string;
   };
+  createdAt?: string;
+  updatedAt?: string;
+  createdAtLocal?: string;
+  updatedAtLocal?: string;
 }
 
 @Injectable({
@@ -29,9 +33,8 @@ export interface Product {
 })
 export class ProductService {
   private apiUrl = 'http://localhost:3000/api/products';
-  private useBackend = true; // ✅ true = backend, false = mock
+  private useBackend = true;
 
-  // Datos mock (respaldo)
   private allProducts: Product[] = [
     { id: 1, name: 'Ferrari Black Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product1.jpg', type: 'chaqueta' },
     { id: 2, name: 'Jack Daniels Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product2.jpg', type: 'chaqueta' },
@@ -62,10 +65,6 @@ export class ProductService {
     });
   }
 
-  // ============================================
-  // MÉTODOS MOCK (compatibilidad)
-  // ============================================
-
   getAllProducts(): Product[] {
     return this.allProducts;
   }
@@ -81,10 +80,6 @@ export class ProductService {
   getProductById(id: number): Product | undefined {
     return this.allProducts.find(p => p.id === id);
   }
-
-  // ============================================
-  // MÉTODOS BACKEND/MOCK (Observable)
-  // ============================================
 
   getJacketProducts(): Observable<Product[]> {
     if (!this.useBackend) {
@@ -156,10 +151,6 @@ export class ProductService {
   deleteProduct(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
   }
-
-  // ============================================
-  // UTILIDADES
-  // ============================================
 
   setUseBackend(value: boolean): void {
     this.useBackend = value;
