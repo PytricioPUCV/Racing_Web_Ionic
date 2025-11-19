@@ -2,7 +2,6 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { OrderItem } from '../models';
 
-// POST /api/order-items - Agregar item a pedido
 export const createOrderItem = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { orderId, productId, quantity, price, size } = req.body;
@@ -32,7 +31,6 @@ export const createOrderItem = async (req: AuthRequest, res: Response): Promise<
   }
 };
 
-// GET /api/order-items/:orderId - Obtener items de un pedido
 export const getOrderItems = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { orderId } = req.params;
@@ -52,7 +50,6 @@ export const getOrderItems = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// DELETE /api/order-items/:id - Eliminar item del pedido
 export const deleteOrderItem = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

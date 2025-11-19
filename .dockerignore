@@ -1,0 +1,12 @@
+node_modules
+www
+platforms
+plugins
+npm-debug.log
+.env
+.git
+.gitignore
+README.md
+.vscode
+.DS_Store
+.angular

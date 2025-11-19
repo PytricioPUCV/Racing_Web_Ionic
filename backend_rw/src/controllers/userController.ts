@@ -2,18 +2,29 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { User } from '../models';
 import bcrypt from 'bcrypt';
+import { encrypt, decrypt } from '../utils/encryption';
+import { DateTime } from 'luxon';
 
-// ============================================
-// FUNCIONES EXISTENTES (MANTENER)
-// ============================================
+const formatUserTimestamps = (user: any, timezone: string) => {
+  const createdDate = DateTime.fromJSDate(user.createdAt).setZone(timezone);
+  const updatedDate = DateTime.fromJSDate(user.updatedAt).setZone(timezone);
+  
+  return {
+    createdAtLocal: createdDate.toFormat('dd/MM/yyyy HH:mm'),
+    updatedAtLocal: updatedDate.toFormat('dd/MM/yyyy HH:mm'),
+    memberSince: createdDate.toRelative(),
+    registrationDate: createdDate.toLocaleString(DateTime.DATE_FULL),
+    lastActivityRelative: updatedDate.toRelative(),
+    daysSinceRegistration: Math.floor(DateTime.now().diff(createdDate, 'days').days)
+  };
+};
 
-// PUT /api/users/:id/change-password - Cambiar contraseña
 export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { currentPassword, newPassword } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
-    // Validaciones
     if (!currentPassword || !newPassword) {
       res.status(400).json({ message: 'Contraseña actual y nueva son requeridas' });
       return;
@@ -31,7 +42,6 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    // Verificar contraseña actual
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     
     if (!isPasswordValid) {
@@ -39,16 +49,14 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
       return;
     }
 
-    // Hashear nueva contraseña
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Actualizar contraseña
     await user.update({ password: hashedPassword });
 
     console.log(`✅ Contraseña actualizada para: ${user.email}`);
 
     res.json({
-      message: 'Contraseña actualizada exitosamente'
+      message: 'Contraseña actualizada exitosamente',
+      updatedAt: DateTime.now().setZone(timezone).toFormat('dd/MM/yyyy HH:mm:ss')
     });
   } catch (error) {
     console.error('❌ Error al cambiar contraseña:', error);
@@ -56,24 +64,41 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-// GET /api/users - Listar todos los usuarios
 export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    // ✅ NUEVO: Verificar si es admin
     if (req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para ver todos los usuarios' });
       return;
     }
 
+    const timezone = req.clientTimezone || 'America/Santiago';
+
     const users = await User.findAll({
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
+      order: [['createdAt', 'DESC']]
+    });
+
+    const decryptedUsers = users.map(user => {
+      const timestamps = formatUserTimestamps(user, timezone);
+      
+      return {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        rut: decrypt(user.rut),
+        region: decrypt(user.region),
+        comuna: decrypt(user.comuna),
+        role: user.role,
+        ...timestamps
+      };
     });
 
     console.log(`✅ Listando ${users.length} usuarios (Admin: ${req.user.email})`);
 
     res.json({
       message: 'Usuarios obtenidos exitosamente',
-      users
+      users: decryptedUsers,
+      totalUsers: users.length
     });
   } catch (error) {
     console.error('❌ Error al obtener usuarios:', error);
@@ -81,12 +106,11 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// GET /api/users/:id - Obtener un usuario por ID
 export const getUserById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
-    // ✅ NUEVO: Solo admin o el mismo usuario puede ver su perfil
     if (req.user?.id !== parseInt(id) && req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para ver este usuario' });
       return;
@@ -101,11 +125,22 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    const timestamps = formatUserTimestamps(user, timezone);
+
     console.log(`✅ Usuario obtenido: ${user.email}`);
 
     res.json({
       message: 'Usuario obtenido exitosamente',
-      user
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        rut: decrypt(user.rut),
+        region: decrypt(user.region),
+        comuna: decrypt(user.comuna),
+        role: user.role,
+        ...timestamps
+      }
     });
   } catch (error) {
     console.error('❌ Error al obtener usuario:', error);
@@ -113,13 +148,12 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// PUT /api/users/:id - Actualizar un usuario
 export const updateUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { username, email, rut, region, comuna, role, isActive } = req.body;
+    const { username, email, rut, region, comuna, role } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
-    // ✅ NUEVO: Solo admin o el mismo usuario puede actualizar su perfil
     if (req.user?.id !== parseInt(id) && req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para actualizar este usuario' });
       return;
@@ -132,7 +166,6 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    // ✅ NUEVO: Validar que el email no esté en uso
     if (email && email !== user.email) {
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
@@ -141,16 +174,15 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
       }
     }
 
-    // ✅ NUEVO: Solo admin puede cambiar role e isActive
     const updateData: any = {
       username: username || user.username,
       email: email || user.email,
-      rut: rut || user.rut,
-      region: region || user.region,
-      comuna: comuna || user.comuna
     };
 
-    // Solo admin puede actualizar rol
+    if (rut) updateData.rut = encrypt(rut);
+    if (region) updateData.region = encrypt(region);
+    if (comuna) updateData.comuna = encrypt(comuna);
+
     if (req.user?.role === 'admin') {
       if (role && ['user', 'admin', 'guest'].includes(role)) {
         updateData.role = role;
@@ -158,6 +190,8 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
     }
 
     await user.update(updateData);
+
+    const timestamps = formatUserTimestamps(user, timezone);
 
     console.log(`✅ Usuario actualizado: ${user.email}`);
 
@@ -167,10 +201,11 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
         id: user.id,
         email: user.email,
         username: user.username,
-        rut: user.rut,
-        region: user.region,
-        comuna: user.comuna,
-        role: user.role
+        rut: decrypt(user.rut),
+        region: decrypt(user.region),
+        comuna: decrypt(user.comuna),
+        role: user.role,
+        ...timestamps
       }
     });
   } catch (error) {
@@ -179,12 +214,11 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-// DELETE /api/users/:id - Eliminar un usuario
 export const deleteUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
-    // ✅ NUEVO: Solo admin puede eliminar usuarios (y no a sí mismo)
     if (req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para eliminar usuarios' });
       return;
@@ -210,7 +244,8 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
     res.json({
       message: 'Usuario eliminado exitosamente',
       userId: id,
-      deletedUser: userEmail
+      deletedUser: userEmail,
+      deletedAt: DateTime.now().setZone(timezone).toFormat('dd/MM/yyyy HH:mm:ss')
     });
   } catch (error) {
     console.error('❌ Error al eliminar usuario:', error);

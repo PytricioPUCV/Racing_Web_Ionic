@@ -1,37 +1,18 @@
-# Dependencies
 node_modules/
+backend_rw/node_modules/
 
-# Build
-dist/
-build/
-
-# Environment variables
 .env
 .env.local
 .env.production
-.env.development
 
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
+dist/
+www/
+backend_rw/dist/
 
-# OS
 .DS_Store
 Thumbs.db
-*.swp
-*.swo
 
-# IDE
 .vscode/
 .idea/
-*.iml
 
-# Testing
-coverage/
-.nyc_output/
-
-# TypeScript
-*.tsbuildinfo
+npm-debug.log*

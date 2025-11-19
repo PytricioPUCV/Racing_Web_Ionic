@@ -17,7 +17,6 @@ export interface AuthRequest extends Request {
 
 export const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction): void => {
   try {
-    // Obtener token del header
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
@@ -25,20 +24,17 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
       return;
     }
 
-    // Verificar token
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     
-    // Agregar datos del usuario al request (formato antiguo - para compatibilidad)
     req.userId = decoded.id;
     req.userEmail = decoded.email;
 
-    // Agregar datos del usuario al request (formato nuevo - para los nuevos controladores)
     req.user = {
       id: decoded.id,
       email: decoded.email,
       username: decoded.username,
       rut: decoded.rut,
-      role: decoded.role || 'user' // ✅ NUEVO: Agregar rol desde el token
+      role: decoded.role || 'user'
     };
 
     console.log(`✅ Token verificado - Usuario: ${req.user.email} (Rol: ${req.user.role})`);

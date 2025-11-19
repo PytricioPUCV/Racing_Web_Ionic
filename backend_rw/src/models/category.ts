@@ -35,7 +35,15 @@ Category.init({
   },
 }, {
   sequelize,
-  tableName: 'Categories'
+  tableName: 'Categories',
+  timestamps: true,
+  indexes: [
+    {
+      unique: true,
+      fields: ['name'],
+      name: 'categories_name_index'
+    }
+  ]
 });
 
 export default Category;

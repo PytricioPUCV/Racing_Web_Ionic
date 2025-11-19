@@ -55,7 +55,23 @@ CartItem.init({
   },
 }, {
   sequelize,
-  tableName: 'CartItems'
+  tableName: 'CartItems',
+  timestamps: true,
+  indexes: [
+    {
+      fields: ['cartId'],
+      name: 'cart_items_cart_id_index'
+    },
+    {
+      fields: ['productId'],
+      name: 'cart_items_product_id_index'
+    },
+    {
+      unique: true,
+      fields: ['cartId', 'productId', 'size'],
+      name: 'cart_items_unique_product_index'
+    }
+  ]
 });
 
 export default CartItem;

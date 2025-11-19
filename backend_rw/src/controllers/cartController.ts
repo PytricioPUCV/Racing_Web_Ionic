@@ -1,14 +1,31 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { Cart, CartItem } from '../models';
+import { DateTime } from 'luxon';
 
-// POST /api/carts - Crear carrito
+const formatCartTimestamps = (cart: any, timezone: string) => {
+  const cartData = cart.toJSON();
+  const createdDate = DateTime.fromJSDate(cart.createdAt).setZone(timezone);
+  const updatedDate = DateTime.fromJSDate(cart.updatedAt).setZone(timezone);
+  
+  return {
+    ...cartData,
+    createdAtLocal: createdDate.toFormat('dd/MM/yyyy HH:mm'),
+    updatedAtLocal: updatedDate.toFormat('dd/MM/yyyy HH:mm'),
+    lastModifiedRelative: updatedDate.toRelative(),
+    daysSinceCreated: Math.floor(DateTime.now().diff(createdDate, 'days').days),
+    isRecent: DateTime.now().diff(updatedDate, 'hours').hours < 24
+  };
+};
+
 export const createCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
       res.status(401).json({ message: 'No autorizado' });
       return;
     }
+
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const cart = await Cart.create({
       userId: req.user.id,
@@ -19,7 +36,7 @@ export const createCart = async (req: AuthRequest, res: Response): Promise<void>
 
     res.status(201).json({
       message: 'Carrito creado exitosamente',
-      cart
+      cart: formatCartTimestamps(cart, timezone)
     });
   } catch (error) {
     console.error('❌ Error al crear carrito:', error);
@@ -27,13 +44,14 @@ export const createCart = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-// GET /api/carts/user - Obtener mi carrito
 export const getUserCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
       res.status(401).json({ message: 'No autorizado' });
       return;
     }
+
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const cart = await Cart.findOne({
       where: { userId: req.user.id },
@@ -45,9 +63,24 @@ export const getUserCart = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    const cartData = formatCartTimestamps(cart, timezone);
+    
+    if (cartData.items && cartData.items.length > 0) {
+      cartData.items = cartData.items.map((item: any) => ({
+        ...item,
+        addedAtLocal: DateTime.fromJSDate(item.createdAt)
+          .setZone(timezone)
+          .toFormat('dd/MM/yyyy HH:mm'),
+        addedAtRelative: DateTime.fromJSDate(item.createdAt)
+          .setZone(timezone)
+          .toRelative()
+      }));
+    }
+
     res.json({
       message: 'Carrito obtenido exitosamente',
-      cart
+      cart: cartData,
+      itemCount: cartData.items?.length || 0
     });
   } catch (error) {
     console.error('❌ Error al obtener carrito:', error);
@@ -55,10 +88,10 @@ export const getUserCart = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// GET /api/carts/:id - Obtener carrito por ID
 export const getCartById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const cart = await Cart.findByPk(id, {
       include: [{ association: 'items', include: [{ association: 'product' }] }]
@@ -69,9 +102,24 @@ export const getCartById = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    const cartData = formatCartTimestamps(cart, timezone);
+    
+    if (cartData.items && cartData.items.length > 0) {
+      cartData.items = cartData.items.map((item: any) => ({
+        ...item,
+        addedAtLocal: DateTime.fromJSDate(item.createdAt)
+          .setZone(timezone)
+          .toFormat('dd/MM/yyyy HH:mm'),
+        addedAtRelative: DateTime.fromJSDate(item.createdAt)
+          .setZone(timezone)
+          .toRelative()
+      }));
+    }
+
     res.json({
       message: 'Carrito obtenido exitosamente',
-      cart
+      cart: cartData,
+      itemCount: cartData.items?.length || 0
     });
   } catch (error) {
     console.error('❌ Error al obtener carrito:', error);
@@ -79,10 +127,10 @@ export const getCartById = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// DELETE /api/carts/:id - Limpiar carrito
 export const clearCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const cart = await Cart.findByPk(id);
 
@@ -96,7 +144,8 @@ export const clearCart = async (req: AuthRequest, res: Response): Promise<void> 
     console.log(`✅ Carrito vaciado: ID ${id}`);
 
     res.json({
-      message: 'Carrito vaciado exitosamente'
+      message: 'Carrito vaciado exitosamente',
+      clearedAt: DateTime.now().setZone(timezone).toFormat('dd/MM/yyyy HH:mm:ss')
     });
   } catch (error) {
     console.error('❌ Error al limpiar carrito:', error);

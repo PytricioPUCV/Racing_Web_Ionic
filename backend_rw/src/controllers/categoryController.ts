@@ -2,18 +2,15 @@ import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { Category } from '../models';
 
-// POST /api/categories - Crear categoría
 export const createCategory = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, description } = req.body;
 
-    // Validaciones
     if (!name) {
       res.status(400).json({ message: 'El nombre de la categoría es requerido' });
       return;
     }
 
-    // Verificar que no existe
     const existing = await Category.findOne({ where: { name } });
     if (existing) {
       res.status(400).json({ message: 'La categoría ya existe' });
@@ -37,7 +34,6 @@ export const createCategory = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-// GET /api/categories - Obtener todas las categorías
 export const getAllCategories = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const categories = await Category.findAll();
@@ -52,7 +48,6 @@ export const getAllCategories = async (req: AuthRequest, res: Response): Promise
   }
 };
 
-// GET /api/categories/:id - Obtener categoría por ID
 export const getCategoryById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
