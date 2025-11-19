@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner, IonButton } from '@ionic/angular/standalone';
+import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner, IonButton, IonImg } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
 import { ProductService, Product } from '../services/product';
@@ -25,6 +25,7 @@ import { RouterLink } from '@angular/router';
     IonCard, 
     IonSpinner,
     IonButton,
+    IonImg,  // ← AGREGADO
     RouterLink
   ],
 })
@@ -65,7 +66,6 @@ export class HomePage implements OnInit {
     }
   }
 
-  // ✅ MÉTODOS DE NAVEGACIÓN CON RECARGA
   goToProfile() {
     window.location.href = '/profile';
   }

@@ -6,18 +6,17 @@
   <div class="user-welcome" *ngIf="currentUser">
     <div class="welcome-content">
       <span class="welcome-text">¡Hola, <strong>{{ currentUser.username }}</strong>! 👋</span>
-      
     </div>
   </div>
+
   <!-- Sección de banner -->
   <div class="hero-banner">
-  <img src="assets/banner-f1.jpg" alt="Racing F1 Banner" class="hero-image" />
-  <div class="hero-overlay">
-    <h1 class="hero-title">Racing con Estilo</h1>
-    <p class="hero-subtitle">Racing Jackets y accesorios</p>
+    <ion-img src="assets/banner-f1.jpg" alt="Racing F1 Banner" class="hero-image"></ion-img>
+    <div class="hero-overlay">
+      <h1 class="hero-title">Racing con Estilo</h1>
+      <p class="hero-subtitle">Racing Jackets y accesorios</p>
+    </div>
   </div>
-</div>
-
 
   <div class="product-section">
     <div class="product-header">
@@ -36,10 +35,10 @@
       <ion-row>
         <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let product of products">
           <ion-card class="product-item" (click)="navegarAlProducto(product.id)">
-            <img 
+            <ion-img 
               [src]="product.image || product.imageUrl" 
               [alt]="product.name"
-            >
+            ></ion-img>
             <div class="product-info">
               <span class="product-name"><b>{{ product.name }}</b></span>
               <div class="price-wrapper">
