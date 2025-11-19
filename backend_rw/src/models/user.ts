@@ -79,7 +79,25 @@ User.init({
   },
 }, {
   sequelize,
-  tableName: 'Users'
+  tableName: 'Users',
+  timestamps: true,
+  // ✅ AGREGAR ÍNDICES PARA OPTIMIZACIÓN
+  indexes: [
+    {
+      unique: true,
+      fields: ['email'],
+      name: 'users_email_index'
+    },
+    {
+      unique: true,
+      fields: ['rut'],
+      name: 'users_rut_index'
+    },
+    {
+      fields: ['role'],
+      name: 'users_role_index'
+    }
+  ]
 });
 
 export default User;

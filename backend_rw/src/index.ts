@@ -2,7 +2,8 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { Settings } from 'luxon'; // ← AGREGAR
+import compression from 'compression';
+import { Settings } from 'luxon';
 import sequelize from './database';
 import { db } from './models';
 import userRoutes from './routes/userRoutes';
@@ -13,9 +14,8 @@ import orderRoutes from './routes/orderRoutes';
 import orderItemRoutes from './routes/orderItemRoutes';
 import cartRoutes from './routes/cartRoutes';
 import cartItemRoutes from './routes/cartItemRoutes';
-import { timezoneMiddleware } from './middlewares/timezone.middleware'; // ← AGREGAR
+import { timezoneMiddleware } from './middlewares/timezone.middleware';
 
-// ✅ Configurar timezone por defecto para Chile
 process.env.TZ = 'America/Santiago';
 Settings.defaultZone = 'America/Santiago';
 
@@ -34,13 +34,14 @@ const corsOptions = {
     'https://racing-web-ionic.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Timezone'] // ← AGREGAR X-Timezone
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Timezone']
 };
 app.use(cors(corsOptions));
 
+app.use(compression());
+
 app.use(express.json());
 
-// ✅ AGREGAR: Middleware de timezone (después de express.json())
 app.use(timezoneMiddleware);
 
 app.use('/api/auth', authRoutes);
@@ -76,8 +77,9 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`\n🚀 Servidor iniciado en http://localhost:${PORT}`);
       console.log(`📝 Entorno: ${isDevelopment ? 'DESARROLLO' : 'PRODUCCIÓN'}`);
-      console.log(`🌍 Timezone: ${Settings.defaultZone.name}`); // ← AGREGAR
+      console.log(`🌍 Timezone: ${Settings.defaultZone.name}`);
       console.log('🔒 Seguridad: Helmet + CORS configurado');
+      console.log('⚡ Optimización: Compresión Gzip activada'); // ← AGREGAR
       console.log('\n📋 Endpoints disponibles:');
       console.log('    /api/auth         - Autenticación');
       console.log('    /api/users        - Usuarios');

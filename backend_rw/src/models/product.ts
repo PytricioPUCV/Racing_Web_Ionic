@@ -87,7 +87,42 @@ Product.init({
   },
 }, {
   sequelize,
-  tableName: 'Products'
+  tableName: 'Products',
+  timestamps: true,
+  // ✅ ÍNDICES PARA OPTIMIZACIÓN
+  indexes: [
+    {
+      // Búsqueda por categoría (muy frecuente)
+      fields: ['categoryId'],
+      name: 'products_category_id_index'
+    },
+    {
+      // Filtrar productos activos
+      fields: ['isActive'],
+      name: 'products_is_active_index'
+    },
+    {
+      // Ordenar/filtrar por precio
+      fields: ['price'],
+      name: 'products_price_index'
+    },
+    {
+      // Filtrar por marca (Ferrari, Ford, etc.)
+      fields: ['brand'],
+      name: 'products_brand_index'
+    },
+    {
+      // Índice compuesto para consultas frecuentes
+      // Ej: "Productos activos de una categoría"
+      fields: ['categoryId', 'isActive'],
+      name: 'products_category_active_index'
+    },
+    {
+      // Búsqueda por nombre (para search)
+      fields: ['name'],
+      name: 'products_name_index'
+    }
+  ]
 });
 
 export default Product;

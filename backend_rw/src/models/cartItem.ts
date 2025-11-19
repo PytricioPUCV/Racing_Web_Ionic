@@ -55,7 +55,27 @@ CartItem.init({
   },
 }, {
   sequelize,
-  tableName: 'CartItems'
+  tableName: 'CartItems',
+  timestamps: true,
+  // ✅ ÍNDICES PARA OPTIMIZACIÓN
+  indexes: [
+    {
+      // Buscar todos los items de un carrito específico
+      fields: ['cartId'],
+      name: 'cart_items_cart_id_index'
+    },
+    {
+      // Ver qué productos están en carritos (para análisis)
+      fields: ['productId'],
+      name: 'cart_items_product_id_index'
+    },
+    {
+      // Índice compuesto: evitar productos duplicados en el mismo carrito
+      unique: true,
+      fields: ['cartId', 'productId', 'size'],
+      name: 'cart_items_unique_product_index'
+    }
+  ]
 });
 
 export default CartItem;
