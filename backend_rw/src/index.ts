@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { Settings } from 'luxon';
 import sequelize from './database';
-import { db } from './models';
 import userRoutes from './routes/userRoutes';
 import authRoutes from './routes/authRoutes';
 import categoryRoutes from './routes/categoryRoutes';
@@ -60,7 +59,7 @@ app.get('/', (req, res) => {
 async function startServer() {
   try {
     await sequelize.authenticate();
-    console.log('✅ Conexión a la base de datos de Supabase establecida correctamente.');
+    console.log('✅ Conexión a la base de datos de NeonDB establecida correctamente.');
 
     await sequelize.sync({ alter: isDevelopment }); 
     
@@ -79,7 +78,7 @@ async function startServer() {
       console.log(`📝 Entorno: ${isDevelopment ? 'DESARROLLO' : 'PRODUCCIÓN'}`);
       console.log(`🌍 Timezone: ${Settings.defaultZone.name}`);
       console.log('🔒 Seguridad: Helmet + CORS configurado');
-      console.log('⚡ Optimización: Compresión Gzip activada'); // ← AGREGAR
+      console.log('⚡ Optimización: Compresión Gzip activada');
       console.log('\n📋 Endpoints disponibles:');
       console.log('    /api/auth         - Autenticación');
       console.log('    /api/users        - Usuarios');

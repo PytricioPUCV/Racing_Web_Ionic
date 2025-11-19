@@ -1,11 +1,9 @@
-/* === CONTENEDOR PRINCIPAL === */
 .cart-container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px 0 100px;
 }
 
-/* === HEADER DE LA PÁGINA === */
 .page-header {
   display: flex;
   align-items: center;
@@ -25,7 +23,6 @@
   }
 }
 
-/* === CARRITO VACÍO === */
 .empty-cart {
   text-align: center;
   padding: 80px 20px;
@@ -58,14 +55,12 @@
   }
 }
 
-/* === CONTENIDO DEL CARRITO === */
 .cart-content {
   display: grid;
   grid-template-columns: 1fr 400px;
   gap: 30px;
 }
 
-/* === ITEMS DEL CARRITO === */
 .cart-items {
   display: flex;
   flex-direction: column;
@@ -170,7 +165,6 @@
   }
 }
 
-/* === RESUMEN DEL CARRITO === */
 .cart-summary {
   position: sticky;
   top: 80px;
@@ -229,7 +223,6 @@
   }
 }
 
-/* === RESPONSIVE === */
 @media (max-width: 992px) {
   .cart-content {
     grid-template-columns: 1fr;
@@ -274,7 +267,6 @@
   }
 }
 
-/* === MODO OSCURO === */
 :host-context(body.dark) {
   .cart-item,
   .cart-summary ion-card {

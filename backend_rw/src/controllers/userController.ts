@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt';
 import { encrypt, decrypt } from '../utils/encryption';
 import { DateTime } from 'luxon';
 
-// Helper function para formatear timestamps de usuario
 const formatUserTimestamps = (user: any, timezone: string) => {
   const createdDate = DateTime.fromJSDate(user.createdAt).setZone(timezone);
   const updatedDate = DateTime.fromJSDate(user.updatedAt).setZone(timezone);
@@ -13,13 +12,9 @@ const formatUserTimestamps = (user: any, timezone: string) => {
   return {
     createdAtLocal: createdDate.toFormat('dd/MM/yyyy HH:mm'),
     updatedAtLocal: updatedDate.toFormat('dd/MM/yyyy HH:mm'),
-    // "Miembro desde hace X tiempo"
     memberSince: createdDate.toRelative(),
-    // Fecha de registro legible
     registrationDate: createdDate.toLocaleString(DateTime.DATE_FULL),
-    // Última actividad
     lastActivityRelative: updatedDate.toRelative(),
-    // Días desde registro
     daysSinceRegistration: Math.floor(DateTime.now().diff(createdDate, 'days').days)
   };
 };
@@ -80,7 +75,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
 
     const users = await User.findAll({
       attributes: { exclude: ['password'] },
-      order: [['createdAt', 'DESC']] // Usuarios más recientes primero
+      order: [['createdAt', 'DESC']]
     });
 
     const decryptedUsers = users.map(user => {

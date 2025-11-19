@@ -2,13 +2,11 @@
 
 <ion-content class="ion-padding">
   <div class="cart-container">
-    <!-- Título -->
     <div class="page-header">
       <ion-icon name="cart-outline"></ion-icon>
       <h1>Tu Carrito de Compras</h1>
     </div>
 
-    <!-- Carrito vacío -->
     <div *ngIf="cartItems.length === 0" class="empty-cart">
       <ion-icon name="cart-outline"></ion-icon>
       <h2>Tu carrito está vacío</h2>
@@ -18,14 +16,11 @@
       </ion-button>
     </div>
 
-    <!-- Lista de productos en el carrito -->
     <div *ngIf="cartItems.length > 0" class="cart-content">
-      <!-- Items del carrito -->
       <div class="cart-items">
         <ion-card *ngFor="let item of cartItems; let i = index" class="cart-item">
           <ion-card-content>
             <div class="item-content">
-              <!-- Imagen del producto - OPTIMIZADO CON ion-img -->
               <div class="item-image">
                 <ion-img 
                   [src]="item.product?.image || item.product?.imageUrl || 'assets/placeholder.jpg'" 
@@ -33,14 +28,12 @@
                 ></ion-img>
               </div>
 
-              <!-- Info del producto -->
               <div class="item-info">
                 <h3>{{ item.product?.name || 'Producto sin nombre' }}</h3>
                 <p class="item-size">Talla: {{ item.size }}</p>
                 <p class="item-price">{{ item.product?.price | currency:'CLP':'symbol-narrow' }}</p>
               </div>
 
-              <!-- Controles de cantidad -->
               <div class="item-controls">
                 <div class="quantity-controls">
                   <ion-button fill="clear" size="small" (click)="decreaseQuantity(i)">
@@ -52,12 +45,10 @@
                   </ion-button>
                 </div>
 
-                <!-- Subtotal -->
                 <p class="item-subtotal">
                   {{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}
                 </p>
 
-                <!-- Botón eliminar -->
                 <ion-button fill="clear" color="danger" size="small" (click)="removeItem(i)">
                   <ion-icon name="trash-outline"></ion-icon>
                 </ion-button>
@@ -67,7 +58,6 @@
         </ion-card>
       </div>
 
-      <!-- Resumen del carrito -->
       <div class="cart-summary">
         <ion-card>
           <ion-card-header>

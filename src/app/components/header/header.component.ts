@@ -23,13 +23,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentUser: any = null;
 
   currentTime: string = '';
-  countryFlag: string = '🌍'; // ← AGREGAR: emoji por defecto
+  countryFlag: string = '🌍';
   showTime: boolean = false;
   private timeInterval: any;
 
-  // ✅ NUEVO: Mapa de timezones a banderas
   private timezoneToFlag: { [key: string]: string } = {
-    // América
     'America/Santiago': '🇨🇱',
     'America/Argentina/Buenos_Aires': '🇦🇷',
     'America/Sao_Paulo': '🇧🇷',
@@ -44,7 +42,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     'America/Toronto': '🇨🇦',
     'America/Vancouver': '🇨🇦',
     
-    // Europa
     'Europe/Madrid': '🇪🇸',
     'Europe/London': '🇬🇧',
     'Europe/Paris': '🇫🇷',
@@ -56,7 +53,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     'Europe/Athens': '🇬🇷',
     'Europe/Moscow': '🇷🇺',
     
-    // Asia
     'Asia/Tokyo': '🇯🇵',
     'Asia/Shanghai': '🇨🇳',
     'Asia/Seoul': '🇰🇷',
@@ -66,7 +62,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     'Asia/Manila': '🇵🇭',
     'Asia/Jakarta': '🇮🇩',
     
-    // Oceanía
     'Australia/Sydney': '🇦🇺',
     'Pacific/Auckland': '🇳🇿'
   };
@@ -76,7 +71,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.checkLoginStatus();
     this.updateTime();
-    this.setCountryFlag(); // ← AGREGAR
+    this.setCountryFlag();
     this.timeInterval = setInterval(() => {
       this.updateTime();
     }, 1000);
@@ -93,7 +88,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.currentTime = now.toFormat('HH:mm:ss');
   }
 
-  // ✅ NUEVO: Obtener bandera según timezone
   setCountryFlag() {
     const timezone = this.timezoneService.getUserTimezone();
     this.countryFlag = this.timezoneToFlag[timezone] || '🌍';
