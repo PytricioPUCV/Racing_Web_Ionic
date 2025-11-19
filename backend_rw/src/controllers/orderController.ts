@@ -1,11 +1,34 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { Order, OrderItem } from '../models';
+import { DateTime } from 'luxon';
+
+// Helper function para formatear timestamps de órdenes
+const formatOrderTimestamps = (order: any, timezone: string) => {
+  const orderData = order.toJSON();
+  const createdDate = DateTime.fromJSDate(order.createdAt).setZone(timezone);
+  const updatedDate = DateTime.fromJSDate(order.updatedAt).setZone(timezone);
+  
+  return {
+    ...orderData,
+    // Fecha formateada legible
+    createdAtLocal: createdDate.toFormat('dd/MM/yyyy HH:mm:ss'),
+    updatedAtLocal: updatedDate.toFormat('dd/MM/yyyy HH:mm:ss'),
+    // Fecha relativa (ej: "hace 2 horas")
+    createdAtRelative: createdDate.toRelative(),
+    // Fecha completa para detalles
+    createdAtFull: createdDate.toLocaleString(DateTime.DATETIME_FULL),
+    // Estimación de entrega (7 días desde la creación)
+    estimatedDelivery: createdDate.plus({ days: 7 }).toFormat('dd/MM/yyyy'),
+    estimatedDeliveryFull: createdDate.plus({ days: 7 }).toLocaleString(DateTime.DATE_FULL)
+  };
+};
 
 // POST /api/orders - Crear pedido
 export const createOrder = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { totalAmount, shippingAddress, shippingRegion, shippingComuna, paymentMethod } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     if (!totalAmount || !shippingAddress || !shippingRegion || !shippingComuna || !paymentMethod) {
       res.status(400).json({ message: 'Todos los campos son requeridos' });
@@ -31,7 +54,7 @@ export const createOrder = async (req: AuthRequest, res: Response): Promise<void
 
     res.status(201).json({
       message: 'Pedido creado exitosamente',
-      order
+      order: formatOrderTimestamps(order, timezone)
     });
   } catch (error) {
     console.error('❌ Error al crear pedido:', error);
@@ -47,14 +70,22 @@ export const getUserOrders = async (req: AuthRequest, res: Response): Promise<vo
       return;
     }
 
+    const timezone = req.clientTimezone || 'America/Santiago';
+
     const orders = await Order.findAll({
       where: { userId: req.user.id },
-      include: [{ association: 'items' }]
+      include: [{ association: 'items' }],
+      order: [['createdAt', 'DESC']] // Más recientes primero
     });
+
+    const ordersWithTimezone = orders.map(order => 
+      formatOrderTimestamps(order, timezone)
+    );
 
     res.json({
       message: 'Pedidos obtenidos exitosamente',
-      orders
+      orders: ordersWithTimezone,
+      totalOrders: orders.length
     });
   } catch (error) {
     console.error('❌ Error al obtener pedidos:', error);
@@ -66,6 +97,7 @@ export const getUserOrders = async (req: AuthRequest, res: Response): Promise<vo
 export const getOrderById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const order = await Order.findByPk(id, {
       include: [{ association: 'items' }]
@@ -78,7 +110,7 @@ export const getOrderById = async (req: AuthRequest, res: Response): Promise<voi
 
     res.json({
       message: 'Pedido obtenido exitosamente',
-      order
+      order: formatOrderTimestamps(order, timezone)
     });
   } catch (error) {
     console.error('❌ Error al obtener pedido:', error);
@@ -91,6 +123,7 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
   try {
     const { id } = req.params;
     const { status } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const validStatuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
@@ -109,9 +142,12 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response): Promis
 
     console.log(`✅ Pedido actualizado: ID ${order.id}, Status: ${status}`);
 
+    const formattedOrder = formatOrderTimestamps(order, timezone);
+
     res.json({
       message: 'Pedido actualizado exitosamente',
-      order
+      order: formattedOrder,
+      statusUpdatedAt: DateTime.now().setZone(timezone).toFormat('dd/MM/yyyy HH:mm:ss')
     });
   } catch (error) {
     console.error('❌ Error al actualizar pedido:', error);

@@ -7,7 +7,8 @@ import * as allIcons from 'ionicons/icons';
 
 import { routes } from './app/app.routes';
 import { AppComponent } from './app/app.component';
-import { authInterceptor } from './app/services/auth.interceptor'; 
+import { authInterceptor } from './app/services/auth.interceptor';
+import { timezoneInterceptor } from './app/interceptors/timezone.interceptor'; // ← AGREGAR
 
 addIcons(allIcons);
 
@@ -16,6 +17,11 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])) 
+    provideHttpClient(
+      withInterceptors([
+        timezoneInterceptor,
+        authInterceptor
+      ])
+    )
   ],
 });

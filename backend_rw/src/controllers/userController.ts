@@ -3,11 +3,32 @@ import { AuthRequest } from '../middlewares/authMiddleware';
 import { User } from '../models';
 import bcrypt from 'bcrypt';
 import { encrypt, decrypt } from '../utils/encryption';
+import { DateTime } from 'luxon';
+
+// Helper function para formatear timestamps de usuario
+const formatUserTimestamps = (user: any, timezone: string) => {
+  const createdDate = DateTime.fromJSDate(user.createdAt).setZone(timezone);
+  const updatedDate = DateTime.fromJSDate(user.updatedAt).setZone(timezone);
+  
+  return {
+    createdAtLocal: createdDate.toFormat('dd/MM/yyyy HH:mm'),
+    updatedAtLocal: updatedDate.toFormat('dd/MM/yyyy HH:mm'),
+    // "Miembro desde hace X tiempo"
+    memberSince: createdDate.toRelative(),
+    // Fecha de registro legible
+    registrationDate: createdDate.toLocaleString(DateTime.DATE_FULL),
+    // Última actividad
+    lastActivityRelative: updatedDate.toRelative(),
+    // Días desde registro
+    daysSinceRegistration: Math.floor(DateTime.now().diff(createdDate, 'days').days)
+  };
+};
 
 export const changePassword = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { currentPassword, newPassword } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     if (!currentPassword || !newPassword) {
       res.status(400).json({ message: 'Contraseña actual y nueva son requeridas' });
@@ -39,7 +60,8 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
     console.log(`✅ Contraseña actualizada para: ${user.email}`);
 
     res.json({
-      message: 'Contraseña actualizada exitosamente'
+      message: 'Contraseña actualizada exitosamente',
+      updatedAt: DateTime.now().setZone(timezone).toFormat('dd/MM/yyyy HH:mm:ss')
     });
   } catch (error) {
     console.error('❌ Error al cambiar contraseña:', error);
@@ -54,27 +76,34 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    const timezone = req.clientTimezone || 'America/Santiago';
+
     const users = await User.findAll({
-      attributes: { exclude: ['password'] }
+      attributes: { exclude: ['password'] },
+      order: [['createdAt', 'DESC']] // Usuarios más recientes primero
     });
 
-    const decryptedUsers = users.map(user => ({
-      id: user.id,
-      email: user.email,
-      username: user.username,
-      rut: decrypt(user.rut),
-      region: decrypt(user.region),
-      comuna: decrypt(user.comuna),
-      role: user.role,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    }));
+    const decryptedUsers = users.map(user => {
+      const timestamps = formatUserTimestamps(user, timezone);
+      
+      return {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        rut: decrypt(user.rut),
+        region: decrypt(user.region),
+        comuna: decrypt(user.comuna),
+        role: user.role,
+        ...timestamps
+      };
+    });
 
     console.log(`✅ Listando ${users.length} usuarios (Admin: ${req.user.email})`);
 
     res.json({
       message: 'Usuarios obtenidos exitosamente',
-      users: decryptedUsers
+      users: decryptedUsers,
+      totalUsers: users.length
     });
   } catch (error) {
     console.error('❌ Error al obtener usuarios:', error);
@@ -85,6 +114,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
 export const getUserById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     if (req.user?.id !== parseInt(id) && req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para ver este usuario' });
@@ -100,6 +130,8 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
+    const timestamps = formatUserTimestamps(user, timezone);
+
     console.log(`✅ Usuario obtenido: ${user.email}`);
 
     res.json({
@@ -111,7 +143,8 @@ export const getUserById = async (req: AuthRequest, res: Response): Promise<void
         rut: decrypt(user.rut),
         region: decrypt(user.region),
         comuna: decrypt(user.comuna),
-        role: user.role
+        role: user.role,
+        ...timestamps
       }
     });
   } catch (error) {
@@ -124,6 +157,7 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
   try {
     const { id } = req.params;
     const { username, email, rut, region, comuna, role } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     if (req.user?.id !== parseInt(id) && req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para actualizar este usuario' });
@@ -162,6 +196,8 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
 
     await user.update(updateData);
 
+    const timestamps = formatUserTimestamps(user, timezone);
+
     console.log(`✅ Usuario actualizado: ${user.email}`);
 
     res.json({
@@ -173,7 +209,8 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
         rut: decrypt(user.rut),
         region: decrypt(user.region),
         comuna: decrypt(user.comuna),
-        role: user.role
+        role: user.role,
+        ...timestamps
       }
     });
   } catch (error) {
@@ -185,6 +222,7 @@ export const updateUser = async (req: AuthRequest, res: Response): Promise<void>
 export const deleteUser = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     if (req.user?.role !== 'admin') {
       res.status(403).json({ message: 'No tienes permisos para eliminar usuarios' });
@@ -211,7 +249,8 @@ export const deleteUser = async (req: AuthRequest, res: Response): Promise<void>
     res.json({
       message: 'Usuario eliminado exitosamente',
       userId: id,
-      deletedUser: userEmail
+      deletedUser: userEmail,
+      deletedAt: DateTime.now().setZone(timezone).toFormat('dd/MM/yyyy HH:mm:ss')
     });
   } catch (error) {
     console.error('❌ Error al eliminar usuario:', error);

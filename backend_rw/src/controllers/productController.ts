@@ -1,11 +1,28 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 import { Product } from '../models';
+import { DateTime } from 'luxon';
+
+// Helper function para formatear timestamps
+const formatProductTimestamps = (product: any, timezone: string) => {
+  const productData = product.toJSON();
+  
+  return {
+    ...productData,
+    createdAtLocal: DateTime.fromJSDate(product.createdAt)
+      .setZone(timezone)
+      .toFormat('dd/MM/yyyy HH:mm'),
+    updatedAtLocal: DateTime.fromJSDate(product.updatedAt)
+      .setZone(timezone)
+      .toFormat('dd/MM/yyyy HH:mm')
+  };
+};
 
 // POST /api/products - Crear producto
 export const createProduct = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, description, price, categoryId, imageUrl, stock, size, brand, color, isActive } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     // Validaciones
     if (!name || !description || !price || !categoryId || !stock || !size || !brand) {
@@ -35,7 +52,7 @@ export const createProduct = async (req: AuthRequest, res: Response): Promise<vo
 
     res.status(201).json({
       message: 'Producto creado exitosamente',
-      product
+      product: formatProductTimestamps(product, timezone)
     });
   } catch (error) {
     console.error('❌ Error al crear producto:', error);
@@ -46,13 +63,19 @@ export const createProduct = async (req: AuthRequest, res: Response): Promise<vo
 // GET /api/products - Obtener todos los productos
 export const getAllProducts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
+    const timezone = req.clientTimezone || 'America/Santiago';
+    
     const products = await Product.findAll({
       include: [{ association: 'category' }]
     });
 
+    const productsWithTimezone = products.map(product => 
+      formatProductTimestamps(product, timezone)
+    );
+
     res.json({
       message: 'Productos obtenidos exitosamente',
-      products
+      products: productsWithTimezone
     });
   } catch (error) {
     console.error('❌ Error al obtener productos:', error);
@@ -64,6 +87,7 @@ export const getAllProducts = async (req: AuthRequest, res: Response): Promise<v
 export const getProductById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const product = await Product.findByPk(id, {
       include: [{ association: 'category' }]
@@ -76,7 +100,7 @@ export const getProductById = async (req: AuthRequest, res: Response): Promise<v
 
     res.json({
       message: 'Producto obtenido exitosamente',
-      product
+      product: formatProductTimestamps(product, timezone)
     });
   } catch (error) {
     console.error('❌ Error al obtener producto:', error);
@@ -89,6 +113,7 @@ export const updateProduct = async (req: AuthRequest, res: Response): Promise<vo
   try {
     const { id } = req.params;
     const { name, description, price, stock, imageUrl, isActive } = req.body;
+    const timezone = req.clientTimezone || 'America/Santiago';
 
     const product = await Product.findByPk(id);
 
@@ -110,7 +135,7 @@ export const updateProduct = async (req: AuthRequest, res: Response): Promise<vo
 
     res.json({
       message: 'Producto actualizado exitosamente',
-      product
+      product: formatProductTimestamps(product, timezone)
     });
   } catch (error) {
     console.error('❌ Error al actualizar producto:', error);
