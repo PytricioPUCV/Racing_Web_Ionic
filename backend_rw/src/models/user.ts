@@ -81,7 +81,6 @@ User.init({
   sequelize,
   tableName: 'Users',
   timestamps: true,
-  // ✅ AGREGAR ÍNDICES PARA OPTIMIZACIÓN
   indexes: [
     {
       unique: true,

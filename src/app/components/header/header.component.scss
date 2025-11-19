@@ -59,7 +59,6 @@ h2 {
   }
 }
 
-// Estilos para el reloj con bandera
 .current-time {
   display: flex;
   align-items: center;
@@ -113,7 +112,6 @@ ion-button {
   flex-shrink: 0;
 }
 
-/* Responsive para móvil */
 @media (max-width: 768px) {
   .desktop-nav,
   .action-buttons {
@@ -147,7 +145,6 @@ ion-button {
   }
 }
 
-/* Menú móvil */
 .mobile-nav {
   display: none;
   position: fixed;

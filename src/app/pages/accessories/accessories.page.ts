@@ -20,7 +20,7 @@ import { ProductService, Product } from '../../services/product';
     IonCol,
     IonCard,
     IonSpinner,
-    IonImg  // ← AGREGADO
+    IonImg
   ],
 })
 export class AccessoriesPage implements OnInit {

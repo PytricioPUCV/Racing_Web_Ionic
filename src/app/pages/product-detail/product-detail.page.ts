@@ -35,7 +35,7 @@ import { firstValueFrom } from 'rxjs';
     IonCol, 
     IonLabel, 
     IonButton,
-    IonImg,  // ← AGREGAR ESTA LÍNEA
+    IonImg,
     IonAccordionGroup, 
     IonAccordion, 
     IonItem

@@ -5,7 +5,7 @@ interface OrderAttributes {
   id: number;
   userId: number;
   totalAmount: number;
-  status: string; // 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'
+  status: string;
   shippingAddress: string;
   shippingRegion: string;
   shippingComuna: string;
@@ -76,31 +76,24 @@ Order.init({
   sequelize,
   tableName: 'Orders',
   timestamps: true,
-  // ✅ ÍNDICES PARA OPTIMIZACIÓN
   indexes: [
     {
-      // Buscar pedidos de un usuario específico
       fields: ['userId'],
       name: 'orders_user_id_index'
     },
     {
-      // Filtrar por estado del pedido
       fields: ['status'],
       name: 'orders_status_index'
     },
     {
-      // Ordenar por fecha de creación
       fields: ['createdAt'],
       name: 'orders_created_at_index'
     },
     {
-      // Ordenar por fecha de pedido
       fields: ['orderDate'],
       name: 'orders_order_date_index'
     },
     {
-      // Índice compuesto: pedidos de un usuario por estado
-      // Ej: "Pedidos pendientes del usuario X"
       fields: ['userId', 'status'],
       name: 'orders_user_status_index'
     }

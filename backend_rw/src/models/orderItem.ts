@@ -63,15 +63,12 @@ OrderItem.init({
   sequelize,
   tableName: 'OrderItems',
   timestamps: true,
-  // ✅ ÍNDICES PARA OPTIMIZACIÓN
   indexes: [
     {
-      // Buscar todos los items de una orden específica
       fields: ['orderId'],
       name: 'order_items_order_id_index'
     },
     {
-      // Ver qué productos se han vendido
       fields: ['productId'],
       name: 'order_items_product_id_index'
     }
