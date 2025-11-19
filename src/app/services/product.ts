@@ -22,6 +22,11 @@ export interface Product {
     id: number;
     name: string;
   };
+  // ✅ AGREGAR: Campos de timezone del backend
+  createdAt?: string;
+  updatedAt?: string;
+  createdAtLocal?: string;
+  updatedAtLocal?: string;
 }
 
 @Injectable({

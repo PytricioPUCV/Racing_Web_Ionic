@@ -6,6 +6,7 @@ import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
 import { ProductService, Product } from '../services/product';
 import { AuthService } from '../services/auth.service';
+import { TimezoneService } from '../services/timezone.service'; // ← AGREGAR
 import { RouterLink } from '@angular/router';
 
 @Component({
@@ -25,13 +26,14 @@ import { RouterLink } from '@angular/router';
     IonCard, 
     IonSpinner,
     IonButton,
-    IonImg,  // ← AGREGADO
+    IonImg,
     RouterLink
   ],
 })
 export class HomePage implements OnInit {
   private authService = inject(AuthService);
   private productService = inject(ProductService);
+  private timezoneService = inject(TimezoneService); // ← AGREGAR
   
   products: Product[] = [];
   currentUser: any = null;
@@ -41,6 +43,7 @@ export class HomePage implements OnInit {
     this.loadAllProducts();
     this.currentUser = this.authService.getCurrentUser();
     console.log('✅ Usuario autenticado en Home:', this.currentUser);
+    console.log('🌍 Timezone del usuario:', this.timezoneService.getUserTimezone());
   }
 
   loadAllProducts() {
@@ -64,6 +67,18 @@ export class HomePage implements OnInit {
       console.log('🔗 Navegando al producto:', id);
       window.location.href = `/product/${id}`;
     }
+  }
+  
+  formatDate(isoDate: string): string {
+    return this.timezoneService.formatDate(isoDate, 'dd/MM/yyyy');
+  }
+
+  formatDateTime(isoDate: string): string {
+    return this.timezoneService.formatDate(isoDate, 'dd/MM/yyyy HH:mm');
+  }
+
+  getRelativeTime(isoDate: string): string | null {
+    return this.timezoneService.formatRelative(isoDate);
   }
 
   goToProfile() {

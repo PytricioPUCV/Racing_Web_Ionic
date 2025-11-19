@@ -49,6 +49,13 @@
                   <b>${{ product.price.toLocaleString('es-CL') }}</b>
                 </span>
               </div>
+              
+              <p class="product-date" *ngIf="product.createdAtLocal">
+                <small>Agregado: {{ product.createdAtLocal }}</small>
+              </p>
+              <p class="product-date" *ngIf="product.createdAt">
+                <small>{{ getRelativeTime(product.createdAt) }}</small>
+              </p>
             </div>
           </ion-card>
         </ion-col>
