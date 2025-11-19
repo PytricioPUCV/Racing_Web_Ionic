@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
+/* =================== RESET Y ESTILOS GENERALES =================== */
 * {
   margin: 0;
   padding: 0;
@@ -21,46 +22,39 @@ body {
   overflow-x: hidden;
 }
 
-ion-toast.success-toast {
-  --background: #2dd36f;
-  --color: #ffffff;
-  --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  
-  &::part(message) {
-    font-weight: 600;
-    font-size: 16px;
-  }
-
-  &::part(container) {
-    padding: 16px;
-  }
+/* =================== ESTILOS PARA TOAST =================== */
+// Toast personalizado
+ion-toast.custom-toast {
+  --background: #10b981 !important; // Verde por defecto
+  --color: #ffffff !important; // Texto blanco
+  --border-radius: 12px !important;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
+  --min-height: 60px !important;
 }
 
-ion-toast.danger-toast {
-  --background: #eb445a;
-  --color: #ffffff;
-  --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  
-  &::part(message) {
-    font-weight: 600;
-    font-size: 16px;
-  }
-
-  &::part(container) {
-    padding: 16px;
-  }
+ion-toast.custom-toast::part(message) {
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
 }
 
-ion-toast.warning-toast {
-  --background: #ffc409;
-  --color: #000000;
-  --border-radius: 12px;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  
-  &::part(message) {
-    font-weight: 600;
-    font-size: 16px;
-  }
+ion-toast.custom-toast::part(container) {
+  background: #10b981 !important;
+  padding: 16px !important;
+  border-radius: 12px !important;
 }
+
+// Toast de error/peligro
+ion-toast.custom-toast[color="danger"] {
+  --background: #ef4444 !important;
+}
+
+ion-toast.custom-toast[color="danger"]::part(container) {
+  background: #ef4444 !important;
+}
+
+ion-toast.custom-toast[color="danger"]::part(message) {
+  color: #ffffff !important;
+}
+
+

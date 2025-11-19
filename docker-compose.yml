@@ -29,7 +29,7 @@ services:
     restart: always
     environment:
       NODE_ENV: production
-      PORT: 3050
+      PORT: 3000
       DB_HOST: database
       DB_PORT: 5432
       DB_USER: ${DB_USER:-racing_user}
