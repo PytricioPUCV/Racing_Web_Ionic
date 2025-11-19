@@ -3,18 +3,39 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const isDocker = process.env.DB_HOST !== undefined;
-
 let sequelize: Sequelize;
 
-if (isDocker) {
-  console.log('🐳 Ejecutando en Docker...');
+// Priorizar DB_URL si existe (funciona para Docker y local)
+if (process.env.DB_URL) {
+  console.log('🔗 Conectando con DB_URL (NeonDB)...');
+  
+  sequelize = new Sequelize(process.env.DB_URL, {
+    dialect: 'postgres',
+    protocol: 'postgres',
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false
+      }
+    },
+    logging: process.env.NODE_ENV === 'development' ? console.log : false,
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000
+    }
+  });
+  
+} else {
+  // Fallback a parámetros individuales (PostgreSQL local sin SSL)
+  console.log('🐳 Conectando con parámetros individuales (PostgreSQL local)...');
   
   sequelize = new Sequelize({
     database: process.env.DB_NAME || 'racing_db',
     username: process.env.DB_USER || 'racing_user',
     password: process.env.DB_PASSWORD || 'racing_password',
-    host: process.env.DB_HOST || 'database',
+    host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
     dialect: 'postgres',
     logging: false,
@@ -28,27 +49,6 @@ if (isDocker) {
       idle: 10000
     }
   });
-  
-} else {
-  console.log('☁️  Conectando a Supabase...');
-  
-  const dbUrl = process.env.DB_URL;
-  
-  if (!dbUrl) {
-    throw new Error('❌ DB_URL no está definida en las variables de entorno');
-  }
-  
-  sequelize = new Sequelize(dbUrl, {
-    dialect: 'postgres',
-    protocol: 'postgres',
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
-    },
-    logging: process.env.NODE_ENV === 'development' ? console.log : false
-  });
 }
 
 async function testConnection() {
@@ -57,6 +57,7 @@ async function testConnection() {
     console.log('✅ Conexión a la base de datos establecida correctamente.');
   } catch (error) {
     console.error('❌ No se pudo conectar a la base de datos:', error);
+    throw error;
   }
 }
 

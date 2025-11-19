@@ -1,10 +1,11 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../database';
+import { Op } from 'sequelize'; // ← AGREGAR ESTA IMPORTACIÓN
 
 interface CartAttributes {
   id: number;
-  userId: number | null; // null si es invitado
-  sessionId: string | null; // para invitados
+  userId: number | null;
+  sessionId: string | null;
 }
 
 interface CartCreationAttributes extends Optional<CartAttributes, 'id' | 'userId' | 'sessionId'> {}
@@ -38,7 +39,20 @@ Cart.init({
   },
 }, {
   sequelize,
-  tableName: 'Carts'
+  tableName: 'Carts',
+  timestamps: true,
+  indexes: [
+    {
+      // Índice para userId (sin unique por los null)
+      fields: ['userId'],
+      name: 'carts_user_id_index'
+    },
+    {
+      // Índice para sessionId (invitados)
+      fields: ['sessionId'],
+      name: 'carts_session_id_index'
+    }
+  ]
 });
 
 export default Cart;

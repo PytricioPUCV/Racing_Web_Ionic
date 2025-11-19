@@ -13,6 +13,17 @@
 
     <!-- Botones de acción principales -->
     <ion-buttons slot="end" class="user-actions">
+      <!-- Botón de Reloj -->
+      <ion-button (click)="toggleTimeDisplay()" color="light" title="Hora local">
+        <ion-icon slot="icon-only" name="time-outline"></ion-icon>
+      </ion-button>
+      
+      <!-- Mostrar hora con bandera -->
+      <span *ngIf="showTime" class="current-time">
+        <span class="country-flag">{{ countryFlag }}</span>
+        {{ currentTime }}
+      </span>
+
       <ion-button (click)="toggleTheme()">
         <ion-icon slot="icon-only" name="sunny-outline" class="theme-icon-light"></ion-icon>
         <ion-icon slot="icon-only" name="moon-outline" class="theme-icon-dark"></ion-icon>
@@ -46,7 +57,7 @@
   </ion-toolbar>
 </ion-header>
 
-<!-- Menú móvil, solo visible si isMobileMenuOpen==true -->
+<!-- Menú móvil -->
 <div class="mobile-nav" [class.active]="isMobileMenuOpen">
   <ul>
     <li><a href="/home">INICIO</a></li>

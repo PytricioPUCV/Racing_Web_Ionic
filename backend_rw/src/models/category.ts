@@ -35,7 +35,17 @@ Category.init({
   },
 }, {
   sequelize,
-  tableName: 'Categories'
+  tableName: 'Categories',
+  timestamps: true,
+  // ✅ ÍNDICES PARA OPTIMIZACIÓN
+  indexes: [
+    {
+      // Búsqueda por nombre (ya es único, pero reforzamos el índice)
+      unique: true,
+      fields: ['name'],
+      name: 'categories_name_index'
+    }
+  ]
 });
 
 export default Category;

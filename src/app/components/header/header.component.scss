@@ -50,8 +50,55 @@ h2 {
   }
 }
 
-.user-actions ion-button {
-  margin-left: 0.5rem;
+.user-actions {
+  display: flex;
+  align-items: center;
+  
+  ion-button {
+    margin-left: 0.5rem;
+  }
+}
+
+// Estilos para el reloj con bandera
+.current-time {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0.5rem;
+  font-weight: 600;
+  font-size: 14px;
+  color: #e10600;
+  letter-spacing: 0.5px;
+  animation: fadeIn 0.3s ease-in;
+  white-space: nowrap;
+}
+
+.country-flag {
+  font-size: 18px;
+  animation: waveFlag 2s ease-in-out infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes waveFlag {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
 }
 
 ion-button {
@@ -88,9 +135,19 @@ ion-button {
       margin-right: 0;
     }
   }
+
+  .current-time {
+    font-size: 12px;
+    margin: 0 0.3rem;
+    gap: 4px;
+  }
+
+  .country-flag {
+    font-size: 16px;
+  }
 }
 
-/* Menú móvil: oculto por defecto, visible solo con .active */
+/* Menú móvil */
 .mobile-nav {
   display: none;
   position: fixed;
