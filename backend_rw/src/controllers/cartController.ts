@@ -3,7 +3,6 @@ import { AuthRequest } from '../middlewares/authMiddleware';
 import { Cart, CartItem } from '../models';
 import { DateTime } from 'luxon';
 
-// Helper function para formatear timestamps de carrito
 const formatCartTimestamps = (cart: any, timezone: string) => {
   const cartData = cart.toJSON();
   const createdDate = DateTime.fromJSDate(cart.createdAt).setZone(timezone);
@@ -13,15 +12,12 @@ const formatCartTimestamps = (cart: any, timezone: string) => {
     ...cartData,
     createdAtLocal: createdDate.toFormat('dd/MM/yyyy HH:mm'),
     updatedAtLocal: updatedDate.toFormat('dd/MM/yyyy HH:mm'),
-    // Útil para mostrar "última modificación hace X tiempo"
     lastModifiedRelative: updatedDate.toRelative(),
-    // Para saber si el carrito está "fresco" o abandonado
     daysSinceCreated: Math.floor(DateTime.now().diff(createdDate, 'days').days),
     isRecent: DateTime.now().diff(updatedDate, 'hours').hours < 24
   };
 };
 
-// POST /api/carts - Crear carrito
 export const createCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
@@ -48,7 +44,6 @@ export const createCart = async (req: AuthRequest, res: Response): Promise<void>
   }
 };
 
-// GET /api/carts/user - Obtener mi carrito
 export const getUserCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
@@ -68,7 +63,6 @@ export const getUserCart = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    // Formatear timestamps de los items del carrito también
     const cartData = formatCartTimestamps(cart, timezone);
     
     if (cartData.items && cartData.items.length > 0) {
@@ -94,7 +88,6 @@ export const getUserCart = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// GET /api/carts/:id - Obtener carrito por ID
 export const getCartById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -109,7 +102,6 @@ export const getCartById = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    // Formatear timestamps de los items del carrito
     const cartData = formatCartTimestamps(cart, timezone);
     
     if (cartData.items && cartData.items.length > 0) {
@@ -135,7 +127,6 @@ export const getCartById = async (req: AuthRequest, res: Response): Promise<void
   }
 };
 
-// DELETE /api/carts/:id - Limpiar carrito
 export const clearCart = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

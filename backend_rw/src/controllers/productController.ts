@@ -3,7 +3,6 @@ import { AuthRequest } from '../middlewares/authMiddleware';
 import { Product } from '../models';
 import { DateTime } from 'luxon';
 
-// Helper function para formatear timestamps
 const formatProductTimestamps = (product: any, timezone: string) => {
   const productData = product.toJSON();
   
@@ -18,13 +17,11 @@ const formatProductTimestamps = (product: any, timezone: string) => {
   };
 };
 
-// POST /api/products - Crear producto
 export const createProduct = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { name, description, price, categoryId, imageUrl, stock, size, brand, color, isActive } = req.body;
     const timezone = req.clientTimezone || 'America/Santiago';
 
-    // Validaciones
     if (!name || !description || !price || !categoryId || !stock || !size || !brand) {
       res.status(400).json({ message: 'Todos los campos son requeridos' });
       return;
@@ -60,7 +57,6 @@ export const createProduct = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// GET /api/products - Obtener todos los productos
 export const getAllProducts = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const timezone = req.clientTimezone || 'America/Santiago';
@@ -83,7 +79,6 @@ export const getAllProducts = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-// GET /api/products/:id - Obtener producto por ID
 export const getProductById = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -108,7 +103,6 @@ export const getProductById = async (req: AuthRequest, res: Response): Promise<v
   }
 };
 
-// PUT /api/products/:id - Actualizar producto
 export const updateProduct = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -143,7 +137,6 @@ export const updateProduct = async (req: AuthRequest, res: Response): Promise<vo
   }
 };
 
-// DELETE /api/products/:id - Eliminar producto
 export const deleteProduct = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

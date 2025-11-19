@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from 'sequelize';
 import sequelize from '../database';
-import { Op } from 'sequelize'; // ← AGREGAR ESTA IMPORTACIÓN
+import { Op } from 'sequelize';
 
 interface CartAttributes {
   id: number;
@@ -43,12 +43,10 @@ Cart.init({
   timestamps: true,
   indexes: [
     {
-      // Índice para userId (sin unique por los null)
       fields: ['userId'],
       name: 'carts_user_id_index'
     },
     {
-      // Índice para sessionId (invitados)
       fields: ['sessionId'],
       name: 'carts_session_id_index'
     }

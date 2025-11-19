@@ -1,5 +1,4 @@
 services:
-  # Backend Node.js + TypeScript (conectado a NeonDB)
   backend:
     build:
       context: ./backend_rw
@@ -9,7 +8,6 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
-      # Solo necesitas DB_URL para NeonDB
       DB_URL: ${DB_URL}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
@@ -25,7 +23,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Frontend Ionic Angular
   frontend:
     build:
       context: .
@@ -33,7 +30,7 @@ services:
     container_name: racing_frontend
     restart: always
     environment:
-      - API_URL=http://localhost:3000  # Actualizado al puerto correcto
+      - API_URL=http://localhost:3000
     ports:
       - "8080:80"
     depends_on:

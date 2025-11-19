@@ -4,21 +4,17 @@
       <a href="/home"><img src="assets/logo.svg" alt="RCNG Logo" class="header-logo" /></a>
     </ion-buttons>
 
-    <!-- Navegación en desktop -->
     <ion-buttons slot="end" class="desktop-nav">
       <ion-button (click)="goToHome()" class="nav-link">Inicio</ion-button>
       <ion-button (click)="goToJackets()" class="nav-link">Chaquetas</ion-button>
       <ion-button (click)="goToAccessories()" class="nav-link">Accesorios</ion-button>
     </ion-buttons>
 
-    <!-- Botones de acción principales -->
     <ion-buttons slot="end" class="user-actions">
-      <!-- Botón de Reloj -->
       <ion-button (click)="toggleTimeDisplay()" color="light" title="Hora local">
         <ion-icon slot="icon-only" name="time-outline"></ion-icon>
       </ion-button>
       
-      <!-- Mostrar hora con bandera -->
       <span *ngIf="showTime" class="current-time">
         <span class="country-flag">{{ countryFlag }}</span>
         {{ currentTime }}
@@ -48,7 +44,6 @@
       </ng-template>
     </ion-buttons>
 
-    <!-- Botón menú móvil -->
     <ion-buttons slot="end" class="mobile-menu-btn">
       <ion-button (click)="toggleMobileMenu()">
         <ion-icon name="menu"></ion-icon>
@@ -57,7 +52,6 @@
   </ion-toolbar>
 </ion-header>
 
-<!-- Menú móvil -->
 <div class="mobile-nav" [class.active]="isMobileMenuOpen">
   <ul>
     <li><a href="/home">INICIO</a></li>

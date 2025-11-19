@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 
-/* =================== RESET Y ESTILOS GENERALES =================== */
 * {
   margin: 0;
   padding: 0;
@@ -22,11 +21,9 @@ body {
   overflow-x: hidden;
 }
 
-/* =================== ESTILOS PARA TOAST =================== */
-// Toast personalizado
 ion-toast.custom-toast {
-  --background: #10b981 !important; // Verde por defecto
-  --color: #ffffff !important; // Texto blanco
+  --background: #10b981 !important;
+  --color: #ffffff !important;
   --border-radius: 12px !important;
   --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
   --min-height: 60px !important;
@@ -44,7 +41,6 @@ ion-toast.custom-toast::part(container) {
   border-radius: 12px !important;
 }
 
-// Toast de error/peligro
 ion-toast.custom-toast[color="danger"] {
   --background: #ef4444 !important;
 }

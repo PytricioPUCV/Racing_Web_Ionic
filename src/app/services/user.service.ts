@@ -21,22 +21,18 @@ export class UserService {
   private http = inject(HttpClient);
   private apiUrl = 'http://localhost:3000/api/users';
 
-  // ✅ Obtener todos los usuarios (Admin)
   getAllUsers(): Observable<UserProfile[]> {
     return this.http.get<UserProfile[]>(`${this.apiUrl}/admin/users`);
   }
 
-  // ✅ Obtener usuario por ID (Admin)
   getUserById(userId: number): Observable<UserProfile> {
     return this.http.get<UserProfile>(`${this.apiUrl}/admin/users/${userId}`);
   }
 
-  // ✅ Actualizar usuario (Admin)
   updateUser(userId: number, data: Partial<UserProfile>): Observable<any> {
     return this.http.put(`${this.apiUrl}/admin/users/${userId}`, data);
   }
 
-  // ✅ Eliminar usuario (Admin)
   deleteUser(userId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/admin/users/${userId}`);
   }

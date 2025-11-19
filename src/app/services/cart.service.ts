@@ -19,11 +19,9 @@ export class CartService {
   private apiUrl = 'http://localhost:3000/api/carts';
   private itemsApiUrl = 'http://localhost:3000/api/cart-items';
 
- // Estado reactivo del carrito
 private cartItemsSubject = new BehaviorSubject<CartItem[]>([]);
 private cartItemCountSubject = new BehaviorSubject<number>(0);
 
-// ✅ Observables públicos para suscripciones
 public cartItems$ = this.cartItemsSubject.asObservable();
 public cartItemCount$ = this.cartItemCountSubject.asObservable();
 
@@ -41,7 +39,6 @@ public cartItemCount$ = this.cartItemCountSubject.asObservable();
     loadUserCart(): void {
   this.getUserCart().subscribe({
     next: (response) => {
-      // ✅ Acceder a response.cart.items (según tu estructura de backend)
       const items = response.cart?.items || [];
       console.log('📦 Items cargados desde backend:', items);
       this.cartItemsSubject.next(items);
@@ -53,7 +50,6 @@ public cartItemCount$ = this.cartItemCountSubject.asObservable();
   });
 }
 
-//funciones CRUD para el carrito
   createCart(): Observable<any> {
     return this.http.post(this.apiUrl, {}, { headers: this.getHeaders() });
   }
