@@ -17,6 +17,7 @@ import { FooterComponent } from '../../components/footer/footer.component';
 import { ProductService, Product } from '../../services/product';
 import { CartService, CartItem } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
+import { DemoModeService } from '../../services/demo-mode.service';
 import { firstValueFrom } from 'rxjs';
 
 const JACKET_SIZES = ['M', 'L', 'XL', 'XXL'];
@@ -64,6 +65,7 @@ export class ProductDetailPage implements OnInit {
     private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
+    private demoMode: DemoModeService,
     private toastController: ToastController,
     private cdr: ChangeDetectorRef
   ) {}
@@ -136,6 +138,11 @@ export class ProductDetailPage implements OnInit {
   async addToCart(goToCheckout = false): Promise<void> {
     if (!this.product) {
       await this.presentToast('❌ Error: Producto no disponible', 'danger');
+      return;
+    }
+
+    if (this.demoMode.isDemo) {
+      this.router.navigate(['/login']);
       return;
     }
 

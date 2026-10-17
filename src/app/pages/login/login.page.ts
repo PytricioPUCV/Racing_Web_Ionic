@@ -5,18 +5,21 @@ import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonInput, IonButton, IonSpinner, ToastController } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
+import { DemoModeService } from '../../services/demo-mode.service';
+import { DemoNoticeComponent } from '../../components/demo-notice/demo-notice.component';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent, IonContent, IonInput, IonButton, IonSpinner]
+  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent, DemoNoticeComponent, IonContent, IonInput, IonButton, IonSpinner]
 })
 export class LoginPage {
   private authService = inject(AuthService);
   private router = inject(Router);
   private toastController = inject(ToastController);
+  private demoMode = inject(DemoModeService);
 
   email: string = '';
   password: string = '';
@@ -28,7 +31,8 @@ export class LoginPage {
   }
 
   onLogin() {
-    if (this.submitting) return;
+    // Sin backend no hay cuentas: el aviso de demostración ya está visible sobre el formulario
+    if (this.submitting || this.demoMode.isDemo) return;
 
     if (!this.email || !this.password) {
       this.showToastMessage('Ingresa tu email y tu contraseña', 'danger');
@@ -51,6 +55,7 @@ export class LoginPage {
       },
       error: (error) => {
         this.submitting = false;
+        if (this.demoMode.reportError(error)) return;
         this.showToastMessage(error.error?.message || 'Email o contraseña incorrectos', 'danger');
       }
     });

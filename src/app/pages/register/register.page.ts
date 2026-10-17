@@ -5,6 +5,8 @@ import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonSpinner, ToastController } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
+import { DemoModeService } from '../../services/demo-mode.service';
+import { DemoNoticeComponent } from '../../components/demo-notice/demo-notice.component';
 import { REGIONES_Y_COMUNAS } from '../../data/regiones';
 
 @Component({
@@ -17,6 +19,7 @@ import { REGIONES_Y_COMUNAS } from '../../data/regiones';
     FormsModule,
     RouterLink,
     HeaderComponent,
+    DemoNoticeComponent,
     IonContent,
     IonInput,
     IonSelect,
@@ -30,6 +33,7 @@ export class RegisterPage implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private toastController = inject(ToastController);
+  private demoMode = inject(DemoModeService);
 
   email: string = '';
   password: string = '';
@@ -80,7 +84,8 @@ export class RegisterPage implements OnInit {
   }
 
   onRegister() {
-    if (this.submitting) return;
+    // Sin backend no se pueden crear cuentas: el aviso de demostración ya está visible
+    if (this.submitting || this.demoMode.isDemo) return;
 
     if (!this.email || !this.password || !this.username || !this.rut || !this.selectedRegion || !this.selectedComuna) {
       this.showToastMessage('Todos los campos son obligatorios', 'danger');
@@ -137,6 +142,7 @@ export class RegisterPage implements OnInit {
       },
       error: (error) => {
         this.submitting = false;
+        if (this.demoMode.reportError(error)) return;
         this.showToastMessage(error.error?.message || 'No se pudo crear la cuenta', 'danger');
       }
     });

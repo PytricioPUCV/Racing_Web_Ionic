@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { DemoModeService } from './demo-mode.service';
 
 export interface Product {
   id?: number;
@@ -29,34 +30,64 @@ export interface Product {
   updatedAtLocal?: string;
 }
 
+const JACKETS = { id: 1, name: 'Chaquetas' };
+const ACCESSORIES = { id: 2, name: 'Accesorios' };
+
+// Mismos productos que crea el seed del backend (backend_rw/src/seed.ts)
+const jacket = (id: number, name: string, price: number, originalPrice: number): Product => ({
+  id, name, price, originalPrice,
+  image: `assets/product${id}.jpg`,
+  type: 'chaqueta',
+  categoryId: JACKETS.id,
+  category: JACKETS,
+  description: `Chaqueta oficial de carreras ${name}`,
+  brand: name.split(' ')[0],
+  size: 'L',
+  stock: 10,
+  isActive: true
+});
+
+const accessory = (id: number, name: string, price: number, originalPrice: number): Product => ({
+  id, name, price, originalPrice,
+  image: `assets/acc${id - 8}.jpg`,
+  type: 'accesorio',
+  categoryId: ACCESSORIES.id,
+  category: ACCESSORIES,
+  description: `${name} - Accesorio oficial de carreras`,
+  brand: name.includes('F1') ? 'F1' : name.split(' ')[0],
+  size: 'Único',
+  stock: 15,
+  isActive: true
+});
+
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
+  private http = inject(HttpClient);
+  private demoMode = inject(DemoModeService);
   private apiUrl = `${environment.apiUrl}/products`;
   private useBackend = true;
 
   private allProducts: Product[] = [
-    { id: 1, name: 'Ferrari Black Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product1.jpg', type: 'chaqueta' },
-    { id: 2, name: 'Jack Daniels Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product2.jpg', type: 'chaqueta' },
-    { id: 3, name: 'Ford Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product3.jpg', type: 'chaqueta' },
-    { id: 4, name: 'Red Bull Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product4.jpg', type: 'chaqueta' },
-    { id: 5, name: 'Ferrari Cuero Racing Jacket', price: 80000, originalPrice: 100000, image: 'assets/product5.jpg', type: 'chaqueta' },
-    { id: 6, name: 'Porsche Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product6.jpg', type: 'chaqueta' },
-    { id: 7, name: 'Ferrari White Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product7.jpg', type: 'chaqueta' },
-    { id: 8, name: 'Subaru Racing Jacket', price: 60000, originalPrice: 80000, image: 'assets/product8.jpg', type: 'chaqueta' },
+    jacket(1, 'Ferrari Black Racing Jacket', 60000, 80000),
+    jacket(2, 'Jack Daniels Racing Jacket', 60000, 80000),
+    jacket(3, 'Ford Racing Jacket', 60000, 80000),
+    jacket(4, 'Red Bull Racing Jacket', 60000, 80000),
+    jacket(5, 'Ferrari Cuero Racing Jacket', 80000, 100000),
+    jacket(6, 'Porsche Racing Jacket', 60000, 80000),
+    jacket(7, 'Ferrari White Racing Jacket', 60000, 80000),
+    jacket(8, 'Subaru Racing Jacket', 60000, 80000),
 
-    { id: 9, name: 'Gorra F1 Racing Black', price: 25000, originalPrice: 30000, image: 'assets/acc1.jpg', type: 'accesorio' },
-    { id: 10, name: 'Guantes F1 Racing', price: 35000, originalPrice: 45000, image: 'assets/acc2.jpg', type: 'accesorio' },
-    { id: 11, name: 'Llavero Pistón Metálico', price: 15000, originalPrice: 20000, image: 'assets/acc3.jpg', type: 'accesorio' },
-    { id: 12, name: 'Mochila Red Bull Team', price: 55000, originalPrice: 70000, image: 'assets/acc4.jpg', type: 'accesorio' },
-    { id: 13, name: 'Calcetines Checkered Flag', price: 12000, originalPrice: 15000, image: 'assets/acc5.jpg', type: 'accesorio' },
-    { id: 14, name: 'Cinturón de Seguridad F1', price: 28000, originalPrice: 35000, image: 'assets/acc6.jpg', type: 'accesorio' },
-    { id: 15, name: 'Tazón F1', price: 18000, originalPrice: 22000, image: 'assets/acc7.jpg', type: 'accesorio' },
-    { id: 16, name: 'Gafas de Sol Aviador', price: 40000, originalPrice: 50000, image: 'assets/acc8.jpg', type: 'accesorio' },
+    accessory(9, 'Gorra F1 Racing Black', 25000, 30000),
+    accessory(10, 'Guantes F1 Racing', 35000, 45000),
+    accessory(11, 'Llavero Pistón Metálico', 15000, 20000),
+    accessory(12, 'Mochila Red Bull Team', 55000, 70000),
+    accessory(13, 'Calcetines Checkered Flag', 12000, 15000),
+    accessory(14, 'Cinturón de Seguridad F1', 28000, 35000),
+    accessory(15, 'Tazón F1', 18000, 22000),
+    accessory(16, 'Gafas de Sol Aviador', 40000, 50000),
   ];
-
-  constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
@@ -66,84 +97,25 @@ export class ProductService {
     });
   }
 
-  getAllProducts(): Product[] {
-    return this.allProducts;
-  }
-
-  getAccessories(): Product[] {
-    return this.allProducts.filter(p => p.type === 'accesorio');
-  }
-
-  getJackets(): Product[] {
-    return this.allProducts.filter(p => p.type === 'chaqueta');
-  }
-
   getProductById(id: number): Product | undefined {
     return this.allProducts.find(p => p.id === id);
   }
 
-  getJacketProducts(): Observable<Product[]> {
-    if (!this.useBackend) {
-      console.log('📦 Usando datos MOCK para chaquetas');
-      return of(this.allProducts.filter(p => p.type === 'chaqueta'));
-    }
-
-    console.log('🌐 Cargando chaquetas desde BACKEND');
-    return this.http.get<any>(`${this.apiUrl}`, { headers: this.getHeaders() }).pipe(
-      map(response => response.products.filter((p: Product) => p.categoryId === 1)),
-      catchError(error => {
-        console.error('❌ Error al cargar desde backend, usando MOCK:', error);
-        return of(this.allProducts.filter(p => p.type === 'chaqueta'));
-      })
-    );
-  }
-
-  getAccessoryProducts(): Observable<Product[]> {
-    if (!this.useBackend) {
-      console.log('📦 Usando datos MOCK para accesorios');
-      return of(this.allProducts.filter(p => p.type === 'accesorio'));
-    }
-
-    console.log('🌐 Cargando accesorios desde BACKEND');
-    return this.http.get<any>(`${this.apiUrl}`, { headers: this.getHeaders() }).pipe(
-      map(response => response.products.filter((p: Product) => p.categoryId === 2)),
-      catchError(error => {
-        console.error('❌ Error al cargar desde backend, usando MOCK:', error);
-        return of(this.allProducts.filter(p => p.type === 'accesorio'));
-      })
-    );
-  }
-
-  // Catálogo real: sin respaldo a datos de prueba, para que un error de la API se muestre como tal
+  // Catálogo desde la API. Solo si no hay backend (modo demo) se usan los productos locales;
+  // cualquier otro error se propaga para que la página lo muestre.
   getCatalog(): Observable<Product[]> {
     return this.http.get<{ products: Product[] }>(this.apiUrl).pipe(
-      map(response => response.products.filter(p => p.isActive !== false))
-    );
-  }
-
-  getAllProductsFromAPI(): Observable<Product[]> {
-    return this.http.get<any>(`${this.apiUrl}`, { headers: this.getHeaders() }).pipe(
-      map(response => response.products),
-      catchError(error => {
-        console.error('❌ Error al cargar productos desde API:', error);
-        return of(this.allProducts);
-      })
+      map(response => response.products.filter(p => p.isActive !== false)),
+      catchError(error => this.demoMode.reportError(error) ? of(this.allProducts) : throwError(() => error))
     );
   }
 
   getProductByIdFromAPI(id: number): Observable<Product> {
-    if (!this.useBackend) {
-      const product = this.allProducts.find(p => p.id === id);
-      return of(product as Product);
-    }
-
-    console.log(`🌐 GET ${this.apiUrl}/${id}`);
-    return this.http.get<any>(`${this.apiUrl}/${id}`, { headers: this.getHeaders() }).pipe(
+    return this.http.get<{ product: Product }>(`${this.apiUrl}/${id}`).pipe(
       map(response => response.product),
       catchError(error => {
-        console.error('❌ Error al cargar producto desde API:', error);
-        const mockProduct = this.allProducts.find(p => p.id === id);
-        return of(mockProduct as Product);
+        const demoProduct = this.demoMode.reportError(error) ? this.getProductById(id) : undefined;
+        return demoProduct ? of(demoProduct) : throwError(() => error);
       })
     );
   }
@@ -158,11 +130,6 @@ export class ProductService {
 
   deleteProduct(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, { headers: this.getHeaders() });
-  }
-
-  setUseBackend(value: boolean): void {
-    this.useBackend = value;
-    console.log(`🔄 Modo cambiado a: ${value ? 'BACKEND' : 'MOCK'}`);
   }
 
   isUsingBackend(): boolean {
