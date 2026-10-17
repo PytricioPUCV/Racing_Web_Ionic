@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { 
   IonContent, 
   IonGrid, 
@@ -50,6 +50,7 @@ export class ProductDetailPage implements OnInit {
 
   constructor(
     private route: ActivatedRoute, 
+    private router: Router,
     private productService: ProductService,
     private cartService: CartService,
     private toastController: ToastController,
@@ -153,7 +154,7 @@ export class ProductDetailPage implements OnInit {
     }
   }
 
-  async addToCart(): Promise<void> {
+  async addToCart(goToCheckout = false): Promise<void> {
     if (!this.product) {
       await this.presentToast('❌ Error: Producto no disponible', 'danger');
       return;
@@ -198,6 +199,11 @@ export class ProductDetailPage implements OnInit {
 
     this.cartService.addCartItem(cartItem).subscribe({
       next: async () => {
+        if (goToCheckout) {
+          this.cartService.loadUserCart();
+          this.router.navigate(['/checkout']);
+          return;
+        }
         await this.presentToast(
           `✅ ${this.product!.name} añadido (x${this.quantity}, ${this.selectedSize})`, 
           'success'

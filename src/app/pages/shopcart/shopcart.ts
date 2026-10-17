@@ -16,6 +16,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { CartService, CartItem } from '../../services/cart.service';
 import { Subscription } from 'rxjs';
+import { SHIPPING_COST } from '../../config/shop';
 
 @Component({
   selector: 'app-shopcart',
@@ -40,7 +41,7 @@ export class ShopcartPage implements OnInit {
   @ViewChild(IonContent) content!: IonContent;
 
   cartItems: CartItem[] = [];
-  shippingCost: number = 5000;
+  shippingCost: number = SHIPPING_COST;
   private cartSubscription?: Subscription;
 
   constructor(

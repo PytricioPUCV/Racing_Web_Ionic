@@ -11,7 +11,7 @@
     </ion-buttons>
 
     <ion-buttons slot="end" class="user-actions">
-      <ion-button (click)="toggleTimeDisplay()" color="light" title="Hora local">
+      <ion-button (click)="toggleTimeDisplay()" title="Hora local">
         <ion-icon slot="icon-only" name="time-outline"></ion-icon>
       </ion-button>
       
@@ -25,12 +25,12 @@
         <ion-icon slot="icon-only" name="moon-outline" class="theme-icon-dark"></ion-icon>
       </ion-button>
 
-      <ion-button (click)="goToCart()" color="light">
+      <ion-button (click)="goToCart()">
         <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
       </ion-button>
 
       <ng-container *ngIf="isLoggedIn; else notLoggedIn">
-        <ion-button (click)="goToProfile()" color="light" title="Perfil">
+        <ion-button (click)="goToProfile()" title="Perfil">
           <ion-icon slot="icon-only" name="person-outline"></ion-icon>
         </ion-button>
         <ion-button (click)="logout()" color="danger" title="Cerrar sesión">
@@ -38,7 +38,7 @@
         </ion-button>
       </ng-container>
       <ng-template #notLoggedIn>
-        <ion-button (click)="goToLogin()" color="light" title="Iniciar sesión">
+        <ion-button (click)="goToLogin()" title="Iniciar sesión">
           <ion-icon slot="icon-only" name="person-outline"></ion-icon>
         </ion-button>
       </ng-template>

@@ -17,6 +17,7 @@ import { timezoneMiddleware } from './middlewares/timezone.middleware';
 
 process.env.TZ = 'America/Santiago';
 Settings.defaultZone = 'America/Santiago';
+Settings.defaultLocale = 'es-CL';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
