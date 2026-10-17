@@ -27,10 +27,8 @@ import {
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 import { UserService, UserProfile } from '../../services/user.service';
-import { HttpClient } from '@angular/common/http';
 import { addIcons } from 'ionicons';
 import { personOutline, mailOutline, cardOutline, locationOutline, saveOutline, lockClosedOutline, lockOpenOutline } from 'ionicons/icons';
-import { environment } from '../../../environments/environment';
 import { REGIONES_Y_COMUNAS } from '../../data/regiones';
 
 @Component({
@@ -67,7 +65,6 @@ import { REGIONES_Y_COMUNAS } from '../../data/regiones';
 export class ProfilePage implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
-  private http = inject(HttpClient);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -190,6 +187,16 @@ export class ProfilePage implements OnInit {
     return rutRegex.test(rut);
   }
 
+  isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  isValidPassword(password: string): boolean {
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
+    return passwordRegex.test(password);
+  }
+
   onSaveProfile() {
     if (!this.username || !this.email || !this.selectedRegion || !this.selectedComuna) {
       this.showToastMessage('Todos los campos son obligatorios', 'danger');
@@ -201,9 +208,28 @@ export class ProfilePage implements OnInit {
       return;
     }
 
+    if (!this.isValidEmail(this.email)) {
+      this.showToastMessage('Email inválido. Ejemplo: usuario@ejemplo.com', 'danger');
+      return;
+    }
+
     if (!this.isValidRut(this.rut)) {
       this.showToastMessage('RUT inválido. Formato: 12.345.678-9', 'danger');
       return;
+    }
+
+    const wantsPasswordChange = !this.isViewingOtherUser && !!(this.currentPassword || this.newPassword);
+
+    if (wantsPasswordChange) {
+      if (!this.currentPassword || !this.newPassword) {
+        this.showToastMessage('Para cambiar la contraseña ingresa la actual y la nueva', 'danger');
+        return;
+      }
+
+      if (!this.isValidPassword(this.newPassword)) {
+        this.showToastMessage('La nueva contraseña debe tener al menos 8 caracteres, incluyendo letras y números', 'danger');
+        return;
+      }
     }
 
     const updateData = {
@@ -215,40 +241,52 @@ export class ProfilePage implements OnInit {
     };
 
     const userId = this.isViewingOtherUser && this.viewingUser ? this.viewingUser.id : this.currentUser.id;
-    const apiUrl = `${environment.apiUrl}/users/${userId}`;
 
-    this.http.put(apiUrl, updateData).subscribe({
-      next: (response: any) => {
-        console.log('✅ Perfil actualizado:', response);
-        
+    this.userService.updateUser(userId, updateData).subscribe({
+      next: (user) => {
         if (!this.isViewingOtherUser) {
           const updatedUser = {
             ...this.currentUser,
-            username: response.user.username,
-            email: response.user.email,
-            rut: response.user.rut,
-            region: response.user.region,
-            comuna: response.user.comuna
+            username: user.username,
+            email: user.email,
+            rut: user.rut,
+            region: user.region,
+            comuna: user.comuna
           };
-          
+
           localStorage.setItem('currentUser', JSON.stringify(updatedUser));
           this.currentUser = updatedUser;
         }
 
-        this.isEditing = false;
-        this.showToastMessage('Perfil actualizado exitosamente', 'success');
+        if (wantsPasswordChange) {
+          this.changePassword(userId);
+        } else {
+          this.finishSave('Perfil actualizado exitosamente');
+        }
       },
       error: (error) => {
         console.error('❌ Error al actualizar perfil:', error);
-        let errorMsg = 'Error al actualizar perfil';
-        
-        if (error.error?.message) {
-          errorMsg = error.error.message;
-        }
-        
-        this.showToastMessage(errorMsg, 'danger');
+        this.showToastMessage(error.error?.message || 'Error al actualizar perfil', 'danger');
       }
     });
+  }
+
+  private changePassword(userId: number) {
+    this.userService.changePassword(userId, this.currentPassword, this.newPassword).subscribe({
+      next: () => this.finishSave('Perfil y contraseña actualizados exitosamente'),
+      error: (error) => {
+        // El perfil ya se guardó: se mantiene el modo edición para reintentar la contraseña
+        const reason = error.error?.message || 'Error al cambiar la contraseña';
+        this.showToastMessage(`Perfil guardado, pero no se cambió la contraseña: ${reason}`, 'danger');
+      }
+    });
+  }
+
+  private finishSave(message: string) {
+    this.isEditing = false;
+    this.currentPassword = '';
+    this.newPassword = '';
+    this.showToastMessage(message, 'success');
   }
 
   deleteUser() {
@@ -259,8 +297,7 @@ export class ProfilePage implements OnInit {
     }
 
     this.userService.deleteUser(this.viewingUser.id).subscribe({
-      next: (response) => {
-        console.log('✅ Usuario eliminado:', response);
+      next: () => {
         this.showToastMessage('Usuario eliminado exitosamente', 'success');
         setTimeout(() => {
           this.router.navigate(['/admin/users']);

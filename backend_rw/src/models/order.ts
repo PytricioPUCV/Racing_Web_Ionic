@@ -47,6 +47,10 @@ Order.init({
   totalAmount: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
+    // Postgres devuelve DECIMAL como string; se expone como número
+    get() {
+      return Number(this.getDataValue('totalAmount'));
+    },
   },
   status: {
     type: DataTypes.ENUM('pending', 'confirmed', 'shipped', 'delivered', 'cancelled'),

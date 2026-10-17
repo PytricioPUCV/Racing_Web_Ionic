@@ -36,11 +36,11 @@
 
               <div class="item-controls">
                 <div class="quantity-controls">
-                  <ion-button fill="clear" size="small" (click)="decreaseQuantity(i)">
+                  <ion-button fill="clear" size="small" aria-label="Disminuir cantidad" [disabled]="item.quantity <= 1 || updatingItemId === item.id" (click)="decreaseQuantity(i)">
                     <ion-icon name="remove-circle-outline"></ion-icon>
                   </ion-button>
                   <span class="quantity">{{ item.quantity }}</span>
-                  <ion-button fill="clear" size="small" (click)="increaseQuantity(i)">
+                  <ion-button fill="clear" size="small" aria-label="Aumentar cantidad" [disabled]="updatingItemId === item.id" (click)="increaseQuantity(i)">
                     <ion-icon name="add-circle-outline"></ion-icon>
                   </ion-button>
                 </div>

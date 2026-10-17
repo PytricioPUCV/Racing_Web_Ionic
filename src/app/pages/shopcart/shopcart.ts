@@ -42,6 +42,7 @@ export class ShopcartPage implements OnInit {
 
   cartItems: CartItem[] = [];
   shippingCost: number = SHIPPING_COST;
+  updatingItemId: number | null = null;
   private cartSubscription?: Subscription;
 
   constructor(
@@ -94,35 +95,31 @@ export class ShopcartPage implements OnInit {
   }
 
   increaseQuantity(index: number) {
-    const item = this.cartItems[index];
-    if (!item.id) return;
-
-    const newQuantity = item.quantity + 1;
-
-    this.cartService.updateCartItem(item.id, newQuantity).subscribe({
-      next: () => {
-        console.log('✅ Cantidad actualizada');
-      },
-      error: (err) => {
-        console.error('❌ Error actualizando cantidad:', err);
-        this.presentToast('Error al actualizar cantidad', 'danger');
-      }
-    });
+    this.changeQuantity(index, 1);
   }
 
   decreaseQuantity(index: number) {
-    const item = this.cartItems[index];
-    if (!item.id || item.quantity <= 1) return;
+    this.changeQuantity(index, -1);
+  }
 
-    const newQuantity = item.quantity - 1;
+  private changeQuantity(index: number, delta: number) {
+    const item = this.cartItems[index];
+    if (!item.id || this.updatingItemId !== null) return;
+
+    const newQuantity = item.quantity + delta;
+    if (newQuantity < 1) return;
+
+    this.updatingItemId = item.id;
 
     this.cartService.updateCartItem(item.id, newQuantity).subscribe({
       next: () => {
-        console.log('✅ Cantidad actualizada');
+        this.updatingItemId = null;
+        this.cartService.loadUserCart();
       },
       error: (err) => {
+        this.updatingItemId = null;
         console.error('❌ Error actualizando cantidad:', err);
-        this.presentToast('Error al actualizar cantidad', 'danger');
+        this.presentToast(err.error?.message || 'Error al actualizar cantidad', 'danger');
       }
     });
   }

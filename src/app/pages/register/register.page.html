@@ -97,7 +97,8 @@
   [isOpen]="showToast"
   [message]="toastMessage"
   [duration]="3000"
-  [cssClass]="toastColor === 'success' ? 'success-toast' : 'danger-toast'"
+  [color]="toastColor"
+    cssClass="custom-toast"
   position="top"
   (didDismiss)="showToast = false">
 </ion-toast>

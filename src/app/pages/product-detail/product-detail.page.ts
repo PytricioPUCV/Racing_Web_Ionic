@@ -18,6 +18,7 @@ import { HeaderComponent } from '../../components/header/header.component';
 import { FooterComponent } from '../../components/footer/footer.component';
 import { ProductService, Product } from '../../services/product';
 import { CartService, CartItem } from '../../services/cart.service';
+import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -53,6 +54,7 @@ export class ProductDetailPage implements OnInit {
     private router: Router,
     private productService: ProductService,
     private cartService: CartService,
+    private authService: AuthService,
     private toastController: ToastController,
     private cdr: ChangeDetectorRef
   ) {
@@ -157,6 +159,12 @@ export class ProductDetailPage implements OnInit {
   async addToCart(goToCheckout = false): Promise<void> {
     if (!this.product) {
       await this.presentToast('❌ Error: Producto no disponible', 'danger');
+      return;
+    }
+
+    if (!this.authService.isAuthenticated()) {
+      await this.presentToast('Inicia sesión para añadir productos al carrito', 'danger');
+      this.router.navigate(['/login']);
       return;
     }
 

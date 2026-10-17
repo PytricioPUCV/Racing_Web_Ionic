@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 export interface CartItem {
   id?: number;
@@ -26,8 +27,19 @@ private cartItemCountSubject = new BehaviorSubject<number>(0);
 public cartItems$ = this.cartItemsSubject.asObservable();
 public cartItemCount$ = this.cartItemCountSubject.asObservable();
 
-  constructor(private http: HttpClient) {
-    this.loadUserCart();
+  constructor(private http: HttpClient, private authService: AuthService) {
+    this.authService.isAuthenticated$.subscribe(isAuthenticated => {
+      if (isAuthenticated) {
+        this.loadUserCart();
+      } else {
+        this.setItems([]);
+      }
+    });
+  }
+
+  private setItems(items: CartItem[]): void {
+    this.cartItemsSubject.next(items);
+    this.cartItemCountSubject.next(items.reduce((total, item) => total + item.quantity, 0));
   }
 
   private getHeaders(): HttpHeaders {
@@ -37,19 +49,25 @@ public cartItemCount$ = this.cartItemCountSubject.asObservable();
       'Authorization': `Bearer ${token}`
     });
   }
-    loadUserCart(): void {
-  this.getUserCart().subscribe({
-    next: (response) => {
-      const items = response.cart?.items || [];
-      console.log('📦 Items cargados desde backend:', items);
-      this.cartItemsSubject.next(items);
-      this.cartItemCountSubject.next(items.length);
-    },
-    error: (err) => {
-      console.error('Error loading cart:', err);
+  loadUserCart(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.setItems([]);
+      return;
     }
-  });
-}
+
+    this.getUserCart().subscribe({
+      next: (response) => {
+        this.setItems(response.cart?.items || []);
+      },
+      error: (err) => {
+        // 404 = el usuario todavía no tiene carrito
+        this.setItems([]);
+        if (err.status !== 404) {
+          console.error('Error loading cart:', err);
+        }
+      }
+    });
+  }
 
   createCart(): Observable<any> {
     return this.http.post(this.apiUrl, {}, { headers: this.getHeaders() });

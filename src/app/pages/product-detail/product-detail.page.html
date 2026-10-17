@@ -27,9 +27,9 @@
 
           <div class="price-wrapper">
             <p class="original" *ngIf="product.originalPrice">
-              ${{ product.originalPrice.toLocaleString('es-CL') }}
+              {{ product.originalPrice | currency:'CLP':'symbol-narrow' }}
             </p>
-            <p class="product-price">${{ product.price.toLocaleString('es-CL') }}</p>
+            <p class="product-price">{{ product.price | currency:'CLP':'symbol-narrow' }}</p>
           </div>
           
           <div class="selector-container">

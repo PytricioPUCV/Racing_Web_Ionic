@@ -24,10 +24,10 @@
               <span class="product-name"><b>{{ product.name }}</b></span>
               <div class="price-wrapper">
                 <span class="product-price-original" *ngIf="product.originalPrice">
-                  ${{ product.originalPrice.toLocaleString('es-CL') }}
+                  {{ product.originalPrice | currency:'CLP':'symbol-narrow' }}
                 </span>
                 <span class="product-price">
-                  <b>${{ product.price.toLocaleString('es-CL') }}</b>
+                  <b>{{ product.price | currency:'CLP':'symbol-narrow' }}</b>
                 </span>
               </div>
             </div>

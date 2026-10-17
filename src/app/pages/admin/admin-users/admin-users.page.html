@@ -28,11 +28,8 @@
               <p><strong>Email:</strong> {{ user.email }}</p>
               <p><strong>RUT:</strong> {{ user.rut || 'N/A' }}</p>
               <p><strong>Región:</strong> {{ user.region || 'N/A' }}</p>
-              <p><strong>Estado:</strong> 
-                <ion-badge [color]="user.isActive ? 'success' : 'warning'">
-                  {{ user.isActive ? 'Activo' : 'Inactivo' }}
-                </ion-badge>
-              </p>
+              <p><strong>Comuna:</strong> {{ user.comuna || 'N/A' }}</p>
+              <p *ngIf="user.registrationDate"><strong>Registrado:</strong> {{ user.registrationDate }}</p>
 
               <div class="user-actions">
                 <ion-button 

@@ -1,4 +1,5 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
@@ -26,6 +27,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   countryFlag: string = '🌍';
   showTime: boolean = false;
   private timeInterval: any;
+  private authSubscription?: Subscription;
 
   private timezoneToFlag: { [key: string]: string } = {
     'America/Santiago': '🇨🇱',
@@ -69,7 +71,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   constructor(private themeService: ThemeService) {}
 
   ngOnInit() {
-    this.checkLoginStatus();
+    this.authSubscription = this.authService.isAuthenticated$.subscribe(() => this.checkLoginStatus());
     this.updateTime();
     this.setCountryFlag();
     this.timeInterval = setInterval(() => {
@@ -78,6 +80,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.authSubscription?.unsubscribe();
     if (this.timeInterval) {
       clearInterval(this.timeInterval);
     }
@@ -132,8 +135,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     window.location.href = '/profile';
   }
 
-  goToAdminUsers() {
-    window.location.href = '/admin/users';
+  goToAdmin() {
+    window.location.href = '/admin';
   }
 
   goToLogin() {

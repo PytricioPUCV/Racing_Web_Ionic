@@ -54,6 +54,10 @@ OrderItem.init({
   price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
+    // Postgres devuelve DECIMAL como string; se expone como número
+    get() {
+      return Number(this.getDataValue('price'));
+    },
   },
   size: {
     type: DataTypes.STRING,

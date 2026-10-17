@@ -51,7 +51,7 @@
 
           <ion-item *ngIf="isEditing && !isViewingOtherUser">
             <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Contraseña actual (opcional)</ion-label>
+            <ion-label position="stacked">Contraseña actual (solo si cambiarás la contraseña)</ion-label>
             <ion-input 
               [(ngModel)]="currentPassword" 
               type="password"
@@ -162,14 +162,9 @@
     [isOpen]="showToast"
     [message]="toastMessage"
     [duration]="3000"
-    style="
-      --background: #10b981;
-      --color: white;
-      --box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-      --border-radius: 8px;
-      font-weight: 600;
-      font-size: 16px;
-    "
+    [color]="toastColor"
+    cssClass="custom-toast"
+    position="top"
     (didDismiss)="showToast = false">
   </ion-toast>
 

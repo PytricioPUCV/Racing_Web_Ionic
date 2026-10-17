@@ -51,7 +51,7 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
     const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
     
     if (!isPasswordValid) {
-      res.status(401).json({ message: 'Contraseña actual incorrecta' });
+      res.status(400).json({ message: 'Contraseña actual incorrecta' });
       return;
     }
 
