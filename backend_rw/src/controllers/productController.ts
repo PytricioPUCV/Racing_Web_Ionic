@@ -62,7 +62,8 @@ export const getAllProducts = async (req: AuthRequest, res: Response): Promise<v
     const timezone = req.clientTimezone || 'America/Santiago';
     
     const products = await Product.findAll({
-      include: [{ association: 'category' }]
+      include: [{ association: 'category' }],
+      order: [['id', 'ASC']]
     });
 
     const productsWithTimezone = products.map(product => 

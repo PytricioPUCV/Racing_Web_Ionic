@@ -1,53 +1,44 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  
-  <div class="admin-users-container">
-    <h1>👥 Gestión de Usuarios</h1>
-    <p>Total de usuarios registrados: <strong>{{ users.length }}</strong></p>
+<ion-content>
+  <div class="page-wrap">
+    <nav class="breadcrumb" aria-label="Ruta de navegación">
+      <a routerLink="/admin">Administración</a>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page">Usuarios</span>
+    </nav>
 
-    <div *ngIf="loading" style="text-align: center; padding: 2rem;">
+    <header class="page-head">
+      <h1 class="page-title">Usuarios</h1>
+      <p class="page-lead" *ngIf="!loading">
+        <span class="tabular">{{ users.length }}</span> {{ users.length === 1 ? 'cuenta registrada' : 'cuentas registradas' }}.
+      </p>
+    </header>
+
+    <div *ngIf="loading" class="state-message">
       <ion-spinner></ion-spinner>
-      <p>Cargando usuarios...</p>
     </div>
 
-    <ion-grid *ngIf="!loading">
-      <ion-row>
-        <ion-col *ngFor="let user of users" size="12" size-md="6" size-lg="4">
-          <ion-card class="user-card">
-            <ion-card-header>
-              <div class="user-header">
-                <h2>{{ user.username }}</h2>
-                <ion-badge [color]="user.role === 'admin' ? 'danger' : 'primary'">
-                  {{ user.role }}
-                </ion-badge>
-              </div>
-            </ion-card-header>
-
-            <ion-card-content>
-              <p><strong>Email:</strong> {{ user.email }}</p>
-              <p><strong>RUT:</strong> {{ user.rut || 'N/A' }}</p>
-              <p><strong>Región:</strong> {{ user.region || 'N/A' }}</p>
-              <p><strong>Comuna:</strong> {{ user.comuna || 'N/A' }}</p>
-              <p *ngIf="user.registrationDate"><strong>Registrado:</strong> {{ user.registrationDate }}</p>
-
-              <div class="user-actions">
-                <ion-button 
-                  size="small" 
-                  color="primary"
-                  (click)="viewUserProfile(user.id)">
-                  Ver Perfil
-                </ion-button>
-              </div>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <div *ngIf="!loading && users.length === 0" style="text-align: center; padding: 2rem;">
-      <p>No hay usuarios registrados</p>
+    <div *ngIf="!loading && users.length === 0" class="state-message surface">
+      <ion-icon name="people-outline"></ion-icon>
+      <h2>Todavía no hay usuarios</h2>
+      <p>Las cuentas nuevas aparecerán aquí.</p>
     </div>
+
+    <ul *ngIf="!loading && users.length" class="user-list surface">
+      <li *ngFor="let user of users" class="user-row">
+        <span class="user-row__plate" aria-hidden="true">{{ user.username.charAt(0) }}</span>
+        <div class="user-row__main">
+          <p class="user-row__name">
+            {{ user.username }}
+            <span class="role" [class.role--admin]="user.role === 'admin'">{{ user.role === 'admin' ? 'Admin' : 'Cliente' }}</span>
+          </p>
+          <p class="user-row__meta">{{ user.email }}</p>
+        </div>
+        <p class="user-row__meta user-row__place">{{ user.comuna || 'Sin comuna' }}, {{ user.region || 'sin región' }}</p>
+        <p class="user-row__meta user-row__date" *ngIf="user.registrationDate">Desde el {{ user.registrationDate }}</p>
+        <ion-button size="small" fill="outline" color="dark" (click)="viewUserProfile(user.id)">Ver perfil</ion-button>
+      </li>
+    </ul>
   </div>
-
 </ion-content>

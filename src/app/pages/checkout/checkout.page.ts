@@ -4,11 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import {
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
-  IonList,
-  IonItem,
   IonInput,
   IonSelect,
   IonSelectOption,
@@ -45,11 +40,6 @@ interface PlacedOrder {
     HeaderComponent,
     FooterComponent,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardContent,
-    IonList,
-    IonItem,
     IonInput,
     IonSelect,
     IonSelectOption,

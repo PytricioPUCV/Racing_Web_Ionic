@@ -1,7 +1,8 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonList, IonItem, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonLabel, IonToast } from '@ionic/angular/standalone'; 
+import { Router, RouterLink } from '@angular/router';
+import { IonContent, IonInput, IonSelect, IonSelectOption, IonCheckbox, IonButton, IonSpinner, ToastController } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 import { REGIONES_Y_COMUNAS } from '../../data/regiones';
@@ -12,26 +13,23 @@ import { REGIONES_Y_COMUNAS } from '../../data/regiones';
   styleUrls: ['./register.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
+    RouterLink,
     HeaderComponent,
-    IonContent, 
-    IonHeader, 
-    IonTitle, 
-    IonToolbar, 
-    IonList, 
-    IonItem, 
-    IonInput, 
-    IonSelect, 
-    IonSelectOption, 
-    IonCheckbox, 
-    IonButton, 
-    IonLabel,
-    IonToast
+    IonContent,
+    IonInput,
+    IonSelect,
+    IonSelectOption,
+    IonCheckbox,
+    IonButton,
+    IonSpinner
   ]
 })
 export class RegisterPage implements OnInit {
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private toastController = inject(ToastController);
 
   email: string = '';
   password: string = '';
@@ -40,10 +38,8 @@ export class RegisterPage implements OnInit {
   rut: string = '';
   selectedRegion: string = '';
   selectedComuna: string = '';
-
-  showToast: boolean = false;
-  toastMessage: string = '';
-  toastColor: string = 'success';
+  acceptTerms = false;
+  submitting = false;
 
   regionesYComunas = REGIONES_Y_COMUNAS;
 
@@ -60,6 +56,7 @@ export class RegisterPage implements OnInit {
     const regionSeleccionada = event.detail.value as string;
     this.selectedRegion = regionSeleccionada;
     this.comunas = this.regionesYComunas[regionSeleccionada] || [];
+    this.selectedComuna = '';
   }
 
   isValidEmail(email: string): boolean {
@@ -83,6 +80,8 @@ export class RegisterPage implements OnInit {
   }
 
   onRegister() {
+    if (this.submitting) return;
+
     if (!this.email || !this.password || !this.username || !this.rut || !this.selectedRegion || !this.selectedComuna) {
       this.showToastMessage('Todos los campos son obligatorios', 'danger');
       return;
@@ -98,7 +97,7 @@ export class RegisterPage implements OnInit {
       return;
     }
 
-    if (this.confirmPassword && this.password !== this.confirmPassword) {
+    if (this.password !== this.confirmPassword) {
       this.showToastMessage('Las contraseñas no coinciden', 'danger');
       return;
     }
@@ -113,6 +112,11 @@ export class RegisterPage implements OnInit {
       return;
     }
 
+    if (!this.acceptTerms) {
+      this.showToastMessage('Debes aceptar los términos y condiciones para crear tu cuenta', 'danger');
+      return;
+    }
+
     const registerData = {
       email: this.email,
       password: this.password,
@@ -122,32 +126,31 @@ export class RegisterPage implements OnInit {
       comuna: this.selectedComuna
     };
 
+    this.submitting = true;
+
     this.authService.register(registerData).subscribe({
       next: (response) => {
-        this.showToastMessage('¡Usuario registrado exitosamente!', 'success');
+        this.submitting = false;
+        this.showToastMessage(`Cuenta creada. ¡Bienvenido, ${response.user.username}!`, 'success');
         this.clearForm();
-        
-        setTimeout(() => {
-          window.location.href = '/home';
-        }, 1500);
+        this.router.navigateByUrl('/home');
       },
       error: (error) => {
-        console.error('❌ Error al registrar:', error);
-        let errorMsg = 'Error al registrar usuario';
-        
-        if (error.error?.message) {
-          errorMsg = error.error.message;
-        }
-        
-        this.showToastMessage(errorMsg, 'danger');
+        this.submitting = false;
+        this.showToastMessage(error.error?.message || 'No se pudo crear la cuenta', 'danger');
       }
     });
   }
 
-  showToastMessage(message: string, color: string) {
-    this.toastMessage = message;
-    this.toastColor = color;
-    this.showToast = true;
+  async showToastMessage(message: string, color: 'success' | 'danger') {
+    const toast = await this.toastController.create({
+      message,
+      color,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
   }
 
   clearForm() {
@@ -159,5 +162,6 @@ export class RegisterPage implements OnInit {
     this.selectedRegion = '';
     this.selectedComuna = '';
     this.comunas = [];
+    this.acceptTerms = false;
   }
 }

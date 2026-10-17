@@ -3,9 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import {
   IonContent,
-  IonCard,
-  IonCardHeader,
-  IonCardContent,
   IonButton,
   IonIcon,
   IonImg,
@@ -29,9 +26,6 @@ import { SHIPPING_COST } from '../../config/shop';
     HeaderComponent,
     FooterComponent,
     IonContent,
-    IonCard,
-    IonCardHeader,
-    IonCardContent,
     IonButton,
     IonIcon,
     IonImg
@@ -129,25 +123,25 @@ export class ShopcartPage implements OnInit {
     if (!item.id) return;
 
     const alert = await this.alertController.create({
-      header: 'Eliminar producto',
-      message: '¿Estás seguro de que deseas eliminar este producto del carrito?',
+      header: 'Quitar producto',
+      message: '¿Quieres quitar este producto del carrito?',
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel'
         },
         {
-          text: 'Eliminar',
+          text: 'Quitar',
           role: 'destructive',
           handler: () => {
             this.cartService.removeCartItem(item.id!).subscribe({
               next: async () => {
-                await this.presentToast('Producto eliminado del carrito', 'success');
+                await this.presentToast('Producto quitado del carrito', 'success');
                 this.cartService.loadUserCart();
               },
               error: async (err) => {
                 console.error('❌ Error eliminando item:', err);
-                await this.presentToast('Error al eliminar producto', 'danger');
+                await this.presentToast('No se pudo quitar el producto. Inténtalo de nuevo.', 'danger');
               }
             });
           }

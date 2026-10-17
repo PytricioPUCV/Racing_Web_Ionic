@@ -1,17 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { 
   IonContent, 
-  IonGrid, 
-  IonRow, 
-  IonCol, 
-  IonLabel, 
+  IonIcon,
   IonButton, 
   IonImg,
   IonAccordionGroup, 
   IonAccordion, 
   IonItem,
+  IonLabel,
   ToastController
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
@@ -21,6 +19,16 @@ import { CartService, CartItem } from '../../services/cart.service';
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
 
+const JACKET_SIZES = ['M', 'L', 'XL', 'XXL'];
+const ONE_SIZE = 'Único';
+const MAX_PER_ORDER = 10;
+const LOW_STOCK = 5;
+
+const CATEGORY_ROUTES: Record<string, string> = {
+  Chaquetas: '/jackets',
+  Accesorios: '/accessories'
+};
+
 @Component({
   selector: 'app-product-detail',
   templateUrl: './product-detail.page.html',
@@ -28,18 +36,17 @@ import { firstValueFrom } from 'rxjs';
   standalone: true,
   imports: [
     CommonModule, 
+    RouterLink,
     HeaderComponent, 
     FooterComponent, 
     IonContent, 
-    IonGrid, 
-    IonRow, 
-    IonCol, 
-    IonLabel, 
+    IonIcon,
     IonButton,
     IonImg,
     IonAccordionGroup, 
     IonAccordion, 
-    IonItem
+    IonItem,
+    IonLabel
   ]
 })
 export class ProductDetailPage implements OnInit {
@@ -47,6 +54,8 @@ export class ProductDetailPage implements OnInit {
   selectedSize: string = 'L';
   quantity: number = 1;
   loading: boolean = true;
+  readonly sizes = JACKET_SIZES;
+  readonly lowStock = LOW_STOCK;
   private userCartId: number | null = null;
 
   constructor(
@@ -57,101 +66,69 @@ export class ProductDetailPage implements OnInit {
     private authService: AuthService,
     private toastController: ToastController,
     private cdr: ChangeDetectorRef
-  ) {
-    console.log('✅ ProductDetailPage constructor ejecutado');
-  }
+  ) {}
 
   ngOnInit() {
-    console.log('🔍 ngOnInit ejecutado');
-    
     this.route.paramMap.subscribe((params) => {
       const productId = params.get('id');
-      console.log('📍 ID recibido:', productId);
-      
       if (productId) {
         this.product = null;
         this.loading = true;
         this.quantity = 1;
-        this.selectedSize = 'L';
-        
-        this.cdr.markForCheck();
-        this.cdr.detectChanges();
-        
-        setTimeout(() => {
-          this.loadProduct(+productId);
-        }, 100);
+        this.loadProduct(+productId);
       }
     });
   }
 
-  loadUserCart(): void {
-    this.cartService.getUserCart().subscribe({
-      next: (cart) => {
-        this.userCartId = cart.id;
-        console.log('🛒 Cart ID cargado:', this.userCartId);
-      },
-      error: (err) => {
-        console.error('❌ Error cargando carrito:', err);
-        this.cartService.createCart().subscribe({
-          next: (newCart) => {
-            this.userCartId = newCart.id;
-            console.log('✅ Nuevo carrito creado:', this.userCartId);
-          }
-        });
-      }
-    });
+  get isOneSize(): boolean {
+    return this.product?.size === ONE_SIZE || this.product?.category?.name === 'Accesorios';
+  }
+
+  get categoryName(): string {
+    return this.product?.category?.name || 'Productos';
+  }
+
+  get categoryRoute(): string {
+    return CATEGORY_ROUTES[this.categoryName] || '/home';
+  }
+
+  get isSoldOut(): boolean {
+    return this.product?.stock === 0;
+  }
+
+  get maxQuantity(): number {
+    const stock = this.product?.stock;
+    return typeof stock === 'number' ? Math.min(stock, MAX_PER_ORDER) : MAX_PER_ORDER;
   }
 
   loadProduct(id: number): void {
-    console.log('🔍 loadProduct llamado con ID:', id);
     this.loading = true;
     this.product = null;
-    this.cdr.detectChanges();
+
+    const onLoaded = (product: Product | undefined) => {
+      this.product = product ?? null;
+      this.selectedSize = this.isOneSize ? ONE_SIZE : (JACKET_SIZES.includes(product?.size || '') ? product!.size! : 'L');
+      this.loading = false;
+      this.cdr.detectChanges();
+    };
 
     if (this.productService.isUsingBackend()) {
-      console.log('🌐 Cargando desde BACKEND');
-      
       this.productService.getProductByIdFromAPI(id).subscribe({
-        next: (product: Product) => {
-          console.log('✅ Producto recibido:', product);
-          this.product = product;
-          this.selectedSize = this.product?.size || 'L';
-          this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: (error: any) => {
-          console.error('❌ Error en getProductByIdFromAPI:', error);
-          this.loading = false;
-          this.cdr.detectChanges();
-        }
+        next: onLoaded,
+        error: () => onLoaded(undefined)
       });
     } else {
-      console.log('📦 Cargando desde MOCK');
-      
-      const product = this.productService.getProductById(id);
-      console.log('✅ Producto mock recibido:', product);
-      
-      if (product) {
-        this.product = product;
-        this.selectedSize = this.product?.size || 'L';
-        this.loading = false;
-        this.cdr.detectChanges();
-      } else {
-        console.error('❌ Producto no encontrado en MOCK');
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
+      onLoaded(this.productService.getProductById(id));
     }
   }
 
   selectSize(size: string): void {
     this.selectedSize = size;
-    console.log('📏 Talla seleccionada:', size);
   }
 
   changeQuantity(amount: number): void {
     const newQuantity = this.quantity + amount;
-    if (newQuantity >= 1 && newQuantity <= 10) {
+    if (newQuantity >= 1 && newQuantity <= this.maxQuantity) {
       this.quantity = newQuantity;
     }
   }

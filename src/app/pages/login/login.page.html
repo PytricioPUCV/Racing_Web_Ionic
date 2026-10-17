@@ -1,59 +1,40 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <div class="auth-section">
-    <h1 class="auth-title">Iniciar Sesión</h1>
-    
-    <ion-list>
-      <ion-item>
-        <ion-input 
-          label="Correo Electrónico" 
-          label-placement="floating" 
-          type="email" 
-          [(ngModel)]="email"
-          required>
-        </ion-input>
-      </ion-item>
+<ion-content>
+  <div class="auth">
+    <h1 class="page-title">Inicia sesión</h1>
+    <p class="page-lead">Entra para comprar y revisar tus pedidos.</p>
 
-      <ion-item>
-        <ion-input 
-          label="Contraseña" 
-          label-placement="floating" 
-          type="password" 
-          [(ngModel)]="password"
-          required>
-        </ion-input>
-      </ion-item>
-    </ion-list>
+    <form class="auth__form" (ngSubmit)="onLogin()">
+      <ion-input
+        fill="outline"
+        label="Email"
+        label-placement="floating"
+        type="email"
+        name="email"
+        autocomplete="email"
+        [(ngModel)]="email"
+        required>
+      </ion-input>
 
-    <ion-button 
-      expand="block" 
-      class="auth-btn" 
-      (click)="onLogin()">
-      Ingresar
-    </ion-button>
-    
-    <p class="auth-link">¿No tienes una cuenta? <a href="/register">Regístrate</a></p>
+      <ion-input
+        fill="outline"
+        label="Contraseña"
+        label-placement="floating"
+        type="password"
+        name="password"
+        autocomplete="current-password"
+        [(ngModel)]="password"
+        required>
+      </ion-input>
 
-    <div style="margin: 2rem 0;"></div>
+      <ion-button type="submit" expand="block" [disabled]="submitting">
+        <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+        Iniciar sesión
+      </ion-button>
+    </form>
 
-
-    <ion-button 
-      expand="block" 
-      fill="outline"
-      class="guest-btn"
-      (click)="continueAsGuest()">
-      Continuar como Invitado
-    </ion-button>
+    <p class="auth__alt">¿No tienes cuenta? <a routerLink="/register">Crea una</a></p>
+    <p class="auth__alt"><a routerLink="/home">Seguir como invitado</a></p>
   </div>
-
-  <ion-toast
-    [isOpen]="showToast"
-    [message]="toastMessage"
-    [duration]="3000"
-    [color]="toastColor"
-    cssClass="custom-toast"
-    position="top"
-    (didDismiss)="showToast = false">
-  </ion-toast>
 </ion-content>

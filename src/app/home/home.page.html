@@ -1,63 +1,59 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
+  <section class="hero">
+    <ion-img src="assets/banner-f1.jpg" alt="" class="hero__image"></ion-img>
+    <div class="hero__shade" aria-hidden="true"></div>
 
-  <div class="user-welcome" *ngIf="currentUser">
-    <div class="welcome-content">
-      <span class="welcome-text">¡Hola, <strong>{{ currentUser.username }}</strong>! 👋</span>
+    <div class="hero__content">
+      <h1 class="hero__title display">
+        <span>Ropa de pits</span>
+        <span>para la calle</span>
+      </h1>
+      <p class="hero__lead">Chaquetas racing y accesorios con la estética del paddock, con envío a todo Chile.</p>
+      <div class="hero__actions">
+        <a routerLink="/jackets" class="slant-btn slant-btn--primary"><span>Ver chaquetas</span></a>
+        <a routerLink="/accessories" class="slant-btn slant-btn--ghost"><span>Ver accesorios</span></a>
+      </div>
     </div>
-  </div>
 
-  <div class="hero-banner">
-    <ion-img src="assets/banner-f1.jpg" alt="Racing F1 Banner" class="hero-image"></ion-img>
-    <div class="hero-overlay">
-      <h1 class="hero-title">Racing con Estilo</h1>
-      <p class="hero-subtitle">Racing Jackets y accesorios</p>
-    </div>
-  </div>
+    <div class="hero__livery" aria-hidden="true"></div>
+  </section>
 
-  <div class="product-section">
-    <div class="product-header">
-      <h2>Productos</h2>
-      <ion-button class="buy-btn">Comprar</ion-button>
-    </div>
-    
-    <div *ngIf="loading" style="text-align: center; padding: 2rem;">
+  <div class="page-wrap home-sections">
+    <div *ngIf="loading" class="state-message">
       <ion-spinner></ion-spinner>
-      <p>Cargando productos...</p>
     </div>
 
-    <ion-grid *ngIf="!loading">
-      <ion-row>
-        <ion-col size="12" size-sm="6" size-lg="3" *ngFor="let product of products">
-          <ion-card class="product-item" (click)="navegarAlProducto(product.id)">
-            <ion-img 
-              [src]="product.image || product.imageUrl" 
-              [alt]="product.name"
-            ></ion-img>
-            <div class="product-info">
-              <span class="product-name"><b>{{ product.name }}</b></span>
-              <div class="price-wrapper">
-                <span class="product-price-original" *ngIf="product.originalPrice">
-                  {{ product.originalPrice | currency:'CLP':'symbol-narrow' }}
-                </span>
-                <span class="product-price">
-                  <b>{{ product.price | currency:'CLP':'symbol-narrow' }}</b>
-                </span>
-              </div>
-              
-              <p class="product-date" *ngIf="product.createdAtLocal">
-                <small>Agregado: {{ product.createdAtLocal }}</small>
-              </p>
-              <p class="product-date" *ngIf="product.createdAt">
-                <small>{{ getRelativeTime(product.createdAt) }}</small>
-              </p>
-            </div>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <div *ngIf="loadError" class="state-message">
+      <ion-icon name="cloud-offline-outline"></ion-icon>
+      <h2>No pudimos cargar los productos</h2>
+      <p>Revisa tu conexión e inténtalo de nuevo.</p>
+      <ion-button color="dark" (click)="loadProducts()">Reintentar</ion-button>
+    </div>
+
+    <ng-container *ngIf="!loading && !loadError">
+      <section *ngIf="jackets.length" class="home-section" aria-labelledby="home-jackets">
+        <header class="home-section__head">
+          <h2 id="home-jackets" class="section-title">Chaquetas</h2>
+          <a routerLink="/jackets" class="home-section__link">Ver las {{ jacketCount }}</a>
+        </header>
+        <div class="product-grid">
+          <app-product-card *ngFor="let product of jackets" [product]="product"></app-product-card>
+        </div>
+      </section>
+
+      <section *ngIf="accessories.length" class="home-section" aria-labelledby="home-accessories">
+        <header class="home-section__head">
+          <h2 id="home-accessories" class="section-title">Accesorios</h2>
+          <a routerLink="/accessories" class="home-section__link">Ver los {{ accessoryCount }}</a>
+        </header>
+        <div class="product-grid">
+          <app-product-card *ngFor="let product of accessories" [product]="product"></app-product-card>
+        </div>
+      </section>
+    </ng-container>
   </div>
-  
+
   <app-footer></app-footer>
 </ion-content>

@@ -1,93 +1,70 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <div class="cart-container">
-    <div class="page-header">
-      <ion-icon name="cart-outline"></ion-icon>
-      <h1>Tu Carrito de Compras</h1>
-    </div>
+<ion-content>
+  <div class="page-wrap">
+    <header class="page-head">
+      <h1 class="page-title">Tu carrito</h1>
+      <p class="page-lead" *ngIf="cartItems.length">
+        <span class="tabular">{{ getTotalItems() }}</span> {{ getTotalItems() === 1 ? 'producto' : 'productos' }} listos para salir a pista.
+      </p>
+    </header>
 
-    <div *ngIf="cartItems.length === 0" class="empty-cart">
-      <ion-icon name="cart-outline"></ion-icon>
+    <div *ngIf="cartItems.length === 0" class="state-message surface">
+      <ion-icon name="bag-handle-outline"></ion-icon>
       <h2>Tu carrito está vacío</h2>
-      <p>Agrega productos para comenzar tu compra</p>
-      <ion-button routerLink="/home" expand="block">
-        Ir a Comprar
-      </ion-button>
+      <p>Elige una chaqueta o un accesorio para empezar.</p>
+      <ion-button color="dark" routerLink="/jackets">Ver chaquetas</ion-button>
     </div>
 
-    <div *ngIf="cartItems.length > 0" class="cart-content">
-      <div class="cart-items">
-        <ion-card *ngFor="let item of cartItems; let i = index" class="cart-item">
-          <ion-card-content>
-            <div class="item-content">
-              <div class="item-image">
-                <ion-img 
-                  [src]="item.product?.image || item.product?.imageUrl || 'assets/placeholder.jpg'" 
-                  [alt]="item.product?.name || 'Producto'"
-                ></ion-img>
-              </div>
+    <div *ngIf="cartItems.length > 0" class="cart">
+      <ul class="cart__items surface">
+        <li *ngFor="let item of cartItems; let i = index" class="cart-line">
+          <a class="cart-line__media" [routerLink]="['/product', item.productId]">
+            <ion-img [src]="item.product?.image || item.product?.imageUrl" [alt]="item.product?.name || 'Producto'"></ion-img>
+          </a>
 
-              <div class="item-info">
-                <h3>{{ item.product?.name || 'Producto sin nombre' }}</h3>
-                <p class="item-size">Talla: {{ item.size }}</p>
-                <p class="item-price">{{ item.product?.price | currency:'CLP':'symbol-narrow' }}</p>
-              </div>
+          <div class="cart-line__info">
+            <a class="cart-line__name" [routerLink]="['/product', item.productId]">{{ item.product?.name || 'Producto' }}</a>
+            <p class="cart-line__meta">{{ item.size === 'Único' ? 'Talla única' : 'Talla ' + item.size }}</p>
+            <p class="cart-line__meta tabular">{{ item.product?.price | currency:'CLP':'symbol-narrow' }} c/u</p>
+          </div>
 
-              <div class="item-controls">
-                <div class="quantity-controls">
-                  <ion-button fill="clear" size="small" aria-label="Disminuir cantidad" [disabled]="item.quantity <= 1 || updatingItemId === item.id" (click)="decreaseQuantity(i)">
-                    <ion-icon name="remove-circle-outline"></ion-icon>
-                  </ion-button>
-                  <span class="quantity">{{ item.quantity }}</span>
-                  <ion-button fill="clear" size="small" aria-label="Aumentar cantidad" [disabled]="updatingItemId === item.id" (click)="increaseQuantity(i)">
-                    <ion-icon name="add-circle-outline"></ion-icon>
-                  </ion-button>
-                </div>
-
-                <p class="item-subtotal">
-                  {{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}
-                </p>
-
-                <ion-button fill="clear" color="danger" size="small" (click)="removeItem(i)">
-                  <ion-icon name="trash-outline"></ion-icon>
-                </ion-button>
-              </div>
+          <div class="cart-line__controls">
+            <div class="stepper" role="group" [attr.aria-label]="'Cantidad de ' + (item.product?.name || 'producto')">
+              <button type="button" aria-label="Disminuir cantidad" [disabled]="item.quantity <= 1 || updatingItemId === item.id" (click)="decreaseQuantity(i)">
+                <ion-icon name="remove-outline" aria-hidden="true"></ion-icon>
+              </button>
+              <span class="quantity tabular">{{ item.quantity }}</span>
+              <button type="button" aria-label="Aumentar cantidad" [disabled]="updatingItemId === item.id" (click)="increaseQuantity(i)">
+                <ion-icon name="add-outline" aria-hidden="true"></ion-icon>
+              </button>
             </div>
-          </ion-card-content>
-        </ion-card>
-      </div>
+            <p class="cart-line__total tabular">{{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}</p>
+            <button type="button" class="remove-btn" [attr.aria-label]="'Quitar ' + (item.product?.name || 'producto') + ' del carrito'" (click)="removeItem(i)">
+              <ion-icon name="trash-outline" aria-hidden="true"></ion-icon>
+            </button>
+          </div>
+        </li>
+      </ul>
 
-      <div class="cart-summary">
-        <ion-card>
-          <ion-card-header>
-            <h2>Resumen del Pedido</h2>
-          </ion-card-header>
-          <ion-card-content>
-            <div class="summary-row">
-              <span>Subtotal ({{ getTotalItems() }} items):</span>
-              <span>{{ getSubtotal() | currency:'CLP':'symbol-narrow' }}</span>
-            </div>
-            <div class="summary-row">
-              <span>Envío:</span>
-              <span>{{ shippingCost | currency:'CLP':'symbol-narrow' }}</span>
-            </div>
-            <div class="summary-row total">
-              <span>Total:</span>
-              <span>{{ getTotal() | currency:'CLP':'symbol-narrow' }}</span>
-            </div>
+      <aside class="summary surface" aria-labelledby="summary-title">
+        <h2 id="summary-title" class="summary__title">Resumen</h2>
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <span class="tabular">{{ getSubtotal() | currency:'CLP':'symbol-narrow' }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Envío</span>
+          <span class="tabular">{{ shippingCost | currency:'CLP':'symbol-narrow' }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span class="tabular">{{ getTotal() | currency:'CLP':'symbol-narrow' }}</span>
+        </div>
 
-            <ion-button expand="block" (click)="checkout()">
-              <ion-icon slot="start" name="card-outline"></ion-icon>
-              Finalizar Compra
-            </ion-button>
-
-            <ion-button expand="block" fill="outline" (click)="continueShopping()">
-              Seguir Comprando
-            </ion-button>
-          </ion-card-content>
-        </ion-card>
-      </div>
+        <ion-button expand="block" (click)="checkout()">Finalizar compra</ion-button>
+        <ion-button expand="block" fill="clear" color="dark" (click)="continueShopping()">Seguir comprando</ion-button>
+      </aside>
     </div>
   </div>
 

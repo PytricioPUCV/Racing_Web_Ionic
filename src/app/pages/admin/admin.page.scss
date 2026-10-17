@@ -1,42 +1,57 @@
-.admin-panel {
-  h1 {
-    color: #1f2937;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.admin-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 24px;
+  color: var(--rce-ink);
+
+  ion-icon {
     font-size: 28px;
+    color: var(--rce-accent);
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
   }
 
   p {
-    color: #6b7280;
-    font-size: 14px;
+    flex: 1;
+    color: var(--rce-ink-soft);
+  }
+
+  &:is(a):hover {
+    border-color: var(--rce-ink);
+  }
+
+  &.is-soon {
+    background: transparent;
+    border-style: dashed;
+
+    ion-icon {
+      color: var(--rce-ink-soft);
+    }
   }
 }
 
-.admin-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+.admin-tile__cta {
+  margin-top: 8px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: var(--rce-red);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-  }
-
-  ion-card-header {
-    padding-bottom: 12px;
-  }
-
-  ion-card-title {
-    color: #1f2937;
-    font-weight: 600;
-    font-size: 18px;
-  }
-
-  ion-card-content {
-    p {
-      color: #6b7280;
-      font-size: 14px;
-      margin-bottom: 1rem;
-    }
-  }
+.admin-tile__soon {
+  margin-top: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--rce-ink-soft);
 }

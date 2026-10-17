@@ -1,60 +1,90 @@
-.admin-users-container {
-  h1 {
-    color: #1f2937;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    font-size: 28px;
+.breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  font-size: 0.875rem;
+  color: var(--rce-ink-soft);
+
+  a:hover {
+    color: var(--rce-ink);
+    text-decoration: underline;
   }
 
-  > p {
-    color: #6b7280;
-    margin-bottom: 2rem;
+  [aria-current] {
+    color: var(--rce-ink);
   }
 }
 
-.user-card {
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+.user-list {
+  padding: 0 20px;
+}
 
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+.user-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 2fr) minmax(0, 1.5fr) minmax(0, 1.2fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 0;
+
+  & + & {
+    border-top: 1px solid var(--rce-line);
   }
 
-  ion-card-header {
-    .user-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+  ion-button {
+    margin: 0;
+  }
+}
 
-      h2 {
-        margin: 0;
-        color: #1f2937;
-        font-weight: 600;
-        font-size: 18px;
-        flex: 1;
-      }
-    }
+.user-row__plate {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+  background: var(--rce-navy);
+  box-shadow: inset 0 -4px 0 var(--rce-red);
+  color: #FFFFFF;
+  font-stretch: 125%;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+}
+
+.user-row__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.user-row__meta {
+  color: var(--rce-ink-soft);
+  font-size: 0.9375rem;
+  overflow-wrap: anywhere;
+}
+
+.role {
+  padding: 1px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--rce-line);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--rce-ink-soft);
+
+  &--admin {
+    border-color: var(--rce-yellow);
+    background: var(--rce-yellow);
+    color: var(--rce-navy);
+  }
+}
+
+@media (max-width: 900px) {
+  .user-row {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
   }
 
-  ion-card-content {
-    padding: 16px;
-
-    p {
-      color: #4b5563;
-      font-size: 14px;
-      margin: 8px 0;
-
-      strong {
-        color: #1f2937;
-      }
-    }
-
-    .user-actions {
-      margin-top: 12px;
-      display: flex;
-      gap: 8px;
-    }
+  .user-row__place,
+  .user-row__date {
+    display: none;
   }
 }

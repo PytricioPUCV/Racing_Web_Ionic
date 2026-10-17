@@ -1,49 +1,116 @@
-body {
+// Paleta "paddock": concreto de pit lane, tinta azul marino, rojo racing y amarillo bandera.
+// Los colores de livery (--rce-navy, --rce-red, --rce-yellow) son fijos en ambos temas.
 
-  --ion-background-color: #f5f5f5;
-  --ion-text-color: #000;
-  --ion-toolbar-background: #fff;
-  --ion-card-background: #fff;
-  --ion-item-background: #fff;
-
-  --background-color: #f5f5f5;
-  --text-color: #000;
-  --header-bg: #fff;
-  --header-border: #eee;
-  --card-bg: #fff;
-  --price-original: #999;
-  --price-color: #666;
-  --footer-text: #999;
-  --footer-link: #999;
-  --footer-bg: #000;
-  --footer-text-bright: #fff;
-  --footer-border: #333;
-  --footer-copyright: #666;
-  --mobile-menu-bg: #000;
-  --product-image-radius: 12px;
+:root {
+  --rce-navy: #0E1A3C;
+  --rce-red: #D7261E;
+  --rce-red-strong: #B81D16;
+  --rce-yellow: #FFC61A;
 }
 
+body {
+  --rce-bg: #EDEFF2;
+  --rce-surface: #FFFFFF;
+  --rce-ink: #0E1A3C;
+  --rce-ink-soft: #4A5470;
+  --rce-line: #D5D9E2;
+  --rce-accent: var(--rce-red);
 
+  --ion-font-family: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ion-background-color: var(--rce-bg);
+  --ion-background-color-rgb: 237, 239, 242;
+  --ion-text-color: var(--rce-ink);
+  --ion-text-color-rgb: 14, 26, 60;
+  --ion-toolbar-background: var(--rce-surface);
+  --ion-card-background: var(--rce-surface);
+  --ion-item-background: transparent;
+  --ion-border-color: var(--rce-line);
+
+  --ion-color-primary: #D7261E;
+  --ion-color-primary-rgb: 215, 38, 30;
+  --ion-color-primary-contrast: #FFFFFF;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #B81D16;
+  --ion-color-primary-tint: #DB3C35;
+
+  --ion-color-dark: #0E1A3C;
+  --ion-color-dark-rgb: 14, 26, 60;
+  --ion-color-dark-contrast: #FFFFFF;
+  --ion-color-dark-contrast-rgb: 255, 255, 255;
+  --ion-color-dark-shade: #0C1735;
+  --ion-color-dark-tint: #263150;
+
+  --ion-color-danger: #B0122A;
+  --ion-color-danger-rgb: 176, 18, 42;
+  --ion-color-danger-contrast: #FFFFFF;
+  --ion-color-danger-contrast-rgb: 255, 255, 255;
+  --ion-color-danger-shade: #9B1025;
+  --ion-color-danger-tint: #B82A3F;
+
+  --ion-color-success: #1E7F4A;
+  --ion-color-success-rgb: 30, 127, 74;
+  --ion-color-success-contrast: #FFFFFF;
+  --ion-color-success-contrast-rgb: 255, 255, 255;
+  --ion-color-success-shade: #1A7041;
+  --ion-color-success-tint: #358C5C;
+
+  --ion-color-warning: #FFC61A;
+  --ion-color-warning-rgb: 255, 198, 26;
+  --ion-color-warning-contrast: #0E1A3C;
+  --ion-color-warning-contrast-rgb: 14, 26, 60;
+  --ion-color-warning-shade: #E0AE17;
+  --ion-color-warning-tint: #FFCC31;
+
+  --ion-color-medium: #4A5470;
+  --ion-color-medium-rgb: 74, 84, 112;
+  --ion-color-medium-contrast: #FFFFFF;
+  --ion-color-medium-contrast-rgb: 255, 255, 255;
+  --ion-color-medium-shade: #414a63;
+  --ion-color-medium-tint: #5c657e;
+}
+
+// Carrera nocturna: azul marino profundo en vez de negro
 body.dark {
+  --rce-bg: #0A1128;
+  --rce-surface: #121C3F;
+  --rce-ink: #EEF1F8;
+  --rce-ink-soft: #A9B1C7;
+  --rce-line: #26315A;
+  --rce-accent: #EF3B32;
 
-  --ion-background-color: #121212;
-  --ion-text-color: #e0e0e0;
-  --ion-toolbar-background: #1e1e1e;
-  --ion-card-background: #1e1e1e;
-  --ion-item-background: #1e1e1e;
+  --ion-background-color: var(--rce-bg);
+  --ion-background-color-rgb: 10, 17, 40;
+  --ion-text-color: var(--rce-ink);
+  --ion-text-color-rgb: 238, 241, 248;
+  --ion-toolbar-background: var(--rce-surface);
+  --ion-card-background: var(--rce-surface);
 
-  --background-color: #121212;
-  --text-color: #e0e0e0;
-  --header-bg: #1e1e1e;
-  --header-border: #2c2c2c;
-  --card-bg: #1e1e1e;
-  --price-original: #888;
-  --price-color: #aaa;
-  --footer-text: #888;
-  --footer-link: #888;
-  --footer-bg: #0a0a0a;
-  --footer-text-bright: #e0e0e0;
-  --footer-border: #2c2c2c;
-  --footer-copyright: #666;
-  --mobile-menu-bg: #2c2c2c;
+  --ion-color-primary: #EF3B32;
+  --ion-color-primary-rgb: 239, 59, 50;
+  --ion-color-primary-shade: #D2342C;
+  --ion-color-primary-tint: #F14F47;
+
+  --ion-color-dark: #EEF1F8;
+  --ion-color-dark-rgb: 238, 241, 248;
+  --ion-color-dark-contrast: #0E1A3C;
+  --ion-color-dark-contrast-rgb: 14, 26, 60;
+  --ion-color-dark-shade: #D1D4DA;
+  --ion-color-dark-tint: #F0F2F9;
+
+  --ion-color-danger: #FF5A6A;
+  --ion-color-danger-rgb: 255, 90, 106;
+  --ion-color-danger-contrast: #0E1A3C;
+  --ion-color-danger-contrast-rgb: 14, 26, 60;
+  --ion-color-danger-shade: #E04F5D;
+  --ion-color-danger-tint: #FF6B79;
+
+  --ion-color-success: #4CC98A;
+  --ion-color-success-rgb: 76, 201, 138;
+  --ion-color-success-contrast: #0E1A3C;
+  --ion-color-success-contrast-rgb: 14, 26, 60;
+
+  --ion-color-medium: #A9B1C7;
+  --ion-color-medium-rgb: 169, 177, 199;
+  --ion-color-medium-contrast: #0E1A3C;
+  --ion-color-medium-contrast-rgb: 14, 26, 60;
 }

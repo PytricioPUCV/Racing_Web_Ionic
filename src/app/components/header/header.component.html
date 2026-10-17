@@ -1,64 +1,70 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <a href="/home"><img src="assets/logo.svg" alt="RCNG Logo" class="header-logo" /></a>
-    </ion-buttons>
+<ion-header class="ion-no-border site-header">
+  <div class="bar">
+    <a routerLink="/home" class="wordmark" aria-label="Racing con Estilo, ir al inicio" (click)="closeMobileMenu()">
+      <span class="wordmark__main">Racing</span>
+      <span class="wordmark__sub">con estilo</span>
+    </a>
 
-    <ion-buttons slot="end" class="desktop-nav">
-      <ion-button (click)="goToHome()" class="nav-link">Inicio</ion-button>
-      <ion-button (click)="goToJackets()" class="nav-link">Chaquetas</ion-button>
-      <ion-button (click)="goToAccessories()" class="nav-link">Accesorios</ion-button>
-    </ion-buttons>
+    <nav class="nav-desktop" aria-label="Categorías">
+      <a routerLink="/jackets" routerLinkActive="is-active">Chaquetas</a>
+      <a routerLink="/accessories" routerLinkActive="is-active">Accesorios</a>
+    </nav>
 
-    <ion-buttons slot="end" class="user-actions">
-      <ion-button (click)="toggleTimeDisplay()" title="Hora local">
-        <ion-icon slot="icon-only" name="time-outline"></ion-icon>
-      </ion-button>
-      
-      <span *ngIf="showTime" class="current-time">
-        <span class="country-flag">{{ countryFlag }}</span>
-        {{ currentTime }}
-      </span>
+    <div class="actions">
+      <button type="button" class="icon-btn clock-btn" (click)="toggleTimeDisplay()"
+        [attr.aria-pressed]="showTime" aria-label="Mostrar hora local">
+        <ion-icon name="time-outline" aria-hidden="true"></ion-icon>
+      </button>
+      <span *ngIf="showTime" class="current-time tabular">{{ countryFlag }} {{ currentTime }}</span>
 
-      <ion-button (click)="toggleTheme()">
-        <ion-icon slot="icon-only" name="sunny-outline" class="theme-icon-light"></ion-icon>
-        <ion-icon slot="icon-only" name="moon-outline" class="theme-icon-dark"></ion-icon>
-      </ion-button>
+      <button type="button" class="icon-btn" (click)="toggleTheme()"
+        [attr.aria-label]="isDark ? 'Cambiar a tema claro' : 'Cambiar a tema oscuro'">
+        <ion-icon [name]="isDark ? 'sunny-outline' : 'moon-outline'" aria-hidden="true"></ion-icon>
+      </button>
 
-      <ion-button (click)="goToCart()">
-        <ion-icon slot="icon-only" name="cart-outline"></ion-icon>
-      </ion-button>
+      <a *ngIf="isAdmin" routerLink="/admin" class="icon-btn desktop-only" aria-label="Panel de administración" title="Panel de administración">
+        <ion-icon name="settings-outline" aria-hidden="true"></ion-icon>
+      </a>
 
-      <ng-container *ngIf="isLoggedIn; else notLoggedIn">
-        <ion-button *ngIf="isAdmin" (click)="goToAdmin()" title="Panel de administración" aria-label="Panel de administración">
-          <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="goToProfile()" title="Perfil">
-          <ion-icon slot="icon-only" name="person-outline"></ion-icon>
-        </ion-button>
-        <ion-button (click)="logout()" color="danger" title="Cerrar sesión">
-          Cerrar sesión
-        </ion-button>
+      <a routerLink="/shopcart" class="icon-btn cart-link" (click)="closeMobileMenu()"
+        [attr.aria-label]="'Carrito, ' + ((cartCount$ | async) || 0) + ' productos'">
+        <ion-icon name="bag-handle-outline" aria-hidden="true"></ion-icon>
+        <span *ngIf="(cartCount$ | async) as count" class="cart-badge tabular" aria-hidden="true">{{ count }}</span>
+      </a>
+
+      <ng-container *ngIf="isLoggedIn; else guestActions">
+        <a routerLink="/profile" class="icon-btn desktop-only" aria-label="Mi perfil" title="Mi perfil">
+          <ion-icon name="person-outline" aria-hidden="true"></ion-icon>
+        </a>
+        <button type="button" class="text-btn desktop-only" (click)="logout()">Cerrar sesión</button>
       </ng-container>
-      <ng-template #notLoggedIn>
-        <ion-button (click)="goToLogin()" title="Iniciar sesión">
-          <ion-icon slot="icon-only" name="person-outline"></ion-icon>
-        </ion-button>
+      <ng-template #guestActions>
+        <a routerLink="/login" class="text-btn desktop-only">Iniciar sesión</a>
       </ng-template>
-    </ion-buttons>
 
-    <ion-buttons slot="end" class="mobile-menu-btn">
-      <ion-button (click)="toggleMobileMenu()">
-        <ion-icon name="menu"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-  </ion-toolbar>
+      <button type="button" class="icon-btn menu-btn" (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="isMobileMenuOpen" aria-controls="mobile-nav"
+        [attr.aria-label]="isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'">
+        <ion-icon [name]="isMobileMenuOpen ? 'close-outline' : 'menu-outline'" aria-hidden="true"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <nav id="mobile-nav" class="mobile-nav" *ngIf="isMobileMenuOpen" aria-label="Menú">
+    <a routerLink="/home" (click)="closeMobileMenu()">Inicio</a>
+    <a routerLink="/jackets" (click)="closeMobileMenu()">Chaquetas</a>
+    <a routerLink="/accessories" (click)="closeMobileMenu()">Accesorios</a>
+    <a routerLink="/shopcart" (click)="closeMobileMenu()">Carrito <span class="tabular" *ngIf="(cartCount$ | async) as count">({{ count }})</span></a>
+    <ng-container *ngIf="isLoggedIn; else guestMobile">
+      <a routerLink="/profile" (click)="closeMobileMenu()">Mi perfil</a>
+      <a *ngIf="isAdmin" routerLink="/admin" (click)="closeMobileMenu()">Panel de administración</a>
+      <button type="button" (click)="logout()">Cerrar sesión</button>
+    </ng-container>
+    <ng-template #guestMobile>
+      <a routerLink="/login" (click)="closeMobileMenu()">Iniciar sesión</a>
+      <a routerLink="/register" (click)="closeMobileMenu()">Crear cuenta</a>
+    </ng-template>
+  </nav>
+
+  <div class="livery-stripe" aria-hidden="true"></div>
 </ion-header>
-
-<div class="mobile-nav" [class.active]="isMobileMenuOpen">
-  <ul>
-    <li><a href="/home">INICIO</a></li>
-    <li><a href="/jackets">CHAQUETAS</a></li>
-    <li><a href="/accessories">ACCESORIOS</a></li>
-  </ul>
-</div>

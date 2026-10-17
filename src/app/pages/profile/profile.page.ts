@@ -2,27 +2,16 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { 
-  IonContent, 
-  IonHeader, 
-  IonTitle, 
-  IonToolbar, 
-  IonCard, 
-  IonCardHeader,
-  IonCardTitle,
-  IonCardContent,
-  IonList,
-  IonItem,
-  IonLabel,
+import {
+  IonContent,
   IonInput,
   IonSelect,
   IonSelectOption,
   IonButton,
   IonIcon,
-  IonToast,
-  IonButtons,
-  IonBackButton,
-  IonSpinner
+  IonSpinner,
+  AlertController,
+  ToastController
 } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
@@ -41,24 +30,11 @@ import { REGIONES_Y_COMUNAS } from '../../data/regiones';
     FormsModule,
     HeaderComponent,
     IonContent,
-    IonHeader,
-    IonTitle,
-    IonToolbar,
-    IonCard,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardContent,
-    IonList,
-    IonItem,
-    IonLabel,
     IonInput,
     IonSelect,
     IonSelectOption,
     IonButton,
     IonIcon,
-    IonToast,
-    IonButtons,
-    IonBackButton,
     IonSpinner
   ]
 })
@@ -67,6 +43,8 @@ export class ProfilePage implements OnInit {
   private userService = inject(UserService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private alertController = inject(AlertController);
+  private toastController = inject(ToastController);
 
   currentUser: any = null;
   viewingUser: UserProfile | null = null;
@@ -84,9 +62,6 @@ export class ProfilePage implements OnInit {
   isEditing: boolean = false;
   loading: boolean = false;
 
-  showToast: boolean = false;
-  toastMessage: string = '';
-  toastColor: string = 'success';
 
   regionesYComunas = REGIONES_Y_COMUNAS;
 
@@ -289,30 +264,43 @@ export class ProfilePage implements OnInit {
     this.showToastMessage(message, 'success');
   }
 
-  deleteUser() {
-    if (!this.viewingUser || !this.isViewingOtherUser) return;
+  async deleteUser() {
+    const user = this.viewingUser;
+    if (!user || !this.isViewingOtherUser) return;
 
-    if (!confirm(`¿Estás seguro de que deseas eliminar a ${this.viewingUser.username}?`)) {
-      return;
-    }
-
-    this.userService.deleteUser(this.viewingUser.id).subscribe({
-      next: () => {
-        this.showToastMessage('Usuario eliminado exitosamente', 'success');
-        setTimeout(() => {
-          this.router.navigate(['/admin/users']);
-        }, 1500);
-      },
-      error: (error) => {
-        console.error('❌ Error al eliminar usuario:', error);
-        this.showToastMessage('Error al eliminar usuario', 'danger');
-      }
+    const alert = await this.alertController.create({
+      header: 'Eliminar usuario',
+      message: `Se eliminará la cuenta de ${user.username}. Esta acción no se puede deshacer.`,
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Eliminar',
+          role: 'destructive',
+          handler: () => {
+            this.userService.deleteUser(user.id).subscribe({
+              next: () => {
+                this.showToastMessage(`Usuario ${user.username} eliminado`, 'success');
+                this.router.navigate(['/admin/users']);
+              },
+              error: (error) => {
+                this.showToastMessage(error.error?.message || 'No se pudo eliminar el usuario', 'danger');
+              }
+            });
+          }
+        }
+      ]
     });
+    await alert.present();
   }
 
-  showToastMessage(message: string, color: string) {
-    this.toastMessage = message;
-    this.toastColor = color;
-    this.showToast = true;
+  async showToastMessage(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      color,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
   }
 }

@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { IonHeader, IonToolbar, IonButtons, IonButton, IonIcon } from '@ionic/angular/standalone';
+import { Router, RouterModule } from '@angular/router';
+import { IonHeader, IonIcon } from '@ionic/angular/standalone';
 import { ThemeService } from '../../services/theme';
 import { AuthService } from '../../services/auth.service';
+import { CartService } from '../../services/cart.service';
 import { TimezoneService } from '../../services/timezone.service';
 
 @Component({
@@ -12,11 +13,15 @@ import { TimezoneService } from '../../services/timezone.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterModule, IonHeader, IonToolbar, IonButtons, IonButton, IonIcon]
+  imports: [CommonModule, RouterModule, IonHeader, IonIcon]
 })
 export class HeaderComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private timezoneService = inject(TimezoneService);
+  private cartService = inject(CartService);
+  private router = inject(Router);
+
+  cartCount$ = this.cartService.cartItemCount$;
   
   isMobileMenuOpen = false;
   isLoggedIn = false;
@@ -94,7 +99,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
   setCountryFlag() {
     const timezone = this.timezoneService.getUserTimezone();
     this.countryFlag = this.timezoneToFlag[timezone] || '🌍';
-    console.log(`🌍 Timezone: ${timezone} | Bandera: ${this.countryFlag}`);
   }
 
   toggleTimeDisplay() {
@@ -107,6 +111,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isAdmin = this.currentUser?.role === 'admin';
   }
 
+  get isDark(): boolean {
+    return this.themeService.isDark();
+  }
+
   toggleTheme() {
     this.themeService.toggleTheme();
   }
@@ -115,40 +123,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
   }
 
-  goToHome() {
-    window.location.href = '/home';
-  }
-
-  goToAccessories() {
-    window.location.href = '/accessories';
-  }
-
-  goToJackets() {
-    window.location.href = '/jackets';
-  }
-
-  goToCart() {
-    window.location.href = '/shopcart';
-  }
-
-  goToProfile() {
-    window.location.href = '/profile';
-  }
-
-  goToAdmin() {
-    window.location.href = '/admin';
-  }
-
-  goToLogin() {
-    window.location.href = '/login';
-  }
-
-  goToRegister() {
-    window.location.href = '/register';
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
   }
 
   logout() {
+    this.closeMobileMenu();
     this.authService.logout();
-    window.location.href = '/login';
+    this.router.navigate(['/login']);
   }
 }

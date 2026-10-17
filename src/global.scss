@@ -1,14 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap');
 
-/* CSS obligatorio de Ionic: posiciona y oculta las páginas (.ion-page) al navegar con el router */
+/* CSS de Ionic: core es obligatorio (posiciona y oculta las páginas al navegar con el router);
+   padding habilita las clases ion-padding; structure y typography dan la base tipográfica. */
 @import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/padding.css';
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "DM Sans", sans-serif;
+}
+
+html {
+  font-family: var(--ion-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  color: var(--rce-ink);
+  background: var(--rce-bg);
+  overflow-x: hidden;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+button, input, select, textarea {
+  font: inherit;
 }
 
 a {
@@ -20,40 +39,187 @@ ul {
   list-style: none;
 }
 
-body {
-  overflow-x: hidden;
+img {
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 3px solid var(--rce-yellow);
+  outline-offset: 2px;
+}
+
+/* ---------- Tipografía ---------- */
+
+// Archivo expandido, negro e itálico: la rotulación de patrocinadores de una chaqueta de carreras
+.display {
+  font-stretch: 125%;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.015em;
+  line-height: 0.95;
+}
+
+h1, h2, h3, h4 {
+  color: var(--rce-ink);
+  margin: 0;
+}
+
+.page-title {
+  @extend .display;
+  font-size: clamp(2rem, 1.4rem + 2.6vw, 3.25rem);
+}
+
+.page-lead {
+  color: var(--rce-ink-soft);
+  margin-top: 0.5rem;
+  max-width: 60ch;
+}
+
+.section-title {
+  @extend .display;
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.125rem);
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Layout ---------- */
+
+.page-wrap {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 32px 20px 72px;
+}
+
+.page-head {
+  margin-bottom: 32px;
+}
+
+// Franja de livery: azul marino, rojo y amarillo, como la manga de una chaqueta racing
+.livery-stripe {
+  height: 6px;
+  background: linear-gradient(
+    to bottom,
+    var(--rce-navy) 0 33.33%,
+    var(--rce-red) 33.33% 66.66%,
+    var(--rce-yellow) 66.66% 100%
+  );
+}
+
+body.dark .livery-stripe {
+  background: linear-gradient(
+    to bottom,
+    var(--rce-ink) 0 33.33%,
+    var(--rce-red) 33.33% 66.66%,
+    var(--rce-yellow) 66.66% 100%
+  );
+}
+
+.surface {
+  background: var(--rce-surface);
+  border: 1px solid var(--rce-line);
+  border-radius: 8px;
+}
+
+.state-message {
+  text-align: center;
+  padding: 72px 20px;
+
+  ion-icon {
+    font-size: 56px;
+    color: var(--rce-ink-soft);
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  p {
+    color: var(--rce-ink-soft);
+    margin-bottom: 20px;
+  }
+}
+
+/* ---------- Productos ---------- */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 20px;
+}
+
+@media (max-width: 992px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 12px;
+  }
+}
+
+/* ---------- Componentes Ionic ---------- */
+
+ion-button {
+  --border-radius: 4px;
+  --box-shadow: none;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+  min-height: 44px;
+
+  ion-icon[slot='start'] {
+    margin-inline-end: 8px;
+  }
+}
+
+ion-input[fill='outline'],
+ion-select[fill='outline'] {
+  --border-radius: 6px;
+  --border-color: var(--rce-line);
+  --highlight-color-focused: var(--rce-ink);
+  --background: var(--rce-surface);
+  margin-bottom: 16px;
+}
+
+ion-card {
+  box-shadow: none;
+  border: 1px solid var(--rce-line);
+  border-radius: 8px;
+  margin: 0;
 }
 
 ion-toast.custom-toast {
-  --background: #10b981 !important;
-  --color: #ffffff !important;
-  --border-radius: 12px !important;
-  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
-  --min-height: 60px !important;
+  --background: var(--rce-navy);
+  --color: #FFFFFF;
+  --border-radius: 6px;
+  --box-shadow: 0 8px 24px rgba(14, 26, 60, 0.25);
+  font-weight: 600;
+}
+
+ion-toast.custom-toast[color='success'] {
+  --background: #1E7F4A;
+}
+
+ion-toast.custom-toast[color='danger'] {
+  --background: #B0122A;
 }
 
 ion-toast.custom-toast::part(message) {
-  color: #ffffff !important;
-  font-weight: 600 !important;
-  font-size: 16px !important;
+  color: #FFFFFF;
 }
 
-ion-toast.custom-toast::part(container) {
-  background: #10b981 !important;
-  padding: 16px !important;
-  border-radius: 12px !important;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
-
-ion-toast.custom-toast[color="danger"] {
-  --background: #ef4444 !important;
-}
-
-ion-toast.custom-toast[color="danger"]::part(container) {
-  background: #ef4444 !important;
-}
-
-ion-toast.custom-toast[color="danger"]::part(message) {
-  color: #ffffff !important;
-}
-
-

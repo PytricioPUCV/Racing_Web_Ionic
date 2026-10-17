@@ -114,6 +114,13 @@ export class ProductService {
     );
   }
 
+  // Catálogo real: sin respaldo a datos de prueba, para que un error de la API se muestre como tal
+  getCatalog(): Observable<Product[]> {
+    return this.http.get<{ products: Product[] }>(this.apiUrl).pipe(
+      map(response => response.products.filter(p => p.isActive !== false))
+    );
+  }
+
   getAllProductsFromAPI(): Observable<Product[]> {
     return this.http.get<any>(`${this.apiUrl}`, { headers: this.getHeaders() }).pipe(
       map(response => response.products),

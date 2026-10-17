@@ -1,7 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonList, IonItem, IonInput, IonButton, IonToast } from '@ionic/angular/standalone';
+import { Router, RouterLink } from '@angular/router';
+import { IonContent, IonInput, IonButton, IonSpinner, ToastController } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../components/header/header.component';
 import { AuthService } from '../../services/auth.service';
 
@@ -10,31 +11,16 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [
-    CommonModule, 
-    FormsModule, 
-    HeaderComponent, 
-    IonContent, 
-    IonList, 
-    IonItem, 
-    IonInput, 
-    IonButton,
-    IonToast
-  ]
+  imports: [CommonModule, FormsModule, RouterLink, HeaderComponent, IonContent, IonInput, IonButton, IonSpinner]
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
   private authService = inject(AuthService);
+  private router = inject(Router);
+  private toastController = inject(ToastController);
 
   email: string = '';
   password: string = '';
-
-  showToast: boolean = false;
-  toastMessage: string = '';
-  toastColor: string = 'success';
-
-  constructor() { }
-  
-  ngOnInit() { }
+  submitting = false;
 
   isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,54 +28,42 @@ export class LoginPage implements OnInit {
   }
 
   onLogin() {
+    if (this.submitting) return;
+
     if (!this.email || !this.password) {
-      this.showToastMessage('Email y contraseña son obligatorios', 'danger');
+      this.showToastMessage('Ingresa tu email y tu contraseña', 'danger');
       return;
     }
 
     if (!this.isValidEmail(this.email)) {
-      this.showToastMessage('Email inválido', 'danger');
+      this.showToastMessage('El email no es válido. Ejemplo: usuario@ejemplo.com', 'danger');
       return;
     }
 
-    const credentials = {
-      email: this.email,
-      password: this.password
-    };
+    this.submitting = true;
 
-    this.authService.login(credentials).subscribe({
+    this.authService.login({ email: this.email, password: this.password }).subscribe({
       next: (response) => {
-        this.showToastMessage(`¡Bienvenido ${response.user.username}!`, 'success');
-        
-        setTimeout(() => {
-          window.location.href = '/home';
-        }, 1500);
+        this.submitting = false;
+        this.password = '';
+        this.showToastMessage(`¡Hola, ${response.user.username}!`, 'success');
+        this.router.navigateByUrl('/home');
       },
       error: (error) => {
-        console.error('❌ Error al hacer login:', error);
-        let errorMsg = 'Email o contraseña incorrectos';
-        
-        if (error.error?.message) {
-          errorMsg = error.error.message;
-        }
-        
-        this.showToastMessage(errorMsg, 'danger');
+        this.submitting = false;
+        this.showToastMessage(error.error?.message || 'Email o contraseña incorrectos', 'danger');
       }
     });
   }
 
-  continueAsGuest() {
-    console.log('👤 Continuando como invitado...');
-    this.showToastMessage('¡Bienvenido invitado!', 'success');
-    
-    setTimeout(() => {
-      window.location.href = '/home';
-    }, 1000);
-  }
-
-  showToastMessage(message: string, color: string) {
-    this.toastMessage = message;
-    this.toastColor = color;
-    this.showToast = true;
+  async showToastMessage(message: string, color: 'success' | 'danger') {
+    const toast = await this.toastController.create({
+      message,
+      color,
+      duration: 3000,
+      position: 'top',
+      cssClass: 'custom-toast'
+    });
+    await toast.present();
   }
 }

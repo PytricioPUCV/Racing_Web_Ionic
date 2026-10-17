@@ -1,45 +1,32 @@
-.auth-section {
-  max-width: 500px;
-  margin: 20px auto;
-  padding: 20px;
-  border-radius: 8px;
+.auth {
+  max-width: 440px;
+  margin: 0 auto;
+  padding: 56px 20px 72px;
 }
 
-.auth-title {
-  text-align: center;
-  font-size: 24px;
-  font-weight: 500;
-  margin-bottom: 30px;
+.auth__form {
+  margin-top: 32px;
+
+  ion-button {
+    margin: 8px 0 0;
+    height: 52px;
+  }
 }
 
-ion-list {
-  background: transparent;
-  padding: 0;
-}
-
-ion-item {
-  --background: var(--ion-background-color-step-50, #fff);
-  --border-radius: 8px;
-  margin-bottom: 16px;
-}
-
-.auth-btn {
+.auth__alt {
   margin-top: 20px;
-  height: 48px;
-}
+  color: var(--rce-ink-soft);
 
-.auth-link {
-  text-align: center;
-  margin-top: 20px;
-  font-size: 14px;
-  
   a {
-    color: var(--ion-color-primary);
-    text-decoration: none;
-    font-weight: 500;
+    color: var(--rce-ink);
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--rce-red);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
 
-    &:hover {
-      text-decoration: underline;
-    }
+  & + & {
+    margin-top: 8px;
   }
 }

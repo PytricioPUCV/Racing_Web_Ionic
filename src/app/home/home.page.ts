@@ -1,13 +1,13 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonGrid, IonRow, IonCol, IonCard, IonSpinner, IonButton, IonImg } from '@ionic/angular/standalone';
+import { RouterLink } from '@angular/router';
+import { IonContent, IonSpinner, IonButton, IonImg, IonIcon } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../components/header/header.component';
 import { FooterComponent } from '../components/footer/footer.component';
+import { ProductCardComponent } from '../components/product-card/product-card.component';
 import { ProductService, Product } from '../services/product';
-import { AuthService } from '../services/auth.service';
-import { TimezoneService } from '../services/timezone.service'; // ← AGREGAR
-import { RouterLink } from '@angular/router';
+
+const PREVIEW_SIZE = 4;
 
 @Component({
   selector: 'app-home',
@@ -15,79 +15,50 @@ import { RouterLink } from '@angular/router';
   styleUrls: ['home.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    FormsModule, 
-    HeaderComponent, 
-    FooterComponent, 
-    IonContent, 
-    IonGrid, 
-    IonRow, 
-    IonCol, 
-    IonCard, 
+    CommonModule,
+    RouterLink,
+    HeaderComponent,
+    FooterComponent,
+    ProductCardComponent,
+    IonContent,
     IonSpinner,
     IonButton,
     IonImg,
-    RouterLink
+    IonIcon
   ],
 })
 export class HomePage implements OnInit {
-  private authService = inject(AuthService);
   private productService = inject(ProductService);
-  private timezoneService = inject(TimezoneService); // ← AGREGAR
-  
-  products: Product[] = [];
-  currentUser: any = null;
-  loading: boolean = true;
+
+  jackets: Product[] = [];
+  accessories: Product[] = [];
+  jacketCount = 0;
+  accessoryCount = 0;
+  loading = true;
+  loadError = false;
 
   ngOnInit() {
-    this.loadAllProducts();
-    this.currentUser = this.authService.getCurrentUser();
-    console.log('✅ Usuario autenticado en Home:', this.currentUser);
-    console.log('🌍 Timezone del usuario:', this.timezoneService.getUserTimezone());
+    this.loadProducts();
   }
 
-  loadAllProducts() {
+  loadProducts() {
     this.loading = true;
+    this.loadError = false;
 
-    this.productService.getAllProductsFromAPI().subscribe({
-      next: (products: Product[]) => {
-        this.products = products;
+    this.productService.getCatalog().subscribe({
+      next: (products) => {
+        const jackets = products.filter(p => p.category?.name === 'Chaquetas');
+        const accessories = products.filter(p => p.category?.name === 'Accesorios');
+        this.jacketCount = jackets.length;
+        this.accessoryCount = accessories.length;
+        this.jackets = jackets.slice(0, PREVIEW_SIZE);
+        this.accessories = accessories.slice(0, PREVIEW_SIZE);
         this.loading = false;
-        console.log('✅ Todos los productos cargados desde API:', this.products);
       },
-      error: (error: any) => {
-        console.error('❌ Error al cargar productos:', error);
+      error: () => {
         this.loading = false;
+        this.loadError = true;
       }
     });
-  }
-
-  navegarAlProducto(id: number | undefined) {
-    if (id) {
-      console.log('🔗 Navegando al producto:', id);
-      window.location.href = `/product/${id}`;
-    }
-  }
-  
-  formatDate(isoDate: string): string {
-    return this.timezoneService.formatDate(isoDate, 'dd/MM/yyyy');
-  }
-
-  formatDateTime(isoDate: string): string {
-    return this.timezoneService.formatDate(isoDate, 'dd/MM/yyyy HH:mm');
-  }
-
-  getRelativeTime(isoDate: string): string | null {
-    return this.timezoneService.formatRelative(isoDate);
-  }
-
-  goToProfile() {
-    window.location.href = '/profile';
-  }
-
-  onLogout() {
-    this.authService.logout();
-    console.log('✅ Sesión cerrada');
-    window.location.href = '/login';
   }
 }

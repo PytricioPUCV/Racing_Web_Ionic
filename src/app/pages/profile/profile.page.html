@@ -1,171 +1,76 @@
 <app-header></app-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  
-  <div class="profile-container">
-    <ion-spinner *ngIf="loading"></ion-spinner>
+<ion-content>
+  <div class="profile">
+    <div *ngIf="loading" class="state-message">
+      <ion-spinner></ion-spinner>
+    </div>
 
-    <ion-card class="profile-card" *ngIf="!loading && viewingUser">
-      <ion-card-header>
-        <div class="profile-header">
-          <div class="profile-avatar">
-            <ion-icon name="person-outline" size="large"></ion-icon>
-          </div>
-          <ion-card-title *ngIf="!isViewingOtherUser">Mi Perfil</ion-card-title>
-          <ion-card-title *ngIf="isViewingOtherUser">👤 {{ viewingUser.username }}</ion-card-title>
+    <ng-container *ngIf="!loading && viewingUser">
+      <header class="profile__head">
+        <span class="plate display" aria-hidden="true">{{ (viewingUser.username || '?').charAt(0) }}</span>
+        <div>
+          <h1 class="page-title">{{ isViewingOtherUser ? viewingUser.username : 'Mi perfil' }}</h1>
+          <p class="page-lead">{{ isViewingOtherUser ? 'Datos de la cuenta del cliente.' : 'Revisa y actualiza los datos de tu cuenta.' }}</p>
         </div>
-      </ion-card-header>
+      </header>
 
-      <ion-card-content>
-        <ion-list *ngIf="viewingUser">
-          
-          <ion-item>
-            <ion-icon name="card-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">RUT</ion-label>
-            <ion-input 
-              [(ngModel)]="rut" 
-              [readonly]="true"
-              placeholder="12.345.678-9">
-            </ion-input>
-          </ion-item>
+      <section class="surface panel" *ngIf="!isEditing">
+        <dl class="facts">
+          <div><dt>Nombre de usuario</dt><dd>{{ username }}</dd></div>
+          <div><dt>Email</dt><dd>{{ email }}</dd></div>
+          <div><dt>RUT</dt><dd class="tabular">{{ rut || 'Sin registrar' }}</dd></div>
+          <div><dt>Región</dt><dd>{{ selectedRegion || 'Sin registrar' }}</dd></div>
+          <div><dt>Comuna</dt><dd>{{ selectedComuna || 'Sin registrar' }}</dd></div>
+        </dl>
 
-          <ion-item>
-            <ion-icon name="mail-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Email</ion-label>
-            <ion-input 
-              [(ngModel)]="email" 
-              [readonly]="!isEditing"
-              placeholder="correo@ejemplo.com">
-            </ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-icon name="person-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Nombre de usuario</ion-label>
-            <ion-input 
-              [(ngModel)]="username" 
-              [readonly]="!isEditing"
-              placeholder="Ingresa tu nombre de usuario">
-            </ion-input>
-          </ion-item>
-
-          <ion-item *ngIf="isEditing && !isViewingOtherUser">
-            <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Contraseña actual (solo si cambiarás la contraseña)</ion-label>
-            <ion-input 
-              [(ngModel)]="currentPassword" 
-              type="password"
-              placeholder="Ingresa tu contraseña actual">
-            </ion-input>
-          </ion-item>
-
-          <ion-item *ngIf="isEditing && !isViewingOtherUser">
-            <ion-icon name="lock-open-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Nueva contraseña (opcional)</ion-label>
-            <ion-input 
-              [(ngModel)]="newPassword" 
-              type="password"
-              placeholder="Ingresa tu nueva contraseña (mínimo 8 caracteres, letras y números)">
-            </ion-input>
-          </ion-item>
-
-          <ion-item>
-            <ion-icon name="location-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Región</ion-label>
-            <ion-select 
-              [(ngModel)]="selectedRegion" 
-              [disabled]="!isEditing"
-              [class.editable]="isEditing"
-              placeholder="Selecciona tu región"
-              (ionChange)="onRegionChange($event)">
-              <ion-select-option *ngFor="let region of regiones" [value]="region">
-                {{ region }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-
-          <ion-item>
-            <ion-icon name="location-outline" slot="start"></ion-icon>
-            <ion-label position="stacked">Comuna</ion-label>
-            <ion-select 
-              [(ngModel)]="selectedComuna" 
-              [disabled]="!isEditing"
-              [class.editable]="isEditing"
-              placeholder="Selecciona tu comuna">
-              <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">
-                {{ comuna }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
-
-        </ion-list>
-
-        <div class="action-buttons">
-          <ion-button 
-            *ngIf="!isEditing" 
-            expand="block" 
-            style="
-              --background: #3b82f6;
-              --background-activated: #2563eb;
-              --color: white;
-              background: #3b82f6;
-              color: white;
-              font-weight: 600;
-              text-transform: uppercase;
-              height: 48px;
-            "
-            (click)="toggleEdit()">
-            ✏️ Editar Perfil
+        <div class="panel__actions">
+          <ion-button color="dark" (click)="toggleEdit()">
+            <ion-icon slot="start" name="create-outline"></ion-icon>
+            Editar datos
           </ion-button>
-
-          <div *ngIf="isEditing" class="edit-buttons">
-            <ion-button 
-              expand="block" 
-              style="
-                --background: #10b981;
-                --background-activated: #059669;
-                --color: white;
-                background: #10b981;
-                color: white;
-                font-weight: 600;
-                text-transform: uppercase;
-                height: 48px;
-              "
-              (click)="onSaveProfile()">
-              <ion-icon name="save-outline" slot="start" style="color: white;"></ion-icon>
-              Guardar Cambios
-            </ion-button>
-
-            <ion-button 
-              expand="block" 
-              fill="outline"
-              color="medium"
-              (click)="toggleEdit()">
-              Cancelar
-            </ion-button>
-          </div>
-
-          <ion-button 
-            *ngIf="isViewingOtherUser && !isEditing"
-            expand="block" 
-            color="danger"
-            (click)="deleteUser()">
-            🗑️ Eliminar Usuario
+          <ion-button *ngIf="isViewingOtherUser" fill="outline" color="danger" (click)="deleteUser()">
+            Eliminar usuario
           </ion-button>
         </div>
+      </section>
 
-      </ion-card-content>
-    </ion-card>
+      <form class="surface panel" *ngIf="isEditing" (ngSubmit)="onSaveProfile()">
+        <ion-input fill="outline" label="RUT" label-placement="floating" name="rut" [readonly]="true"
+          helperText="El RUT no se puede modificar" [(ngModel)]="rut"></ion-input>
+        <ion-input fill="outline" label="Nombre de usuario" label-placement="floating" name="username"
+          [(ngModel)]="username"></ion-input>
+        <ion-input fill="outline" label="Email" label-placement="floating" type="email" name="email"
+          [(ngModel)]="email"></ion-input>
+
+        <div class="panel__row">
+          <ion-select fill="outline" label="Región" label-placement="floating" name="region" interface="popover"
+            placeholder="Selecciona tu región" [(ngModel)]="selectedRegion" (ionChange)="onRegionChange($event)">
+            <ion-select-option *ngFor="let region of regiones" [value]="region">{{ region }}</ion-select-option>
+          </ion-select>
+          <ion-select fill="outline" label="Comuna" label-placement="floating" name="comuna" interface="popover"
+            placeholder="Selecciona tu comuna" [(ngModel)]="selectedComuna">
+            <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
+          </ion-select>
+        </div>
+
+        <fieldset *ngIf="!isViewingOtherUser" class="password-box">
+          <legend>Cambiar contraseña</legend>
+          <p>Déjalo en blanco si no quieres cambiarla.</p>
+          <div class="panel__row">
+            <ion-input fill="outline" label="Contraseña actual" label-placement="floating" type="password"
+              name="currentPassword" autocomplete="current-password" [(ngModel)]="currentPassword"></ion-input>
+            <ion-input fill="outline" label="Nueva contraseña" label-placement="floating" type="password"
+              name="newPassword" autocomplete="new-password" helperText="Mínimo 8 caracteres, con letras y números"
+              [(ngModel)]="newPassword"></ion-input>
+          </div>
+        </fieldset>
+
+        <div class="panel__actions">
+          <ion-button type="submit">Guardar cambios</ion-button>
+          <ion-button fill="clear" color="dark" (click)="toggleEdit()">Cancelar</ion-button>
+        </div>
+      </form>
+    </ng-container>
   </div>
-
-  <ion-toast
-    [isOpen]="showToast"
-    [message]="toastMessage"
-    [duration]="3000"
-    [color]="toastColor"
-    cssClass="custom-toast"
-    position="top"
-    (didDismiss)="showToast = false">
-  </ion-toast>
-
 </ion-content>

@@ -1,0 +1,36 @@
+<app-header></app-header>
+
+<ion-content>
+  <div class="page-wrap">
+    <header class="page-head">
+      <h1 class="page-title">{{ config.title }}</h1>
+      <p class="page-lead">
+        {{ config.lead }}
+        <span *ngIf="!loading && !loadError" class="tabular">{{ products.length }} {{ products.length === 1 ? 'modelo' : 'modelos' }}.</span>
+      </p>
+    </header>
+
+    <div *ngIf="loading" class="state-message">
+      <ion-spinner></ion-spinner>
+    </div>
+
+    <div *ngIf="loadError" class="state-message">
+      <ion-icon name="cloud-offline-outline"></ion-icon>
+      <h2>No pudimos cargar los productos</h2>
+      <p>Revisa tu conexión e inténtalo de nuevo.</p>
+      <ion-button color="dark" (click)="loadProducts()">Reintentar</ion-button>
+    </div>
+
+    <div *ngIf="!loading && !loadError && products.length === 0" class="state-message">
+      <ion-icon name="shirt-outline"></ion-icon>
+      <h2>Todavía no hay productos en esta categoría</h2>
+      <p>Vuelve pronto: estamos preparando nuevos modelos.</p>
+    </div>
+
+    <div *ngIf="!loading && products.length" class="product-grid">
+      <app-product-card *ngFor="let product of products" [product]="product"></app-product-card>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+</ion-content>

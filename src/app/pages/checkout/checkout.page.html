@@ -1,139 +1,115 @@
 <app-header></app-header>
 
-<ion-content class="ion-padding">
-  <div class="checkout-container">
+<ion-content>
+  <div class="page-wrap">
 
-    <div *ngIf="loading" class="state-box">
+    <div *ngIf="loading" class="state-message">
       <ion-spinner></ion-spinner>
-      <p>Cargando tu pedido...</p>
     </div>
 
-    <div *ngIf="!loading && placedOrder" class="state-box confirmation">
-      <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
-      <h1>¡Pedido confirmado!</h1>
-      <p>Tu pedido <strong>#{{ placedOrder.id }}</strong> fue registrado correctamente.</p>
-      <p class="confirmation-total">
-        Total: <strong>{{ placedOrder.totalAmount | currency:'CLP':'symbol-narrow' }}</strong>
-      </p>
-      <p *ngIf="placedOrder.estimatedDeliveryFull">
-        Entrega estimada: {{ placedOrder.estimatedDeliveryFull }}
-      </p>
-      <ion-button routerLink="/home">Seguir comprando</ion-button>
+    <div *ngIf="!loading && placedOrder" class="confirmation surface">
+      <div class="livery-stripe" aria-hidden="true"></div>
+      <div class="confirmation__body">
+        <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon>
+        <h1 class="page-title">Pedido confirmado</h1>
+        <p class="page-lead">Tu pedido <strong>#{{ placedOrder.id }}</strong> quedó registrado.</p>
+        <dl class="confirmation__facts">
+          <div>
+            <dt>Total pagado</dt>
+            <dd class="tabular">{{ placedOrder.totalAmount | currency:'CLP':'symbol-narrow' }}</dd>
+          </div>
+          <div *ngIf="placedOrder.estimatedDeliveryFull">
+            <dt>Entrega estimada</dt>
+            <dd>{{ placedOrder.estimatedDeliveryFull }}</dd>
+          </div>
+        </dl>
+        <ion-button color="dark" routerLink="/home">Seguir comprando</ion-button>
+      </div>
     </div>
 
-    <div *ngIf="!loading && !placedOrder && cartItems.length === 0" class="state-box">
-      <ion-icon name="cart-outline"></ion-icon>
+    <div *ngIf="!loading && !placedOrder && cartItems.length === 0" class="state-message surface">
+      <ion-icon name="bag-handle-outline"></ion-icon>
       <h2>No hay productos para pagar</h2>
       <p>Agrega productos al carrito antes de finalizar la compra.</p>
-      <ion-button routerLink="/home">Ir a comprar</ion-button>
+      <ion-button color="dark" routerLink="/jackets">Ver chaquetas</ion-button>
     </div>
 
     <ng-container *ngIf="!loading && !placedOrder && cartItems.length > 0">
-      <div class="page-header">
-        <ion-icon name="card-outline"></ion-icon>
-        <h1>Finalizar Compra</h1>
-      </div>
+      <header class="page-head">
+        <h1 class="page-title">Finalizar compra</h1>
+      </header>
 
-      <form class="checkout-content" (ngSubmit)="placeOrder()">
-        <div class="checkout-forms">
-          <ion-card>
-            <ion-card-header>
-              <h2>Datos de envío</h2>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-list lines="full">
-                <ion-item>
-                  <ion-input
-                    label="Dirección"
-                    label-placement="floating"
-                    name="shippingAddress"
-                    placeholder="Calle, número, depto."
-                    autocomplete="street-address"
-                    [(ngModel)]="shippingAddress"
-                    required>
-                  </ion-input>
-                </ion-item>
+      <form class="checkout" (ngSubmit)="placeOrder()">
+        <div class="checkout__forms">
+          <section class="panel surface" aria-labelledby="shipping-title">
+            <h2 id="shipping-title" class="panel__title">Datos de envío</h2>
+            <ion-input
+              fill="outline"
+              label="Dirección"
+              label-placement="floating"
+              name="shippingAddress"
+              placeholder="Calle, número, depto."
+              autocomplete="street-address"
+              [(ngModel)]="shippingAddress"
+              required>
+            </ion-input>
+            <div class="panel__row">
+              <ion-select fill="outline" label="Región" label-placement="floating" name="shippingRegion"
+                placeholder="Selecciona una región" interface="popover"
+                [(ngModel)]="selectedRegion" (ionChange)="onRegionChange($event)">
+                <ion-select-option *ngFor="let region of regiones" [value]="region">{{ region }}</ion-select-option>
+              </ion-select>
+              <ion-select fill="outline" label="Comuna" label-placement="floating" name="shippingComuna"
+                placeholder="Selecciona una comuna" interface="popover"
+                [disabled]="!comunas.length" [(ngModel)]="selectedComuna">
+                <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
+              </ion-select>
+            </div>
+          </section>
 
-                <ion-item>
-                  <ion-select
-                    label="Región"
-                    label-placement="floating"
-                    name="shippingRegion"
-                    placeholder="Selecciona una región"
-                    [(ngModel)]="selectedRegion"
-                    (ionChange)="onRegionChange($event)">
-                    <ion-select-option *ngFor="let region of regiones" [value]="region">{{ region }}</ion-select-option>
-                  </ion-select>
-                </ion-item>
-
-                <ion-item>
-                  <ion-select
-                    label="Comuna"
-                    label-placement="floating"
-                    name="shippingComuna"
-                    placeholder="Selecciona una comuna"
-                    [disabled]="!comunas.length"
-                    [(ngModel)]="selectedComuna">
-                    <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">{{ comuna }}</ion-select-option>
-                  </ion-select>
-                </ion-item>
-              </ion-list>
-            </ion-card-content>
-          </ion-card>
-
-          <ion-card>
-            <ion-card-header>
-              <h2>Método de pago</h2>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-list lines="full">
-                <ion-radio-group name="paymentMethod" [(ngModel)]="paymentMethod">
-                  <ion-item *ngFor="let method of paymentMethods">
-                    <ion-radio [value]="method.value" justify="space-between">{{ method.label }}</ion-radio>
-                  </ion-item>
-                </ion-radio-group>
-              </ion-list>
-            </ion-card-content>
-          </ion-card>
+          <section class="panel surface" aria-labelledby="payment-title">
+            <h2 id="payment-title" class="panel__title">Método de pago</h2>
+            <ion-radio-group name="paymentMethod" [(ngModel)]="paymentMethod" class="payment-options">
+              <ion-radio *ngFor="let method of paymentMethods" [value]="method.value" labelPlacement="end" justify="start">
+                {{ method.label }}
+              </ion-radio>
+            </ion-radio-group>
+          </section>
         </div>
 
-        <div class="checkout-summary">
-          <ion-card>
-            <ion-card-header>
-              <h2>Resumen del Pedido</h2>
-            </ion-card-header>
-            <ion-card-content>
-              <div class="summary-item" *ngFor="let item of cartItems">
-                <span>
-                  {{ item.product?.name || 'Producto' }}
-                  <small>Talla {{ item.size }} · x{{ item.quantity }}</small>
-                </span>
-                <span>{{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}</span>
-              </div>
+        <aside class="summary surface" aria-labelledby="summary-title">
+          <h2 id="summary-title" class="panel__title">Resumen</h2>
+          <ul class="summary__items">
+            <li *ngFor="let item of cartItems">
+              <span>
+                {{ item.product?.name || 'Producto' }}
+                <small>{{ item.size === 'Único' ? 'Talla única' : 'Talla ' + item.size }}, {{ item.quantity }} {{ item.quantity === 1 ? 'unidad' : 'unidades' }}</small>
+              </span>
+              <span class="tabular">{{ (item.product?.price || 0) * item.quantity | currency:'CLP':'symbol-narrow' }}</span>
+            </li>
+          </ul>
 
-              <div class="summary-row">
-                <span>Subtotal</span>
-                <span>{{ getSubtotal() | currency:'CLP':'symbol-narrow' }}</span>
-              </div>
-              <div class="summary-row">
-                <span>Envío</span>
-                <span>{{ shippingCost | currency:'CLP':'symbol-narrow' }}</span>
-              </div>
-              <div class="summary-row total">
-                <span>Total</span>
-                <span>{{ getTotal() | currency:'CLP':'symbol-narrow' }}</span>
-              </div>
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span class="tabular">{{ getSubtotal() | currency:'CLP':'symbol-narrow' }}</span>
+          </div>
+          <div class="summary-row">
+            <span>Envío</span>
+            <span class="tabular">{{ shippingCost | currency:'CLP':'symbol-narrow' }}</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span class="tabular">{{ getTotal() | currency:'CLP':'symbol-narrow' }}</span>
+          </div>
 
-              <ion-button expand="block" type="submit" [disabled]="submitting">
-                <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
-                {{ submitting ? 'Procesando...' : 'Confirmar pedido' }}
-              </ion-button>
-              <ion-button expand="block" fill="outline" routerLink="/shopcart" [disabled]="submitting">
-                Volver al carrito
-              </ion-button>
-            </ion-card-content>
-          </ion-card>
-        </div>
+          <ion-button expand="block" type="submit" [disabled]="submitting">
+            <ion-spinner *ngIf="submitting" name="crescent" slot="start"></ion-spinner>
+            {{ submitting ? 'Confirmando...' : 'Confirmar pedido' }}
+          </ion-button>
+          <ion-button expand="block" fill="clear" color="dark" routerLink="/shopcart" [disabled]="submitting">
+            Volver al carrito
+          </ion-button>
+        </aside>
       </form>
     </ng-container>
   </div>

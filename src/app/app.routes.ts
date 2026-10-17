@@ -9,12 +9,22 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
   {
-    path: 'accessories',
-    loadComponent: () => import('./pages/accessories/accessories.page').then(m => m.AccessoriesPage),
+    path: 'jackets',
+    loadComponent: () => import('./pages/catalog/catalog.page').then(m => m.CatalogPage),
+    data: {
+      category: 'Chaquetas',
+      title: 'Chaquetas',
+      lead: 'Chaquetas racing con parches de escudería, para usar todos los días.'
+    }
   },
   {
-    path: 'jackets',
-    loadComponent: () => import('./pages/jackets/jackets.page').then(m => m.JacketsPage),
+    path: 'accessories',
+    loadComponent: () => import('./pages/catalog/catalog.page').then(m => m.CatalogPage),
+    data: {
+      category: 'Accesorios',
+      title: 'Accesorios',
+      lead: 'Gorras, guantes, mochilas y más para completar el look.'
+    }
   },
   {
     path: 'product/:id',

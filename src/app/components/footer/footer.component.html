@@ -1,45 +1,30 @@
-<footer class="footer">
-  <div class="footer-container">
-    <div class="footer-col footer-brand">
-      <img src="assets/logo.svg" alt="RCNG Logo" class="footer-logo">
-      <p class="footer-description">
-        Somos una marca de streetwear chileno que fusiona la cultura urbana con el arte vintage en cada prenda. 
-        Desde 2025, traemos identidad a las calles.
-      </p>
+<footer class="site-footer">
+  <div class="livery-stripe" aria-hidden="true"></div>
+
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="footer-wordmark">Racing</span>
+      <p>Streetwear chileno que lleva la estética del automovilismo a la calle. Chaquetas racing y accesorios desde 2025.</p>
     </div>
 
-    <div class="footer-col footer-customer">
-      <h4>Atención al Cliente</h4>
-      <p>Soporte: <a href="mailto:contacto@gmail.com">contacto@gmail.com</a></p>
-      <p>Teléfono: +569 XXXX XXXX</p>
-      <h5>Nuestras Redes</h5>
-      <div class="social-links">
-        <a href="#" target="_blank"><ion-icon name="logo-instagram"></ion-icon></a>
-        <a href="#" target="_blank"><ion-icon name="logo-tiktok"></ion-icon></a>
-      </div>
-    </div>
+    <nav aria-labelledby="footer-shop">
+      <h2 id="footer-shop">Tienda</h2>
+      <a routerLink="/jackets">Chaquetas</a>
+      <a routerLink="/accessories">Accesorios</a>
+      <a routerLink="/shopcart">Carrito</a>
+    </nav>
 
-    <div class="footer-col footer-links">
-      <h4>Links</h4>
-      <ul>
-        <li><a href="#">Contacto</a></li>
-        <li><a href="#">Métodos de pago</a></li>
-        <li><a href="#">Política de privacidad</a></li>
-        <li><a href="#">Términos y condiciones</a></li>
-      </ul>
-    </div>
+    <nav aria-labelledby="footer-account">
+      <h2 id="footer-account">Tu cuenta</h2>
+      <a routerLink="/profile">Mi perfil</a>
+      <a routerLink="/register">Crear cuenta</a>
+    </nav>
 
-    <div class="footer-col footer-club">
-      <h4>Ingresa al Club</h4>
-      <p>Descuentos exclusivos y regalos especiales.</p>
-      <form class="footer-form">
-        <ion-input type="email" placeholder="Tu correo electrónico" required></ion-input>
-        <ion-button type="submit">Suscribirse</ion-button>
-      </form>
+    <div>
+      <h2>Contacto</h2>
+      <a href="mailto:contacto@gmail.com">contacto&#64;gmail.com</a>
     </div>
   </div>
 
-  <div class="footer-bottom">
-    &copy;Copyright 2025, RACING CLOTHING STREETWEAR
-  </div>
+  <p class="footer-legal">© 2025 Racing con Estilo</p>
 </footer>

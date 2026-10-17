@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { IonContent, IonButton, IonCard, IonGrid, IonRow, IonCol, IonSpinner, IonBadge, IonCardHeader, IonCardContent } from '@ionic/angular/standalone';
+import { Router, RouterLink } from '@angular/router';
+import { IonContent, IonButton, IonSpinner, IonIcon } from '@ionic/angular/standalone';
 import { HeaderComponent } from '../../../components/header/header.component';
 import { UserService, UserProfile } from '../../../services/user.service';
 
@@ -12,17 +12,12 @@ import { UserService, UserProfile } from '../../../services/user.service';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     HeaderComponent,
     IonContent,
     IonButton,
-    IonCard,
-    IonCardHeader,
-    IonCardContent,
-    IonGrid,
-    IonRow,
-    IonCol,
     IonSpinner,
-    IonBadge
+    IonIcon
   ]
 })
 export class AdminUsersPage implements OnInit {
@@ -43,7 +38,6 @@ export class AdminUsersPage implements OnInit {
       next: (users) => {
         this.users = users;
         this.loading = false;
-        console.log('✅ Todos los usuarios cargados:', this.users);
       },
       error: (error) => {
         console.error('❌ Error al cargar usuarios:', error);
