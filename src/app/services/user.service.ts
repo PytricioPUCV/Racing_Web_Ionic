@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface UserProfile {
   id: number;
@@ -19,7 +20,7 @@ export interface UserProfile {
 })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/users';
+  private apiUrl = `${environment.apiUrl}/users`;
 
   getAllUsers(): Observable<UserProfile[]> {
     return this.http.get<UserProfile[]>(`${this.apiUrl}/admin/users`);

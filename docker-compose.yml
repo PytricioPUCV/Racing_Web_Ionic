@@ -12,9 +12,10 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      TRUST_PROXY: 1
       TZ: America/Santiago
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     networks:
       - racing_network
     healthcheck:
@@ -29,8 +30,6 @@ services:
       dockerfile: Dockerfile
     container_name: racing_frontend
     restart: always
-    environment:
-      - API_URL=http://localhost:3000
     ports:
       - "8080:80"
     depends_on:

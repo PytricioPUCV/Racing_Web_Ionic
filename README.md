@@ -193,9 +193,9 @@ Esta es la forma más rápida de levantar el entorno completo (Frontend + Backen
     ```
     
 3.  **Acceso:**
-    - **Frontend (Nginx):** `http://localhost:80`
-    - **Backend API:** `http://localhost:3000`
-    - **Base de Datos:** Puerto 5432 expuesto localmente.
+    - **Frontend (Nginx):** `http://localhost:8080`
+    - **Backend API:** `http://localhost:8080/api` (Nginx hace de proxy hacia el backend). También en `http://localhost:3000`, solo desde la máquina local.
+    - **Base de Datos:** la definida en `DB_URL` (NeonDB u otra instancia PostgreSQL).
 
 ### Ejecución Manual (Frontend y Backend separados)
 

@@ -30,6 +30,7 @@ import { UserService, UserProfile } from '../../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import { addIcons } from 'ionicons';
 import { personOutline, mailOutline, cardOutline, locationOutline, saveOutline, lockClosedOutline, lockOpenOutline } from 'ionicons/icons';
+import { environment } from '../../../environments/environment';
 
 type RegionKey = keyof typeof ProfilePage.prototype.regionesYComunas;
 
@@ -232,7 +233,7 @@ export class ProfilePage implements OnInit {
     };
 
     const userId = this.isViewingOtherUser && this.viewingUser ? this.viewingUser.id : this.currentUser.id;
-    const apiUrl = `http://localhost:3000/api/users/${userId}`;
+    const apiUrl = `${environment.apiUrl}/users/${userId}`;
 
     this.http.put(apiUrl, updateData).subscribe({
       next: (response: any) => {
