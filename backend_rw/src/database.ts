@@ -14,7 +14,7 @@ if (process.env.DB_URL) {
     dialectOptions: {
       ssl: {
         require: true,
-        rejectUnauthorized: false
+        rejectUnauthorized: true
       }
     },
     logging: process.env.NODE_ENV === 'development' ? console.log : false,
@@ -28,11 +28,15 @@ if (process.env.DB_URL) {
   
 } else {
   console.log('🐳 Conectando con parámetros individuales (PostgreSQL local)...');
+
+  if (!process.env.DB_USER || !process.env.DB_PASSWORD) {
+    throw new Error('❌ Define DB_URL, o bien DB_USER y DB_PASSWORD, en las variables de entorno');
+  }
   
   sequelize = new Sequelize({
     database: process.env.DB_NAME || 'racing_db',
-    username: process.env.DB_USER || '***REMOVED***',
-    password: process.env.DB_PASSWORD || 'racing_password',
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
     dialect: 'postgres',

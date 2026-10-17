@@ -59,10 +59,6 @@ export class LoginPage implements OnInit {
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        console.log('✅ Login exitoso con JWT:', response);
-        console.log('✅ Token guardado:', response.token);
-        console.log('✅ Usuario:', response.user);
-        
         this.showToastMessage(`¡Bienvenido ${response.user.username}!`, 'success');
         
         setTimeout(() => {

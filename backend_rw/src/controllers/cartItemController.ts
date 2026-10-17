@@ -1,22 +1,52 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { CartItem } from '../models';
+import { Cart, CartItem, Product } from '../models';
+import { isPositiveInteger } from '../utils/validators';
+
+const findOwnedCartItem = (id: string, userId: number) =>
+  CartItem.findOne({
+    where: { id },
+    include: [{ association: 'cart', where: { userId }, attributes: [] }]
+  });
 
 export const addCartItem = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { cartId, productId, quantity, size } = req.body;
 
-    if (!cartId || !productId || !quantity || !size) {
+    if (!cartId || !productId || !size) {
       res.status(400).json({ message: 'Todos los campos son requeridos' });
       return;
     }
 
+    if (!isPositiveInteger(quantity)) {
+      res.status(400).json({ message: 'La cantidad debe ser un entero mayor a 0' });
+      return;
+    }
+
+    const cart = await Cart.findOne({ where: { id: cartId, userId: req.user!.id } });
+    if (!cart) {
+      res.status(404).json({ message: 'Carrito no encontrado' });
+      return;
+    }
+
+    const product = await Product.findByPk(productId);
+    if (!product || !product.isActive) {
+      res.status(404).json({ message: 'Producto no encontrado' });
+      return;
+    }
+
     const existing = await CartItem.findOne({
-      where: { cartId, productId, size }
+      where: { cartId: cart.id, productId, size }
     });
 
+    const newQuantity = (existing?.quantity ?? 0) + quantity;
+    if (newQuantity > product.stock) {
+      res.status(409).json({ message: `Stock insuficiente. Disponible: ${product.stock}` });
+      return;
+    }
+
     if (existing) {
-      await existing.update({ quantity: existing.quantity + quantity });
+      await existing.update({ quantity: newQuantity });
       console.log(`✅ Cantidad actualizada en carrito`);
       res.json({
         message: 'Item actualizado en carrito',
@@ -24,7 +54,7 @@ export const addCartItem = async (req: AuthRequest, res: Response): Promise<void
       });
     } else {
       const cartItem = await CartItem.create({
-        cartId,
+        cartId: cart.id,
         productId,
         quantity,
         size
@@ -48,15 +78,21 @@ export const updateCartItem = async (req: AuthRequest, res: Response): Promise<v
     const { id } = req.params;
     const { quantity } = req.body;
 
-    if (quantity <= 0) {
-      res.status(400).json({ message: 'La cantidad debe ser mayor a 0' });
+    if (!isPositiveInteger(quantity)) {
+      res.status(400).json({ message: 'La cantidad debe ser un entero mayor a 0' });
       return;
     }
 
-    const cartItem = await CartItem.findByPk(id);
+    const cartItem = await findOwnedCartItem(id, req.user!.id);
 
     if (!cartItem) {
       res.status(404).json({ message: 'Item no encontrado' });
+      return;
+    }
+
+    const product = await Product.findByPk(cartItem.productId);
+    if (product && quantity > product.stock) {
+      res.status(409).json({ message: `Stock insuficiente. Disponible: ${product.stock}` });
       return;
     }
 
@@ -78,7 +114,7 @@ export const removeCartItem = async (req: AuthRequest, res: Response): Promise<v
   try {
     const { id } = req.params;
 
-    const cartItem = await CartItem.findByPk(id);
+    const cartItem = await findOwnedCartItem(id, req.user!.id);
 
     if (!cartItem) {
       res.status(404).json({ message: 'Item no encontrado' });

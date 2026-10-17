@@ -22,6 +22,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+// Solo si el backend corre detrás de un proxy (Nginx, Render, etc.), para que
+// req.ip sea la IP real del cliente y el rate limit funcione correctamente.
+if (process.env.TRUST_PROXY) {
+  const trustProxy = Number(process.env.TRUST_PROXY);
+  app.set('trust proxy', Number.isNaN(trustProxy) ? process.env.TRUST_PROXY : trustProxy);
+}
+
 app.use(helmet());
 
 const corsOptions = {

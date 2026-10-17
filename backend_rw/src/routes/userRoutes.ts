@@ -7,12 +7,19 @@ import {
   changePassword
 } from '../controllers/userController';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import { rateLimit } from '../middlewares/rateLimit.middleware';
 
 const router = Router();
 
+const changePasswordLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: 'Demasiados intentos de cambio de contraseña. Intenta nuevamente en unos minutos.'
+});
+
 router.use(authMiddleware);
 
-router.put('/:id/change-password', changePassword);
+router.put('/:id/change-password', changePasswordLimiter, changePassword);
 
 router.get('/', getAllUsers);
 

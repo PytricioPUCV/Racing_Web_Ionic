@@ -1,39 +1,19 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
-import { OrderItem } from '../models';
+import { Order, OrderItem } from '../models';
 
-export const createOrderItem = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const { orderId, productId, quantity, price, size } = req.body;
-
-    if (!orderId || !productId || !quantity || !price || !size) {
-      res.status(400).json({ message: 'Todos los campos son requeridos' });
-      return;
-    }
-
-    const orderItem = await OrderItem.create({
-      orderId,
-      productId,
-      quantity,
-      price,
-      size
-    });
-
-    console.log(`✅ Item agregado al pedido`);
-
-    res.status(201).json({
-      message: 'Item agregado exitosamente',
-      orderItem
-    });
-  } catch (error) {
-    console.error('❌ Error al crear item:', error);
-    res.status(500).json({ message: 'Error al crear item' });
-  }
-};
-
+// Los items de una orden se crean únicamente dentro de createOrder,
+// con precios tomados de la BD, por eso aquí solo existe la lectura.
 export const getOrderItems = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     const { orderId } = req.params;
+
+    const order = await Order.findByPk(orderId);
+
+    if (!order || (order.userId !== req.user?.id && req.user?.role !== 'admin')) {
+      res.status(404).json({ message: 'Pedido no encontrado' });
+      return;
+    }
 
     const items = await OrderItem.findAll({
       where: { orderId },
@@ -47,29 +27,5 @@ export const getOrderItems = async (req: AuthRequest, res: Response): Promise<vo
   } catch (error) {
     console.error('❌ Error al obtener items:', error);
     res.status(500).json({ message: 'Error al obtener items' });
-  }
-};
-
-export const deleteOrderItem = async (req: AuthRequest, res: Response): Promise<void> => {
-  try {
-    const { id } = req.params;
-
-    const item = await OrderItem.findByPk(id);
-
-    if (!item) {
-      res.status(404).json({ message: 'Item no encontrado' });
-      return;
-    }
-
-    await item.destroy();
-
-    console.log(`✅ Item eliminado`);
-
-    res.json({
-      message: 'Item eliminado exitosamente'
-    });
-  } catch (error) {
-    console.error('❌ Error al eliminar item:', error);
-    res.status(500).json({ message: 'Error al eliminar item' });
   }
 };

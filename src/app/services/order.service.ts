@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 export interface Order {
   id?: number;
-  totalAmount: number;
+  totalAmount?: number;
   shippingAddress: string;
   shippingRegion: string;
   shippingComuna: string;
@@ -12,20 +12,11 @@ export interface Order {
   status?: string;
 }
 
-export interface OrderItem {
-  orderId: number;
-  productId: number;
-  quantity: number;
-  price: number;
-  size: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class OrderService {
   private apiUrl = 'http://localhost:3000/api/orders';
-  private itemsApiUrl = 'http://localhost:3000/api/order-items';
 
   constructor(private http: HttpClient) {}
 
@@ -51,9 +42,5 @@ export class OrderService {
 
   updateOrderStatus(id: number, status: string): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, { status }, { headers: this.getHeaders() });
-  }
-
-  addOrderItem(item: OrderItem): Observable<any> {
-    return this.http.post(this.itemsApiUrl, item, { headers: this.getHeaders() });
   }
 }

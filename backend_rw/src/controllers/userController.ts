@@ -4,6 +4,7 @@ import { User } from '../models';
 import bcrypt from 'bcrypt';
 import { encrypt, decrypt } from '../utils/encryption';
 import { DateTime } from 'luxon';
+import { isValidPassword } from '../utils/validators';
 
 const formatUserTimestamps = (user: any, timezone: string) => {
   const createdDate = DateTime.fromJSDate(user.createdAt).setZone(timezone);
@@ -25,13 +26,18 @@ export const changePassword = async (req: AuthRequest, res: Response): Promise<v
     const { currentPassword, newPassword } = req.body;
     const timezone = req.clientTimezone || 'America/Santiago';
 
+    if (req.user?.id !== parseInt(id)) {
+      res.status(403).json({ message: 'Solo puedes cambiar tu propia contraseña' });
+      return;
+    }
+
     if (!currentPassword || !newPassword) {
       res.status(400).json({ message: 'Contraseña actual y nueva son requeridas' });
       return;
     }
 
-    if (newPassword.length < 6) {
-      res.status(400).json({ message: 'La nueva contraseña debe tener al menos 6 caracteres' });
+    if (!isValidPassword(newPassword)) {
+      res.status(400).json({ message: 'La nueva contraseña debe tener al menos 8 caracteres, incluyendo letras y números' });
       return;
     }
 

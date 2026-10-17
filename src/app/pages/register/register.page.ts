@@ -142,7 +142,6 @@ export class RegisterPage implements OnInit {
 
     this.authService.register(registerData).subscribe({
       next: (response) => {
-        console.log('✅ Usuario registrado con JWT:', response);
         this.showToastMessage('¡Usuario registrado exitosamente!', 'success');
         this.clearForm();
         

@@ -5,7 +5,7 @@ import {
   getOrderById, 
   updateOrderStatus 
 } from '../controllers/orderController';
-import { authMiddleware } from '../middlewares/authMiddleware';
+import { authMiddleware, requireAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -17,6 +17,6 @@ router.get('/', getUserOrders);
 
 router.get('/:id', getOrderById);
 
-router.put('/:id', updateOrderStatus);
+router.put('/:id', requireAdmin, updateOrderStatus);
 
 export default router;

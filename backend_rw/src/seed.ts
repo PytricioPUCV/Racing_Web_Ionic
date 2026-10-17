@@ -1,6 +1,7 @@
 import sequelize from './database';
 import { User, Category, Product } from './models';
 import bcrypt from 'bcrypt';
+import { encrypt } from './utils/encryption';
 
 async function seedDatabase() {
   try {
@@ -13,12 +14,12 @@ async function seedDatabase() {
     if (!existingUser) {
       const hashedPassword = await bcrypt.hash('123456', 10);
       await User.create({
-        rut: '12.345.678-9',
+        rut: encrypt('12.345.678-9'),
         username: 'testuser',
         email: 'test@example.com',
         password: hashedPassword,
-        region: 'Metropolitana de Santiago',
-        comuna: 'Santiago',
+        region: encrypt('Metropolitana de Santiago'),
+        comuna: encrypt('Santiago'),
         role: 'user'
       });
       console.log('✅ Usuario de prueba creado: test@example.com / 123456');

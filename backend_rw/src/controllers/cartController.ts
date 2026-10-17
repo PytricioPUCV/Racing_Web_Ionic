@@ -27,15 +27,17 @@ export const createCart = async (req: AuthRequest, res: Response): Promise<void>
 
     const timezone = req.clientTimezone || 'America/Santiago';
 
-    const cart = await Cart.create({
-      userId: req.user.id,
-      sessionId: null
+    const [cart, created] = await Cart.findOrCreate({
+      where: { userId: req.user.id },
+      defaults: { userId: req.user.id, sessionId: null }
     });
 
-    console.log(`✅ Carrito creado: ID ${cart.id}`);
+    if (created) {
+      console.log(`✅ Carrito creado: ID ${cart.id}`);
+    }
 
-    res.status(201).json({
-      message: 'Carrito creado exitosamente',
+    res.status(created ? 201 : 200).json({
+      message: created ? 'Carrito creado exitosamente' : 'Carrito obtenido exitosamente',
       cart: formatCartTimestamps(cart, timezone)
     });
   } catch (error) {
@@ -97,7 +99,7 @@ export const getCartById = async (req: AuthRequest, res: Response): Promise<void
       include: [{ association: 'items', include: [{ association: 'product' }] }]
     });
 
-    if (!cart) {
+    if (!cart || (cart.userId !== req.user?.id && req.user?.role !== 'admin')) {
       res.status(404).json({ message: 'Carrito no encontrado' });
       return;
     }
@@ -134,7 +136,7 @@ export const clearCart = async (req: AuthRequest, res: Response): Promise<void> 
 
     const cart = await Cart.findByPk(id);
 
-    if (!cart) {
+    if (!cart || cart.userId !== req.user?.id) {
       res.status(404).json({ message: 'Carrito no encontrado' });
       return;
     }

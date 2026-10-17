@@ -3,29 +3,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { User } from '../models';
 import { encrypt, decrypt } from '../utils/encryption';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'default_secret';
-const JWT_EXPIRES_IN = '7d';
-
-const isValidEmail = (email: string): boolean => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-};
-
-const isValidPassword = (password: string): boolean => {
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
-  return passwordRegex.test(password);
-};
-
-const isValidRut = (rut: string): boolean => {
-  const rutRegex = /^\d{1,2}\.\d{3}\.\d{3}[-][0-9kK]{1}$/;
-  return rutRegex.test(rut);
-};
-
-const isValidUsername = (username: string): boolean => {
-  const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-  return usernameRegex.test(username);
-};
+import { JWT_SECRET, JWT_EXPIRES_IN } from '../config';
+import { isValidEmail, isValidPassword, isValidRut, isValidUsername } from '../utils/validators';
 
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -153,16 +132,11 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user = await User.findOne({ where: { email } });
     
     if (!user) {
-      console.log(`Usuario con email ${email} no encontrado`);
       res.status(401).json({ message: 'Email o contraseña incorrectos' });
       return;
     }
-    
-    console.log(`Usuario encontrado: ${user.email}`);
-    console.log(`Hash almacenado: ${user.password}`);
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-    console.log(`Resultado bcrypt.compare: ${isPasswordValid}`);
 
     if (!isPasswordValid) {
       res.status(401).json({ message: 'Email o contraseña incorrectos' });
@@ -214,7 +188,7 @@ export const verifyToken = async (req: Request, res: Response): Promise<void> =>
       return;
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, JWT_SECRET, { algorithms: ['HS256'] }) as { id: number };
 
     const user = await User.findByPk(decoded.id, {
       attributes: { exclude: ['password'] }
